@@ -17,7 +17,7 @@ use circle_program::CircleProgram;
 mod circle_program;
 
 
-mod gl {
+pub mod gl {
     include!(concat!(env!("OUT_DIR"), "/bindings.rs"));
 } 
 

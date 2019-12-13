@@ -11,8 +11,6 @@ edition = "2018"
 [dependencies]
 axgeom = "1.2"
 
-[dev-dependencies]
-glutin = {git="https://github.com/rust-windowing/glutin.git"}
 
 [build-dependencies]
 gl_generator = "0.13.0"
