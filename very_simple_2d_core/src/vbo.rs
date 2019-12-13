@@ -19,7 +19,9 @@ impl<V:Default> GrowableBuffer<V>{
     pub fn new()->GrowableBuffer<V>{
         let mut vbo = 0;
         
-        let buffer=Vec::new();
+        let mut buffer=Vec::new();
+        buffer.resize_with(1000,core::default::Default::default);
+        buffer.clear();
         
         
         unsafe {
@@ -29,7 +31,7 @@ impl<V:Default> GrowableBuffer<V>{
             gl::BindBuffer(gl::ARRAY_BUFFER, vbo);
             gl::BufferData(
                 gl::ARRAY_BUFFER,
-                (buffer.len() *mem::size_of::<V>()) as GLsizeiptr,
+                (buffer.capacity() *mem::size_of::<V>()) as GLsizeiptr,
                 mem::transmute(buffer.as_ptr()),
                 gl::DYNAMIC_DRAW,
             );
@@ -38,35 +40,10 @@ impl<V:Default> GrowableBuffer<V>{
         }
 
 
-        let mut b = GrowableBuffer{vbo,buffer};
-        b.re_generate_buffer();
-        b
-    }
-    pub fn get_id(&self)->u32{
-        self.vbo
+        GrowableBuffer{vbo,buffer}
     }
 
-    pub fn push(&mut self,a:V){
-        if self.buffer.len()==self.buffer.capacity(){
-            self.push(a);
-            self.re_generate_buffer();
 
-        }
-    }
-
-    pub fn len(&self)->usize{
-        self.buffer.len()
-    }
-
-    pub fn capacity(&self)->usize{
-        self.buffer.capacity()
-    }
-
-    pub fn clear(&mut self){
-        self.buffer.clear();
-    }
-    
-    /*
     pub fn update(&mut self){
         let vbo=&mut self.vbo;
         
@@ -76,13 +53,43 @@ impl<V:Default> GrowableBuffer<V>{
             gl::BufferSubData(
                 gl::ARRAY_BUFFER,
                 0,
-                (self.buffer.len()*mem::size_of::<V>()) as GLsizeiptr,
+                (self.buffer.capacity()*mem::size_of::<V>()) as GLsizeiptr,
                 mem::transmute(self.buffer.as_ptr()),
             );
         }
         assert_eq!(unsafe{gl::GetError()},gl::NO_ERROR);   
     }
-    */
+
+    pub fn get_id(&self)->u32{
+        self.vbo
+    }
+
+    pub fn push(&mut self,a:V){
+        if self.buffer.len() == self.buffer.capacity(){
+            panic!("fail");
+            /*
+            self.buffer.push(a);
+            assert!(self.buffer.len()!=self.buffer.capacity(),"vec did not grow:{:?}",(self.buffer.len(),self.buffer.capacity()));
+            self.re_generate_buffer();
+            */
+        }else{
+            self.buffer.push(a);
+        }
+    }
+    
+    pub fn len(&self)->usize{
+        self.buffer.len()
+    }
+
+
+    pub fn capacity(&self)->usize{
+        self.buffer.capacity()
+    }
+
+    pub fn clear(&mut self){
+        self.buffer.clear();
+    }
+    
     
     pub fn get_num_verticies(&self)->usize{
         self.buffer.len()
@@ -90,7 +97,8 @@ impl<V:Default> GrowableBuffer<V>{
 
 
     fn re_generate_buffer(&mut self){
-        
+        unimplemented!();
+            
          
         //self.buffer.resize_with(num_verticies,Default::default);
         let vbo=&mut self.vbo;

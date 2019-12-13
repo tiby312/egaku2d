@@ -1,3 +1,4 @@
+pub use glutin;
 use axgeom::*;
 use very_simple_2d_core::DrawSession;
 use very_simple_2d_core::MySys;
@@ -40,6 +41,8 @@ impl System{
 
         let glutin::dpi::LogicalSize{width,height}=windowed_context.window().inner_size();
         
+        //dbg!(width,height);
+
         System{windowed_context,inner:MySys::new(game_world,vec2(width as f32,height as f32))}
 	}
 

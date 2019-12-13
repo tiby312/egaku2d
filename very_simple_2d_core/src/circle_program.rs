@@ -53,6 +53,7 @@ void main() {
 pub struct Vertex(pub [f32;3]);
 
 
+#[derive(Debug)]
 pub struct CircleProgram{
     pub program:GLuint,
     pub matrix_uniform:GLint,
@@ -63,8 +64,13 @@ pub struct CircleProgram{
     pub alpha_attr:GLint,
 }
 
+#[derive(Debug)]
+pub struct PointMul(pub f32);
+
 impl CircleProgram{
-    pub fn set_viewport(&mut self,game_world:Rect<f32>,window_dim:Vec2<f32>){
+    pub fn set_viewport(&mut self,game_world:Rect<f32>,window_dim:Vec2<f32>)->PointMul{
+        
+
         let _width=window_dim.x as f32;
         let _height=window_dim.y as f32;
 
@@ -77,42 +83,50 @@ impl CircleProgram{
 
         let tx=-(1.+x1/(w/2.0));
         let ty=1.+y1/(h/2.0);
+
+        dbg!((tx,ty,scalex,scaley));
         
         let matrix= [
                     [scalex, 0.0, 0.0],
-                    [0.0, -scaley,0.0],
+                    [0.0   , -scaley,0.0],
                     [tx,ty,1.0]
                 ];  
-
-        unsafe{
+        
+        unsafe
+        {
+            gl::UseProgram(self.program);
+            gl_ok!();
             gl::UniformMatrix3fv(self.matrix_uniform,1, 0,std::mem::transmute(&matrix[0][0]));
             gl_ok!();
         }
+
+        PointMul(window_dim.x/w)
     }
 
 
     pub fn new()->CircleProgram{
         unsafe{
-        // Create GLSL shaders
-        let vs = compile_shader(VS_SRC, gl::VERTEX_SHADER);
-        gl_ok!();
-        
-        let fs = compile_shader(FS_SRC, gl::FRAGMENT_SHADER);
-        gl_ok!();
-        
-        let program = link_program(vs, fs);
-
-        gl_ok!();
-
-        
-            gl::DeleteShader(fs);
+            // Create GLSL shaders
+            let vs = compile_shader(VS_SRC, gl::VERTEX_SHADER);
             gl_ok!();
-            gl::DeleteShader(vs);
+            
+            let fs = compile_shader(FS_SRC, gl::FRAGMENT_SHADER);
+            gl_ok!();
+            
+            let program = link_program(vs, fs);
+            gl_ok!();
+
+            //gl::DeleteShader(fs);
+            gl_ok!();
+
+            //gl::DeleteShader(vs);
+            gl_ok!();
+
+            gl::UseProgram(program);
             gl_ok!();
 
             let square_uniform:GLint = gl::GetUniformLocation(program, CString::new("square").unwrap().as_ptr());
             gl_ok!();
-        
             
             let point_size_uniform:GLint = gl::GetUniformLocation(program, CString::new("point_size").unwrap().as_ptr());
             gl_ok!();

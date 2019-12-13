@@ -14,6 +14,7 @@ macro_rules! gl_ok {
 }
 
 use circle_program::CircleProgram;
+use circle_program::PointMul;
 mod circle_program;
 
 
@@ -31,14 +32,21 @@ impl<'a> CircleSession<'a>{
     	self
     }
 
-    pub fn finish(self){
+    pub fn finish(&mut self){
     	unsafe{
+            gl::UseProgram(self.sys.circle_program.program);
+            gl_ok!();
+        
 	        //TODO move this down more?
 	        gl::BindBuffer(gl::ARRAY_BUFFER, self.sys.circle_buffer.get_id());
-	        
+	        gl_ok!();
 	  
-	        /////
+
+            self.sys.circle_buffer.update();
+	        
+            /////
 	        gl::EnableVertexAttribArray(self.sys.circle_program.pos_attr as GLuint);
+            gl_ok!();
 	        gl::VertexAttribPointer(
 	            self.sys.circle_program.pos_attr as GLuint,
 	            2,
@@ -47,9 +55,11 @@ impl<'a> CircleSession<'a>{
 	            3*mem::size_of::<f32>() as i32,
 	            core::ptr::null(),
 	        );
+            gl_ok!();
 	        /////
 	        
 	        gl::EnableVertexAttribArray(self.sys.circle_program.pos_attr as GLuint);
+            gl_ok!();
 	        gl::VertexAttribPointer(
 	            self.sys.circle_program.pos_attr as GLuint,
 	            1,
@@ -58,10 +68,14 @@ impl<'a> CircleSession<'a>{
 	            3*mem::size_of::<f32>() as i32,
 	            (2*mem::size_of::<f32>()) as *const std::ffi::c_void,
 	        );
+            gl_ok!();
 	        
 	        //////
-	        gl::DrawArrays(gl::POINTS,0 as i32, self.sys.circle_buffer.len() as i32);
+            gl::DrawArrays(gl::POINTS,0 as i32, self.sys.circle_buffer.len() as i32);
+            gl_ok!();
     	}
+        
+        self.sys.circle_buffer.clear();
     }
 }
 
@@ -81,10 +95,20 @@ pub struct DrawSession<'a>{
 impl DrawSession<'_>{
     pub fn new_circle(&mut self,radius:f32,color:[f32;3])->CircleSession{
     	unsafe{
-    		gl::Uniform1f(self.sys.circle_program.point_size_uniform,radius);
+
+            gl::UseProgram(self.sys.circle_program.program);
+            gl_ok!();
+
+    		gl::Uniform1f(self.sys.circle_program.point_size_uniform,radius*self.sys.point_mul.0);
         	gl_ok!();
             gl::Uniform3fv(self.sys.circle_program.bcol_uniform,1,std::mem::transmute(&color[0]));
             gl_ok!();
+
+            let square=0;
+            gl::Uniform1i(self.sys.circle_program.square_uniform,square);
+            gl_ok!();
+            
+
     	}
     	
         CircleSession{sys:self.sys}
@@ -102,19 +126,22 @@ impl DrawSession<'_>{
 pub struct MySys{
 	back_color:[f32;3],
 	circle_program:CircleProgram,
+    point_mul:PointMul,
 	circle_buffer:vbo::GrowableBuffer<circle_program::Vertex>,
-    //pub buffer:vbo::GrowableBuffer<Vertex>
 }
 impl MySys{
     pub fn new(dim:Rect<f32>,window_dim:Vec2<f32>)->MySys{
 
     	let circle_buffer=vbo::GrowableBuffer::new();
-    	let circle_program=CircleProgram::new();
-    	let back_color=[0.0;3];
+    	let mut circle_program=CircleProgram::new();
+        let point_mul=circle_program.set_viewport(dim,window_dim);
 
-    	let mut k = MySys{back_color,circle_program,circle_buffer};
-    	k.set_viewport(dim,window_dim);
-    	k
+        dbg!(&point_mul);
+        dbg!(&circle_program);
+        dbg!(&circle_buffer);
+    	let back_color=[0.2;3];
+
+        MySys{point_mul,back_color,circle_program,circle_buffer}
     }
     pub fn set_viewport(&mut self,dim:Rect<f32>,window_dim:Vec2<f32>){
         self.circle_program.set_viewport(dim,window_dim);
@@ -125,10 +152,13 @@ impl MySys{
         let back_color=&self.back_color;
         unsafe{
             gl::BlendFunc(gl::SRC_ALPHA, gl::ONE_MINUS_SRC_ALPHA);
+            gl_ok!();
             gl::Enable( gl::BLEND );
-
+            gl_ok!();
             gl::ClearColor(back_color[0], back_color[1], back_color[2], 1.0);
+            gl_ok!();
             gl::Clear(gl::COLOR_BUFFER_BIT);
+            gl_ok!();
         }
         DrawSession{sys:self}
     }
