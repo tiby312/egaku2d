@@ -1,4 +1,6 @@
 pub use glutin;
+pub use very_simple_2d_core;
+
 use axgeom::*;
 use very_simple_2d_core::DrawSession;
 use very_simple_2d_core::MySys;
@@ -63,12 +65,14 @@ impl System{
         assert_eq!(unsafe{gl::GetError()},gl::NO_ERROR);
         
     }
+    /*
 	pub fn draw(&mut self,mut func:impl FnMut(DrawSession)){
 		func(self.inner.draw_sys());
 	
 		self.windowed_context.swap_buffers().unwrap();
         assert_eq!(unsafe{gl::GetError()},gl::NO_ERROR);
 	}
+    */
 
 }
 
