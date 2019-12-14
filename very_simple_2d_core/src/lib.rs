@@ -6,7 +6,7 @@ use core::mem;
 mod vbo;
 mod shader;
 
-
+#[macro_export]
 macro_rules! gl_ok {
     () => {
         assert_eq!(gl::GetError(),gl::NO_ERROR);
@@ -33,7 +33,10 @@ impl<'a> CircleSession<'a>{
     }
 
     pub fn finish(&mut self){
-    	unsafe{
+
+        self.sys.circle_buffer.update();
+    	
+        unsafe{
             gl::UseProgram(self.sys.circle_program.program);
             gl_ok!();
         
@@ -42,33 +45,7 @@ impl<'a> CircleSession<'a>{
 	        gl_ok!();
 	  
 
-            self.sys.circle_buffer.update();
 	        
-            /////
-	        gl::EnableVertexAttribArray(self.sys.circle_program.pos_attr as GLuint);
-            gl_ok!();
-	        gl::VertexAttribPointer(
-	            self.sys.circle_program.pos_attr as GLuint,
-	            2,
-	            gl::FLOAT,
-	            gl::FALSE as GLboolean,
-	            3*mem::size_of::<f32>() as i32,
-	            core::ptr::null(),
-	        );
-            gl_ok!();
-	        /////
-	        
-	        gl::EnableVertexAttribArray(self.sys.circle_program.pos_attr as GLuint);
-            gl_ok!();
-	        gl::VertexAttribPointer(
-	            self.sys.circle_program.pos_attr as GLuint,
-	            1,
-	            gl::FLOAT,
-	            gl::FALSE as GLboolean,
-	            3*mem::size_of::<f32>() as i32,
-	            (2*mem::size_of::<f32>()) as *const std::ffi::c_void,
-	        );
-            gl_ok!();
 	        
 	        //////
             gl::DrawArrays(gl::POINTS,0 as i32, self.sys.circle_buffer.len() as i32);
@@ -104,7 +81,7 @@ impl DrawSession<'_>{
             gl::Uniform3fv(self.sys.circle_program.bcol_uniform,1,std::mem::transmute(&color[0]));
             gl_ok!();
 
-            let square=0;
+            let square=1;
             gl::Uniform1i(self.sys.circle_program.square_uniform,square);
             gl_ok!();
             
@@ -136,9 +113,9 @@ impl MySys{
     	let mut circle_program=CircleProgram::new();
         let point_mul=circle_program.set_viewport(dim,window_dim);
 
-        dbg!(&point_mul);
-        dbg!(&circle_program);
-        dbg!(&circle_buffer);
+        //dbg!(&point_mul);
+        //dbg!(&circle_program);
+        //dbg!(&circle_buffer);
     	let back_color=[0.2;3];
 
         MySys{point_mul,back_color,circle_program,circle_buffer}

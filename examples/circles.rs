@@ -16,40 +16,48 @@ fn main()
 	let mut glsys=System::new(rect(0.,1920.,0.,1080.),&events_loop);
 
 
-    events_loop.run(move |event,_,control_flow| {
-    	match event{
+  events_loop.run(move |event,_,control_flow| {
+  	match event{
 
-  			Event::WindowEvent{ event, .. } => match event {
-	  			WindowEvent::KeyboardInput{input,..}=>{       
-                    match input.virtual_keycode{
-                        Some(VirtualKeyCode::Escape)=>{
-                            *control_flow=ControlFlow::Exit;
-                        },
-                        _=>{}
-                    }
-                },
-	  			WindowEvent::CloseRequested => {
-	  				dbg!("close requested");
-	  				*control_flow = ControlFlow::Exit;
-	  			},
-	  			_=>{}
-  			},
-  			Event::EventsCleared=>{
-  				
-  				glsys.draw(|mut sys|{
-  					let mut k=sys.new_circle(100.0,[0.,1.,1.]);
-  					k.draw_circle(vec2(0.,0.),1.0);
-  					k.draw_circle(vec2(1000.,1000.),1.0);
-  					k.draw_circle(vec2(-100.,-100.),1.0);
-  					k.draw_circle(vec2(100.,100.),1.0);
-  					k.finish();
-
-  				});
-				
+			Event::WindowEvent{ event, .. } => match event {
+  			WindowEvent::KeyboardInput{input,..}=>{       
+                  match input.virtual_keycode{
+                      Some(VirtualKeyCode::Escape)=>{
+                          *control_flow=ControlFlow::Exit;
+                      },
+                      _=>{}
+                  }
+              },
+  			WindowEvent::CloseRequested => {
+  				dbg!("close requested");
+  				*control_flow = ControlFlow::Exit;
   			},
   			_=>{}
-  		}
-  	});
+			},
+			Event::EventsCleared=>{
+				
+				glsys.draw(|mut sys|{
+					let mut k=sys.new_circle(10.0,[0.,1.,1.]);
+          for x in (0..1000).step_by(109){
+            for y in (0..1000).step_by(100){
+              k.draw_circle(vec2(x as f32,y as f32),1.0);
+            }
+          }
+          
+          /*
+					k.draw_circle(vec2(0.,0.),1.0);
+					k.draw_circle(vec2(1000.,1000.),1.0);
+					k.draw_circle(vec2(-100.,-100.),1.0);
+					k.draw_circle(vec2(100.,100.),1.0);
+					*/
+          k.finish();
+
+				});
+			
+			},
+			_=>{}
+		}
+	});
 	
 
 }

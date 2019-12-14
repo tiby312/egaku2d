@@ -70,10 +70,6 @@ pub struct PointMul(pub f32);
 impl CircleProgram{
     pub fn set_viewport(&mut self,game_world:Rect<f32>,window_dim:Vec2<f32>)->PointMul{
         
-
-        let _width=window_dim.x as f32;
-        let _height=window_dim.y as f32;
-
         let ((x1,x2),(y1,y2))=game_world.get();
         let w=x2-x1;
         let h=y2-y1;
@@ -91,6 +87,7 @@ impl CircleProgram{
                     [0.0   , -scaley,0.0],
                     [tx,ty,1.0]
                 ];  
+        
         
         unsafe
         {
@@ -142,6 +139,34 @@ impl CircleProgram{
 
             let alpha_attr = gl::GetAttribLocation(program, CString::new("alpha").unwrap().as_ptr());
             gl_ok!();   
+
+
+
+            /////
+            gl::EnableVertexAttribArray(pos_attr as GLuint);
+            gl_ok!();
+            gl::VertexAttribPointer(
+                pos_attr as GLuint,
+                2,
+                gl::FLOAT,
+                gl::FALSE as GLboolean,
+                3*core::mem::size_of::<f32>() as i32,
+                core::ptr::null(),
+            );
+            gl_ok!();
+            /////
+            
+            gl::EnableVertexAttribArray(alpha_attr as GLuint);
+            gl_ok!();
+            gl::VertexAttribPointer(
+                alpha_attr as GLuint,
+                1,
+                gl::FLOAT,
+                gl::FALSE as GLboolean,
+                3*core::mem::size_of::<f32>() as i32,
+                (2*core::mem::size_of::<f32>()) as *const std::ffi::c_void,
+            );
+            gl_ok!();
 
             CircleProgram{program,square_uniform,point_size_uniform,matrix_uniform,bcol_uniform,pos_attr,alpha_attr}
         }
