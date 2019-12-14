@@ -268,19 +268,17 @@ pub struct MySys{
 	circle_buffer:vbo::GrowableBuffer<circle_program::Vertex>,
 }
 impl MySys{
-    pub fn new(dim:Rect<f32>,window_dim:Vec2<f32>)->MySys{
+    pub fn new(dim:Rect<f32>)->MySys{
 
     	let circle_buffer=vbo::GrowableBuffer::new();
     	let mut circle_program=CircleProgram::new();
-        let point_mul=circle_program.set_viewport(dim,window_dim);
+        let point_mul=circle_program.set_viewport(dim);
 
     	let back_color=[0.2;3];
 
         MySys{point_mul,back_color,circle_program,circle_buffer}
     }
-    pub fn set_viewport(&mut self,dim:Rect<f32>,window_dim:Vec2<f32>){
-        self.circle_program.set_viewport(dim,window_dim);
-    }
+    
     pub fn draw_sys(&mut self)->DrawSession{
 
         let back_color=&self.back_color;

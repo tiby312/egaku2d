@@ -13,7 +13,7 @@ use glutin::event::VirtualKeyCode;
 fn main()
 {
 	let events_loop = glutin::event_loop::EventLoop::new();
-	let mut glsys=System::new(rect(0.,1920.,0.,1080.),&events_loop);
+  let mut glsys=System::new(rect(0.,600.,0.,600.),&events_loop);
 
 
   events_loop.run(move |event,_,control_flow| {

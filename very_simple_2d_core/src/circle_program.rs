@@ -70,7 +70,7 @@ pub struct CircleProgram{
 pub struct PointMul(pub f32);
 
 impl CircleProgram{
-    pub fn set_viewport(&mut self,game_world:Rect<f32>,window_dim:Vec2<f32>)->PointMul{
+    pub fn set_viewport(&mut self,game_world:Rect<f32>)->PointMul{
         
         let ((x1,x2),(y1,y2))=game_world.get();
         let w=x2-x1;
@@ -99,7 +99,8 @@ impl CircleProgram{
             gl_ok!();
         }
 
-        PointMul(window_dim.x/w)
+        //PointMul(window_dim.x/w)
+        PointMul(1.0)
     }
 
 

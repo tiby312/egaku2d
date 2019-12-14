@@ -17,11 +17,16 @@ impl System{
 	
 	pub fn new(game_world:Rect<f32>,events_loop:&glutin::event_loop::EventLoop<()>)->System{
 
-        use glutin::window::Fullscreen;
-        let fullscreen = Fullscreen::Borderless(prompt_for_monitor(events_loop));
+        //use glutin::window::Fullscreen;
+        //let fullscreen = Fullscreen::Borderless(prompt_for_monitor(events_loop));
 
+        let width=game_world.x.distance() as f64;
+        let height=game_world.y.distance() as f64;
         let gl_window = glutin::window::WindowBuilder::new()
-            .with_fullscreen(Some(fullscreen));
+           .with_inner_size(glutin::dpi::LogicalSize{width,height})
+           .with_resizable(false)
+           .with_title("very_simple_2d");
+           // .with_fullscreen(Some(fullscreen));
          
         //we are targeting only opengl 3.0 es. and glsl 300 es.
         
@@ -41,17 +46,17 @@ impl System{
         gl::load_with(|symbol| windowed_context.get_proc_address(symbol) as *const _);
         assert_eq!(unsafe{gl::GetError()},gl::NO_ERROR);
 
-        let glutin::dpi::LogicalSize{width,height}=windowed_context.window().inner_size();
+        //let glutin::dpi::LogicalSize{width,height}=windowed_context.window().inner_size();
         
         //dbg!(width,height);
 
-        System{windowed_context,inner:MySys::new(game_world,vec2(width as f32,height as f32))}
+        System{windowed_context,inner:MySys::new(game_world)}
 	}
-
+    /*
 	pub fn set_viewport(&mut self,game_world:Rect<f32>){
 		self.inner.set_viewport(game_world,self.get_dim().inner_as())
 	}
-    
+    */
     pub fn get_dim(&self)->Vec2<usize>{
         let glutin::dpi::LogicalSize{width,height}=self.windowed_context.window().inner_size();
         vec2(width as usize,height as usize)
