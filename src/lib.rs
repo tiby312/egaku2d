@@ -54,6 +54,15 @@ impl System{
         let glutin::dpi::LogicalSize{width,height}=self.windowed_context.window().inner_size();
         vec2(width as usize,height as usize)
     }
+
+    pub fn get_sys(&mut self)->DrawSession{
+        self.inner.draw_sys()
+    }
+    pub fn swap_buffers(&mut self){
+        self.windowed_context.swap_buffers().unwrap();
+        assert_eq!(unsafe{gl::GetError()},gl::NO_ERROR);
+        
+    }
 	pub fn draw(&mut self,mut func:impl FnMut(DrawSession)){
 		func(self.inner.draw_sys());
 	

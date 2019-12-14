@@ -202,10 +202,6 @@ impl DrawSession<'_>{
 
         LineSession{sys:self.sys,radius:radius*kk}
     }
-    pub fn finish(self){
-    	//TODO swap buffers
-    	unimplemented!()
-    }
 }
 
 pub struct MySys{
@@ -227,7 +223,6 @@ impl MySys{
     }
     pub fn set_viewport(&mut self,dim:Rect<f32>,window_dim:Vec2<f32>){
         self.circle_program.set_viewport(dim,window_dim);
-    	//TODO add line program
     }
     pub fn draw_sys(&mut self)->DrawSession{
 

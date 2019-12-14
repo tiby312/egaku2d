@@ -36,43 +36,37 @@ fn main()
 			},
 			Event::EventsCleared=>{
 				
-				glsys.draw(|mut sys|{
-					let mut k=sys.circles(100.0,[0.,1.,1.]);
-          for x in (0..1000).step_by(100){
-            for y in (0..1000).step_by(100){
-              k.draw(vec2(x as f32,y as f32),0.1);
-            }
+				let mut sys=glsys.get_sys();
+
+      	let mut k=sys.circles(100.0,[0.,1.,1.]);
+        for x in (0..1000).step_by(100){
+          for y in (0..1000).step_by(100){
+            k.draw(vec2(x as f32,y as f32),0.1);
           }
+        }
+        k.finish();
 
-          k.finish();
-
-          let mut k=sys.squares(100.0,[1.,0.,1.]);
-          for x in (0..1000).step_by(100){
-            for y in (0..1000).step_by(100){
-              k.draw(vec2(x as f32,y as f32),0.1);
-            }
+        let mut k=sys.squares(100.0,[1.,0.,1.]);
+        for x in (0..1000).step_by(100){
+          for y in (0..1000).step_by(100){
+            k.draw(vec2(x as f32,y as f32),0.1);
           }
+        }
+        k.finish();
 
-          k.finish();
+        sys.lines(10.0,[0.,1.0,0.])
+          .draw(vec2(0.,0.),vec2(500.,500.),0.3)
+          .draw(vec2(40.,40.),vec2(500.,0.),0.3)
+          .draw(vec2(700.,500.),vec2(100.,100.),0.3)
+          .finish();
 
-          sys.lines(10.0,[0.,1.0,0.])
-            .draw(vec2(0.,0.),vec2(500.,500.),0.3)
-            .draw(vec2(40.,40.),vec2(500.,0.),0.3)
-            .draw(vec2(700.,500.),vec2(100.,100.),0.3)
-                        .finish();
+        sys.lines(50.,[1.,1.,0.2])
+          .draw(vec2(50.,500.),vec2(500.,50.),0.2)
+          .finish();
 
+        glsys.swap_buffers();
 
-
-
-          /*
-					k.draw_circle(vec2(0.,0.),1.0);
-					k.draw_circle(vec2(1000.,1000.),1.0);
-					k.draw_circle(vec2(-100.,-100.),1.0);
-					k.draw_circle(vec2(100.,100.),1.0);
-					*/
-
-				});
-			
+         
 			},
 			_=>{}
 		}
