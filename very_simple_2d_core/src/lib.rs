@@ -90,6 +90,41 @@ impl<'a> CircleSession<'a>{
     }
 }
 
+pub struct RectSession<'a>{
+    sys:&'a mut MySys
+}
+
+impl RectSession<'_>{
+    pub fn draw(&mut self,rect:Rect<f32>,alpha:f32)->&mut Self{
+        let [a,b,c,d] = rect.get_corners();
+        let arr=[a,b,c,c,d,a];
+
+        for a in arr.iter(){
+            self.sys.circle_buffer.push(circle_program::Vertex([a.x,a.y,alpha]));    
+        }
+
+        self
+    }
+    pub fn finish(&mut self){
+
+        self.sys.circle_buffer.update();
+        
+        unsafe{
+            gl::UseProgram(self.sys.circle_program.program);
+            gl_ok!();
+        
+            //TODO move this down more?
+            gl::BindBuffer(gl::ARRAY_BUFFER, self.sys.circle_buffer.get_id());
+            gl_ok!();
+      
+            //////
+            gl::DrawArrays(gl::TRIANGLES,0 as i32, self.sys.circle_buffer.len() as i32);
+            gl_ok!();
+        }
+        
+        self.sys.circle_buffer.clear();
+    }
+}
 pub struct LineSession<'a>{
 	sys:&'a mut MySys,
     radius:f32
@@ -180,6 +215,28 @@ impl DrawSession<'_>{
         SquareSession{sys:self.sys}
     }
 
+
+    pub fn rects(&mut self,color:[f32;3])->RectSession{
+        let kk=self.sys.point_mul.0;
+            
+        unsafe{
+            gl::UseProgram(self.sys.circle_program.program);
+            gl_ok!();
+
+            gl::Uniform1f(self.sys.circle_program.point_size_uniform,0.0);
+            gl_ok!();
+            gl::Uniform3fv(self.sys.circle_program.bcol_uniform,1,std::mem::transmute(&color[0]));
+            gl_ok!();
+
+            let square=0;
+            gl::Uniform1i(self.sys.circle_program.square_uniform,square);
+            gl_ok!();
+            
+
+        }
+
+        RectSession{sys:self.sys}
+    }
 
     pub fn lines(&mut self,radius:f32,color:[f32;3])->LineSession{
         let kk=self.sys.point_mul.0;

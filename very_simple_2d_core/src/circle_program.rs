@@ -36,9 +36,11 @@ out vec4 out_color;
 uniform bool square;
 void main() {
 
-    vec2 coord = gl_PointCoord - vec2(0.5);
-    
+    //This is inefficient, but it does allow us to use only one shader program to
+    //do many things. In most use-cases of a 2d graphics library, the cpu is the bottle
+    //neck not the gpu anyway.
     if (square){
+        vec2 coord = gl_PointCoord - vec2(0.5);
         float dis=dot(coord,coord);
         if(dis > 0.25)                  //outside of circle radius?
             discard;

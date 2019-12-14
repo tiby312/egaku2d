@@ -64,6 +64,12 @@ fn main()
           .draw(vec2(50.,500.),vec2(500.,50.),0.2)
           .finish();
 
+        let mut k=sys.rects([0.8,0.8,1.0]);
+        k.draw(rect(50.,200.,700.,800.),0.2);
+
+        k.draw(rect(800.,820.,700.,800.),0.2);
+        k.finish();
+
         glsys.swap_buffers();
 
          
