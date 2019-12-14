@@ -23,7 +23,7 @@ impl<V:Default> GrowableBuffer<V>{
         let mut vbo = 0;
         
         let mut buffer=Vec::new();
-        buffer.resize_with(3000,core::default::Default::default);
+        //TODO add a pre-set capacity???
         buffer.clear();
         
         unsafe {
@@ -73,14 +73,12 @@ impl<V:Default> GrowableBuffer<V>{
     pub fn push(&mut self,a:V){
         
         if self.buffer.len() == self.buffer.capacity(){
-            panic!("fail");
-            /*
+            
             self.buffer.push(a);
-            assert!(self.buffer.len()!=self.buffer.capacity(),"vec did not grow:{:?}",(self.buffer.len(),self.buffer.capacity()));
+            //assert!(self.buffer.len()!=self.buffer.capacity(),"vec did not grow:{:?}",(self.buffer.len(),self.buffer.capacity()));
             self.re_generate_buffer();
-            */
+            
         }else{
-            //self.buffer[0]=a;
             self.buffer.push(a);
         }
         
@@ -96,12 +94,9 @@ impl<V:Default> GrowableBuffer<V>{
     }
     
 
-    /*
+    
     fn re_generate_buffer(&mut self){
-        unimplemented!();
-            
          
-        //self.buffer.resize_with(num_verticies,Default::default);
         let vbo=&mut self.vbo;
         unsafe{
             gl::BindBuffer(gl::ARRAY_BUFFER, *vbo);
@@ -115,5 +110,5 @@ impl<V:Default> GrowableBuffer<V>{
         assert_eq!(unsafe{gl::GetError()},gl::NO_ERROR);
         
     }
-    */
+    
 }

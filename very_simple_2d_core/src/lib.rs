@@ -22,12 +22,46 @@ pub mod gl {
     include!(concat!(env!("OUT_DIR"), "/bindings.rs"));
 } 
 
+
+pub struct SquareSession<'a>{
+    sys:&'a mut MySys
+}
+impl<'a> SquareSession<'a>{
+
+    pub fn draw(&mut self,point:Vec2<f32>,alpha:f32)->&mut Self{
+        self.sys.circle_buffer.push(circle_program::Vertex([point.x,point.y,alpha]));
+        self
+    }
+
+    pub fn finish(&mut self){
+
+        self.sys.circle_buffer.update();
+        
+        unsafe{
+            gl::UseProgram(self.sys.circle_program.program);
+            gl_ok!();
+        
+            //TODO move this down more?
+            gl::BindBuffer(gl::ARRAY_BUFFER, self.sys.circle_buffer.get_id());
+            gl_ok!();
+      
+
+            
+            
+            //////
+            gl::DrawArrays(gl::POINTS,0 as i32, self.sys.circle_buffer.len() as i32);
+            gl_ok!();
+        }
+        
+        self.sys.circle_buffer.clear();
+    }
+}
 pub struct CircleSession<'a>{
     sys:&'a mut MySys
 }
 impl<'a> CircleSession<'a>{
 
-    pub fn draw_circle(&mut self,point:Vec2<f32>,alpha:f32)->&mut Self{
+    pub fn draw(&mut self,point:Vec2<f32>,alpha:f32)->&mut Self{
     	self.sys.circle_buffer.push(circle_program::Vertex([point.x,point.y,alpha]));
     	self
     }
@@ -57,12 +91,47 @@ impl<'a> CircleSession<'a>{
 }
 
 pub struct LineSession<'a>{
-	_sys:&'a mut MySys
+	sys:&'a mut MySys,
+    radius:f32
 }
 impl LineSession<'_>{
-	pub fn draw_line(&mut self,start:Vec2<f32>,end:Vec2<f32>){
-		unimplemented!("{:?}",(start,end))
+	pub fn draw(&mut self,start:Vec2<f32>,end:Vec2<f32>,alpha:f32)->&mut Self{
+        let radius=self.radius;
+        let offset=end-start;
+        let k=offset.rotate_90deg_right().normalize_to(1.0);
+        let start1=start+k*radius;
+        let start2=start-k*radius;
+
+        let end1=end+k*radius;
+        let end2=end-k*radius;
+
+        let arr=[start1,start2,end1,start2,end1,end2];
+
+        for a in arr.iter(){
+            self.sys.circle_buffer.push(circle_program::Vertex([a.x,a.y,alpha]));    
+        }
+        self
 	}
+
+    pub fn finish(&mut self){
+
+        self.sys.circle_buffer.update();
+        
+        unsafe{
+            gl::UseProgram(self.sys.circle_program.program);
+            gl_ok!();
+        
+            //TODO move this down more?
+            gl::BindBuffer(gl::ARRAY_BUFFER, self.sys.circle_buffer.get_id());
+            gl_ok!();
+      
+            //////
+            gl::DrawArrays(gl::TRIANGLES,0 as i32, self.sys.circle_buffer.len() as i32);
+            gl_ok!();
+        }
+        
+        self.sys.circle_buffer.clear();
+    }
 }
 
 
@@ -70,7 +139,7 @@ pub struct DrawSession<'a>{
 	sys:&'a mut MySys
 }
 impl DrawSession<'_>{
-    pub fn new_circle(&mut self,radius:f32,color:[f32;3])->CircleSession{
+    pub fn circles(&mut self,radius:f32,color:[f32;3])->CircleSession{
     	unsafe{
 
             gl::UseProgram(self.sys.circle_program.program);
@@ -90,9 +159,48 @@ impl DrawSession<'_>{
     	
         CircleSession{sys:self.sys}
     }
+    pub fn squares(&mut self,radius:f32,color:[f32;3])->SquareSession{
+        unsafe{
 
-    pub fn new_line(&mut self,radius:f32,color:[f32;4])->LineSession{
-    	unimplemented!("{:?}",(radius,color))
+            gl::UseProgram(self.sys.circle_program.program);
+            gl_ok!();
+
+            gl::Uniform1f(self.sys.circle_program.point_size_uniform,radius*self.sys.point_mul.0);
+            gl_ok!();
+            gl::Uniform3fv(self.sys.circle_program.bcol_uniform,1,std::mem::transmute(&color[0]));
+            gl_ok!();
+
+            let square=0;
+            gl::Uniform1i(self.sys.circle_program.square_uniform,square);
+            gl_ok!();
+            
+
+        }
+        
+        SquareSession{sys:self.sys}
+    }
+
+
+    pub fn lines(&mut self,radius:f32,color:[f32;3])->LineSession{
+        let kk=self.sys.point_mul.0;
+            
+        unsafe{
+            gl::UseProgram(self.sys.circle_program.program);
+            gl_ok!();
+
+            gl::Uniform1f(self.sys.circle_program.point_size_uniform,radius*kk);
+            gl_ok!();
+            gl::Uniform3fv(self.sys.circle_program.bcol_uniform,1,std::mem::transmute(&color[0]));
+            gl_ok!();
+
+            let square=0;
+            gl::Uniform1i(self.sys.circle_program.square_uniform,square);
+            gl_ok!();
+            
+
+        }
+
+        LineSession{sys:self.sys,radius:radius*kk}
     }
     pub fn finish(self){
     	//TODO swap buffers
@@ -113,9 +221,6 @@ impl MySys{
     	let mut circle_program=CircleProgram::new();
         let point_mul=circle_program.set_viewport(dim,window_dim);
 
-        //dbg!(&point_mul);
-        //dbg!(&circle_program);
-        //dbg!(&circle_buffer);
     	let back_color=[0.2;3];
 
         MySys{point_mul,back_color,circle_program,circle_buffer}
