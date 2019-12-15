@@ -31,6 +31,22 @@ impl RefreshTimer{
 }
 
 
+pub struct System2{
+
+}
+impl System2{
+    pub fn new()->Self{
+        unimplemented!()
+    }
+    pub fn set_viewport(&mut self,_rect:Rect<f32>){
+        unimplemented!()
+    }
+    pub fn dim(&self)->Vec2<usize>{
+        unimplemented!()
+    }
+}
+
+
 
 pub struct System{
 	inner:MySys,

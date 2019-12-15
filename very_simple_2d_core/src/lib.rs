@@ -27,7 +27,7 @@ pub struct SquareSession<'a>{
     sys:&'a mut MySys
 }
 impl<'a> SquareSession<'a>{
-
+    #[inline(always)]
     pub fn add(&mut self,point:Vec2<f32>)->&mut Self{
         self.sys.circle_buffer.push(circle_program::Vertex([point.x,point.y]));
         self
@@ -89,6 +89,8 @@ impl<'a> CircleSession<'a>{
         }
         
     }
+
+    #[inline(always)]
     pub fn add(&mut self,point:Vec2<f32>)->&mut Self{
     	self.sys.circle_buffer.push(circle_program::Vertex([point.x,point.y]));
     	self
@@ -124,6 +126,8 @@ impl RectSession<'_>{
         }
         
     }
+
+    #[inline(always)]
     pub fn add(&mut self,rect:Rect<f32>)->&mut Self{
         let [a,b,c,d] = rect.get_corners();
         let arr=[a,b,c,c,d,a];
@@ -163,6 +167,8 @@ impl LineSession<'_>{
         }
         
     }
+
+    #[inline(always)]
 	pub fn add(&mut self,start:Vec2<f32>,end:Vec2<f32>)->&mut Self{
         let radius=self.radius;
         let offset=end-start;
