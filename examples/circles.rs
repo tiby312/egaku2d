@@ -37,38 +37,39 @@ fn main()
 			Event::EventsCleared=>{
 				
 				let mut sys=glsys.get_sys();
-
-      	let mut k=sys.circles(100.0,[0.,1.,1.]);
-        for x in (0..1000).step_by(100){
-          for y in (0..1000).step_by(100){
-            k.draw(vec2(x as f32,y as f32),0.1);
-          }
+        {
+          	let mut k=sys.circles(100.0,[0.,1.,1.,0.1]);
+            for x in (0..1000).step_by(100){
+              for y in (0..1000).step_by(100){
+                k.add(vec2(x as f32,y as f32));
+              }
+            }
+            k.draw();
         }
-        k.finish();
-
-        let mut k=sys.squares(100.0,[1.,0.,1.]);
-        for x in (0..1000).step_by(100){
-          for y in (0..1000).step_by(100){
-            k.draw(vec2(x as f32,y as f32),0.1);
+        {
+          let mut k=sys.squares(100.0,[1.,0.,1.,0.1]);
+          for x in (0..1000).step_by(100){
+            for y in (0..1000).step_by(100){
+              k.add(vec2(x as f32,y as f32));
+            }
           }
+          k.draw();
         }
-        k.finish();
 
-        sys.lines(10.0,[0.,1.0,0.])
-          .draw(vec2(0.,0.),vec2(500.,500.),0.3)
-          .draw(vec2(40.,40.),vec2(500.,0.),0.3)
-          .draw(vec2(700.,500.),vec2(100.,100.),0.3)
-          .finish();
+        sys.lines(10.0,[0.,1.0,0.,0.3])
+          .add(vec2(0.,0.),vec2(500.,500.))
+          .add(vec2(40.,40.),vec2(500.,0.))
+          .add(vec2(700.,500.),vec2(100.,100.)).draw();
 
-        sys.lines(50.,[1.,1.,0.2])
-          .draw(vec2(50.,500.),vec2(500.,50.),0.2)
-          .finish();
+        sys.lines(50.,[1.,1.,0.2,0.2])
+          .add(vec2(50.,500.),vec2(500.,50.)).draw();
 
-        let mut k=sys.rects([0.8,0.8,1.0]);
-        k.draw(rect(50.,200.,700.,800.),0.2);
+        let mut k=sys.rects([0.8,0.8,1.0,0.2]);
+        k.add(rect(50.,200.,700.,800.));
 
-        k.draw(rect(800.,820.,700.,800.),0.2);
-        k.finish();
+        k.add(rect(800.,820.,700.,800.));
+        k.draw();
+        drop(k);
 
         glsys.swap_buffers();
 

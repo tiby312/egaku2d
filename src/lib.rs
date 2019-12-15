@@ -1,11 +1,36 @@
+//!
+//! A library that lets you draw various simple 2d geometry primitives fast using a single 
+//! shader program and a single vertex buffer object with a safe api.
+//!
+
 pub use glutin;
 pub use very_simple_2d_core;
-
-use axgeom::*;
-use very_simple_2d_core::DrawSession;
+pub use very_simple_2d_core::DrawSession;
 use very_simple_2d_core::MySys;
+use axgeom::*;
 use glutin::PossiblyCurrent;
 use very_simple_2d_core::gl;
+
+
+pub struct RefreshTimer{
+    interval:usize,
+    last_time:std::time::Instant
+}
+impl RefreshTimer{
+    pub fn new(interval:usize)->RefreshTimer{
+        RefreshTimer{interval,last_time:std::time::Instant::now()}
+    }
+    pub fn is_ready(&mut self)->bool{
+        if self.last_time.elapsed().as_millis()>=self.interval as u128{
+            self.last_time=std::time::Instant::now();        
+            true
+        }else{
+            false
+        }
+    }
+}
+
+
 
 pub struct System{
 	inner:MySys,
@@ -26,7 +51,6 @@ impl System{
            .with_inner_size(glutin::dpi::LogicalSize{width,height})
            .with_resizable(false)
            .with_title("very_simple_2d");
-           // .with_fullscreen(Some(fullscreen));
          
         //we are targeting only opengl 3.0 es. and glsl 300 es.
         
@@ -81,6 +105,7 @@ impl System{
 
 }
 
+/*
 use glutin::event_loop::{EventLoop};
 use glutin::monitor::{MonitorHandle};
 
@@ -94,3 +119,4 @@ fn prompt_for_monitor(el: &EventLoop<()>) -> MonitorHandle {
 
     monitor
 }
+*/

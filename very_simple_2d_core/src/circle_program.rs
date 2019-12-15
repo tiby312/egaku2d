@@ -15,13 +15,10 @@ static VS_SRC: &'static str = "
 in vec2 position;
 uniform mat3 mmatrix;
 uniform float point_size;
-in float alpha;
-out float alpha2;
 void main() {
     gl_PointSize = point_size;
     vec3 pp=vec3(position,1.0);
     gl_Position = vec4(mmatrix*pp.xyz, 1.0);
-    alpha2=alpha;
 }";
 
 
@@ -30,8 +27,7 @@ void main() {
 static FS_SRC: &'static str = "
 #version 300 es
 precision mediump float;
-in float alpha2;
-uniform vec3 bcol;
+uniform vec4 bcol;
 out vec4 out_color;
 uniform bool square;
 void main() {
@@ -46,13 +42,13 @@ void main() {
             discard;
     }
 
-    out_color = vec4(bcol,alpha2);
+    out_color = bcol;
 }";
 
 
 #[repr(transparent)]
 #[derive(Copy,Clone,Debug,Default)]
-pub struct Vertex(pub [f32;3]);
+pub struct Vertex(pub [f32;2]);
 
 
 #[derive(Debug)]
@@ -63,7 +59,6 @@ pub struct CircleProgram{
     pub point_size_uniform:GLint,
     pub bcol_uniform:GLint,
     pub pos_attr:GLint,
-    pub alpha_attr:GLint,
 }
 
 #[derive(Debug)]
@@ -99,7 +94,6 @@ impl CircleProgram{
             gl_ok!();
         }
 
-        //PointMul(window_dim.x/w)
         PointMul(1.0)
     }
 
@@ -116,10 +110,10 @@ impl CircleProgram{
             let program = link_program(vs, fs);
             gl_ok!();
 
-            //gl::DeleteShader(fs);
+            gl::DeleteShader(fs);
             gl_ok!();
 
-            //gl::DeleteShader(vs);
+            gl::DeleteShader(vs);
             gl_ok!();
 
             gl::UseProgram(program);
@@ -140,9 +134,7 @@ impl CircleProgram{
             let pos_attr = gl::GetAttribLocation(program, CString::new("position").unwrap().as_ptr());
             gl_ok!();
 
-            let alpha_attr = gl::GetAttribLocation(program, CString::new("alpha").unwrap().as_ptr());
-            gl_ok!();   
-
+            
 
 
             /////
@@ -153,25 +145,12 @@ impl CircleProgram{
                 2,
                 gl::FLOAT,
                 gl::FALSE as GLboolean,
-                3*core::mem::size_of::<f32>() as i32,
+                2*core::mem::size_of::<f32>() as i32,
                 core::ptr::null(),
             );
             gl_ok!();
-            /////
-            
-            gl::EnableVertexAttribArray(alpha_attr as GLuint);
-            gl_ok!();
-            gl::VertexAttribPointer(
-                alpha_attr as GLuint,
-                1,
-                gl::FLOAT,
-                gl::FALSE as GLboolean,
-                3*core::mem::size_of::<f32>() as i32,
-                (2*core::mem::size_of::<f32>()) as *const std::ffi::c_void,
-            );
-            gl_ok!();
-
-            CircleProgram{program,square_uniform,point_size_uniform,matrix_uniform,bcol_uniform,pos_attr,alpha_attr}
+           
+            CircleProgram{program,square_uniform,point_size_uniform,matrix_uniform,bcol_uniform,pos_attr}
         }
     }
 }
