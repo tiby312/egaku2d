@@ -3,7 +3,7 @@ extern crate very_simple_2d;
 extern crate axgeom;
 
 use axgeom::*;
-use very_simple_2d::{System};
+use very_simple_2d::*;
 
 use glutin::event::Event;
 use glutin::event_loop::ControlFlow;
@@ -13,8 +13,12 @@ use glutin::event::VirtualKeyCode;
 fn main()
 {
 	let events_loop = glutin::event_loop::EventLoop::new();
-  let mut glsys=System::new(rect(0.,600.,0.,600.),&events_loop);
+  
 
+  //let mut glsys=WindowedSystem::new(vec2(600.,600.),&events_loop);
+
+  let mut glsys=FullScreenSystem::new(&events_loop);
+  glsys.set_viewport_min(600.0);
 
   events_loop.run(move |event,_,control_flow| {
   	match event{
@@ -57,17 +61,17 @@ fn main()
         }
 
         sys.lines(10.0,[0.,1.0,0.,0.3])
-          .add(vec2(0.,0.),vec2(500.,500.))
-          .add(vec2(40.,40.),vec2(500.,0.))
+          .add(vec2(0.,0.),vec2(600.,600.))
+          .add(vec2(0.,600.),vec2(600.,0.))
           .add(vec2(700.,500.),vec2(100.,100.)).draw();
 
         sys.lines(50.,[1.,1.,0.2,0.2])
           .add(vec2(50.,500.),vec2(500.,50.)).draw();
 
         let mut k=sys.rects([0.8,0.8,1.0,0.2]);
-        k.add(rect(50.,200.,700.,800.));
+        k.add(rect(50.,100.,500.,550.));
 
-        k.add(rect(800.,820.,700.,800.));
+        k.add(rect(500.,820.,300.,400.));
         k.draw();
         drop(k);
 

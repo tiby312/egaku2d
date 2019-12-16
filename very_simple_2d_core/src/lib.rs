@@ -200,7 +200,7 @@ impl DrawSession<'_>{
             gl_ok!();
 
 
-    		gl::Uniform1f(self.sys.circle_program.point_size_uniform,radius*2.5);
+    		gl::Uniform1f(self.sys.circle_program.point_size_uniform,radius*2.5*self.sys.point_mul.0);
         	gl_ok!();
             gl::Uniform4fv(self.sys.circle_program.bcol_uniform,1,std::mem::transmute(&color[0]));
             gl_ok!();
@@ -220,7 +220,7 @@ impl DrawSession<'_>{
             gl::UseProgram(self.sys.circle_program.program);
             gl_ok!();
 
-            gl::Uniform1f(self.sys.circle_program.point_size_uniform,radius*2.5);
+            gl::Uniform1f(self.sys.circle_program.point_size_uniform,radius*2.5*self.sys.point_mul.0);
             gl_ok!();
             gl::Uniform4fv(self.sys.circle_program.bcol_uniform,1,std::mem::transmute(&color[0]));
             gl_ok!();
@@ -291,11 +291,14 @@ impl MySys{
     fn reset(&mut self){       
         self.circle_buffer.clear();
     }
+    pub fn set_viewport(&mut self,width:f32,rect:Rect<f32>){
+        self.point_mul=self.circle_program.set_viewport(width,rect);
+    }
     pub fn new(dim:Rect<f32>)->MySys{
 
     	let circle_buffer=vbo::GrowableBuffer::new();
     	let mut circle_program=CircleProgram::new();
-        let point_mul=circle_program.set_viewport(dim);
+        let point_mul=circle_program.set_viewport(dim.x.distance(),dim);
 
     	let back_color=[0.2;3];
 
