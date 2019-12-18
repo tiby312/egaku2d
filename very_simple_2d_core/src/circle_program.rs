@@ -66,7 +66,7 @@ pub struct PointMul(pub f32);
 
 impl CircleProgram{
     pub fn set_viewport(&mut self,width:f32,game_world:Rect<f32>)->PointMul{
-        
+        println!("setting viewport!!!!={:?}",game_world);
         let ((x1,x2),(y1,y2))=game_world.get();
         let w=x2-x1;
         let h=y2-y1;
@@ -74,11 +74,14 @@ impl CircleProgram{
         let scalex=2.0/w;
         let scaley=2.0/h;
 
-        let tx=-(1.+x1/(w/2.0));
-        let ty=1.+y1/(h/2.0);
+        //let tx=-(1.+x1/(w/2.0))+0.3;
+        //let ty=1.+y1/(h/2.0);
+        let tx=-1.0;
+        let ty=1.0;
 
         dbg!((tx,ty,scalex,scaley));
         
+        //println!("scale={:?}",(scalex,scaley));
         let matrix= [
                     [scalex, 0.0, 0.0],
                     [0.0   , -scaley,0.0],
