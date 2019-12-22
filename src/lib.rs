@@ -2,11 +2,38 @@
 //!
 //! A library that lets you draw various simple 2d geometry primitives fast using a single
 //! shader program and a single vertex buffer object with a safe api (provided no other libray
-//! is calling opengl functions).
+//! is calling opengl functions). Uses the builder pattern for a convinient and expressive api.
+//! Uses glutin and opengl es 3.0.
 //!
 //! ## Screenshot
 //!
 //! ![](https://raw.githubusercontent.com/tiby312/very_simple_2d/master/assets/screenshot.gif)
+//!
+//! 
+//! ## Example
+//!
+//! ```rust,no_run
+//! use axgeom::*;
+//! let events_loop = glutin::event_loop::EventLoop::new();
+//! let mut glsys = very_simple_2d::WindowedSystem::new(vec2(600., 480.), &events_loop);
+//! 
+//! let mut sys = glsys.session();
+//!
+//! //Draw some arrows.
+//! sys.arrows([0.0, 1.0, 0.1, 0.5], 5.0)
+//!   .add(vec2(40., 40.), vec2(40., 200.))
+//!   .add(vec2(40., 40.), vec2(200., 40.))
+//!   .draw();
+//!
+//! //Draw some circles.
+//! sys.circles([0., 1., 1., 0.1], 4.0)
+//!   .add(vec2(5.,6.))
+//!   .add(vec2(7.,8.))
+//!   .add(vec2(9.,5.))
+//!   .draw();
+//!
+//! glsys.swap_buffers();
+//! ```
 
 use axgeom::*;
 pub use glutin;
@@ -110,7 +137,7 @@ impl FullScreenSystem {
         self.view_port_set = true;
     }
 
-    pub fn get_sys(&mut self) -> DrawSession {
+    pub fn session(&mut self) -> DrawSession {
         assert!(self.view_port_set);
         self.inner.draw_sys()
     }
@@ -202,7 +229,7 @@ impl WindowedSystem {
         vec2(width as usize, height as usize)
     }
 
-    pub fn get_sys(&mut self) -> DrawSession {
+    pub fn session(&mut self) -> DrawSession {
         self.inner.draw_sys()
     }
     pub fn swap_buffers(&mut self) {
