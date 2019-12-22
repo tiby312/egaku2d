@@ -130,6 +130,63 @@ impl RectSession<'_> {
         self
     }
 }
+
+pub struct ArrowSession<'a>{
+    sys:&'a mut MySys,
+    radius:f32
+}
+impl Drop for ArrowSession<'_> {
+    fn drop(&mut self) {
+        self.sys.reset();
+    }
+}
+
+impl ArrowSession<'_>{
+ pub fn draw(&mut self) {
+        self.sys.circle_buffer.update();
+
+        unsafe {
+            gl::UseProgram(self.sys.circle_program.program);
+            gl_ok!();
+
+            //TODO move this down more?
+            gl::BindBuffer(gl::ARRAY_BUFFER, self.sys.circle_buffer.get_id());
+            gl_ok!();
+
+            //////
+            gl::DrawArrays(gl::TRIANGLES, 0 as i32, self.sys.circle_buffer.len() as i32);
+            gl_ok!();
+        }
+    }
+
+    #[inline(always)]
+    pub fn add(&mut self, start: Vec2<f32>, end: Vec2<f32>) -> &mut Self {
+        let radius = self.radius;
+        let offset = end - start;
+        
+        let arrow_head=start+offset*0.8;
+
+        let k = offset.rotate_90deg_right().normalize_to(1.0);
+        let start1 = start + k * radius;
+        let start2 = start - k * radius;
+
+        let end1 = arrow_head + k * radius;
+        let end2 = arrow_head - k * radius;
+
+        let end11 =arrow_head + k * radius *2.5;
+        let end22 =arrow_head - k * radius * 2.5;
+        let arr = [start1, start2, end1, start2, end1, end2, end,end11,end22];
+
+        for a in arr.iter() {
+            self.sys
+                .circle_buffer
+                .push(circle_program::Vertex([a.x, a.y]));
+        }
+        self
+    }   
+}
+
+
 pub struct LineSession<'a> {
     sys: &'a mut MySys,
     radius: f32,
@@ -254,6 +311,33 @@ impl DrawSession<'_> {
         }
 
         RectSession { sys: self.sys }
+    }
+
+    pub fn arrows(&mut self, color: [f32; 4],radius: f32) -> ArrowSession {
+        let kk = self.sys.point_mul.0;
+
+        unsafe {
+            gl::UseProgram(self.sys.circle_program.program);
+            gl_ok!();
+
+            gl::Uniform1f(self.sys.circle_program.point_size_uniform, radius * kk);
+            gl_ok!();
+            gl::Uniform4fv(
+                self.sys.circle_program.bcol_uniform,
+                1,
+                std::mem::transmute(&color[0]),
+            );
+            gl_ok!();
+
+            let square = 0;
+            gl::Uniform1i(self.sys.circle_program.square_uniform, square);
+            gl_ok!();
+        }
+
+        ArrowSession {
+            sys: self.sys,
+            radius: radius * kk,
+        }
     }
 
     pub fn lines(&mut self, color: [f32; 4],radius: f32) -> LineSession {
