@@ -15,10 +15,9 @@ fn main()
 	let events_loop = glutin::event_loop::EventLoop::new();
   
 
-  //let mut glsys=WindowedSystem::new(vec2(600.,600.),&events_loop);
-
-  let mut glsys=FullScreenSystem::new(&events_loop);
-  glsys.set_viewport_min(600.0);
+  let mut glsys=WindowedSystem::new(vec2(600.,600.),&events_loop);
+  //let mut glsys=FullScreenSystem::new(&events_loop);
+  //glsys.set_viewport_min(600.0);
 
   events_loop.run(move |event,_,control_flow| {
   	match event{
