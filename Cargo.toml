@@ -16,5 +16,5 @@ members = [ "very_simple_2d_core"]
 
 [dependencies]
 axgeom = "1.4"
-very_simple_2d_core = {path="./very_simple_2d_core"}
+very_simple_2d_core = {version="0.1.0", path="./very_simple_2d_core"}
 glutin = "0.22.0-alpha5"
