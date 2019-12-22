@@ -5,6 +5,10 @@ authors = ["Ken Reed <kenakioreed@gmail.com>"]
 repository = "https://github.com/tiby312/very_simple_2d"
 readme = "README.md"
 edition = "2018"
+description = "Simple 2D graphics library"
+license = "MIT/Apache-2.0"
+keywords = ["2d graphics", "2d","graphics","opengl"]
+
 
 
 [workspace]
