@@ -63,7 +63,7 @@ impl<V: Default> GrowableBuffer<V> {
     pub fn push(&mut self, a: V) {
         if self.buffer.len() == self.buffer.capacity() {
             self.buffer.push(a);
-            //assert!(self.buffer.len()!=self.buffer.capacity(),"vec did not grow:{:?}",(self.buffer.len(),self.buffer.capacity()));
+            //println!("Re-generating vbo to size={:?}",self.buffer.capacity());
             self.re_generate_buffer();
         } else {
             self.buffer.push(a);
