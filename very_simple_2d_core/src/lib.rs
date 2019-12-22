@@ -235,6 +235,10 @@ impl LineSession<'_> {
     }
 }
 
+///Allows the user to start drawing shapes.
+///The top left corner is the origin.
+///y grows as you go down.
+///x grows as you go right.
 pub struct DrawSession<'a> {
     sys: &'a mut MySys,
 }

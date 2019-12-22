@@ -12,7 +12,7 @@ use glutin::event_loop::ControlFlow;
 fn main() {
     let events_loop = glutin::event_loop::EventLoop::new();
 
-    let mut glsys = WindowedSystem::new(vec2(800., 600.), &events_loop);
+    let mut glsys = WindowedSystem::new(vec2(600., 480.), &events_loop);
     //let mut glsys=FullScreenSystem::new(&events_loop);
     //glsys.set_viewport_min(600.0);
 
@@ -64,9 +64,9 @@ fn main() {
                     k.draw();
                 }
 
-                sys.lines([0., 1.0, 0., 0.3], 10.0)
-                    .add(vec2(0., 0.), vec2(600., 600.))
-                    .add(vec2(0., 600.), vec2(600., 0.))
+                sys.lines([0., 1.0, 1., 0.3], 3.0)
+                    .add(vec2(400., 0.), vec2(300., 10.))
+                    .add(vec2(10., 300.), vec2(300., 400.))
                     .draw();
 
                 {
@@ -86,9 +86,9 @@ fn main() {
                 }
 
                 let mut k = sys.rects([0.8, 0.8, 1.0, 0.2]);
-                k.add(rect(50., 100., 500., 550.));
+                k.add(rect(50., 100., 300., 350.));
 
-                k.add(rect(500., 720., 300., 400.));
+                k.add(rect(400., 420., 300., 400.));
                 k.draw();
                 drop(k);
 

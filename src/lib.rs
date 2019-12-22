@@ -1,10 +1,12 @@
+//! ## Overview
 //!
 //! A library that lets you draw various simple 2d geometry primitives fast using a single
-//! shader program and a single vertex buffer object with a safe api.
+//! shader program and a single vertex buffer object with a safe api (provided no other libray
+//! is calling opengl functions).
 //!
-//! The window creation api makes it impossible to create a world view that has
-//! a bad aspect ratio.
+//! ## Screenshot
 //!
+//! ![](https://raw.githubusercontent.com/tiby312/very_simple_2d/master/assets/screenshot.gif)
 
 use axgeom::*;
 pub use glutin;
@@ -14,6 +16,9 @@ use very_simple_2d_core::gl;
 pub use very_simple_2d_core::DrawSession;
 use very_simple_2d_core::MySys;
 
+///A timer to determine how often to refresh the screen.
+///You pass it the desired refresh rate, then you can poll
+///with is_ready() to determine if it is time to refresh.
 pub struct RefreshTimer {
     interval: usize,
     last_time: std::time::Instant,
@@ -37,9 +42,8 @@ impl RefreshTimer {
 
 ///Unlike a windowed system, we do not have control over the dimensions of the
 ///window we end up with.
-///A version where the user must use whatever dimensions are given.
-///y grows as you go down.
-///x grows as you go right.
+///After construction, the user must set the viewport using the window dimension
+///information.
 pub struct FullScreenSystem {
     inner: MySys,
     windowed_context: glutin::WindowedContext<PossiblyCurrent>,
@@ -122,9 +126,6 @@ impl FullScreenSystem {
 }
 
 ///A version where the user can control the size of the window.
-///The top left corner is the origin.
-///y grows as you go down.
-///x grows as you go right.
 pub struct WindowedSystem {
     inner: MySys,
     windowed_context: glutin::WindowedContext<PossiblyCurrent>,
