@@ -131,9 +131,9 @@ impl RectSession<'_> {
     }
 }
 
-pub struct ArrowSession<'a>{
-    sys:&'a mut MySys,
-    radius:f32
+pub struct ArrowSession<'a> {
+    sys: &'a mut MySys,
+    radius: f32,
 }
 impl Drop for ArrowSession<'_> {
     fn drop(&mut self) {
@@ -141,8 +141,8 @@ impl Drop for ArrowSession<'_> {
     }
 }
 
-impl ArrowSession<'_>{
- pub fn draw(&mut self) {
+impl ArrowSession<'_> {
+    pub fn draw(&mut self) {
         self.sys.circle_buffer.update();
 
         unsafe {
@@ -163,8 +163,8 @@ impl ArrowSession<'_>{
     pub fn add(&mut self, start: Vec2<f32>, end: Vec2<f32>) -> &mut Self {
         let radius = self.radius;
         let offset = end - start;
-        
-        let arrow_head=start+offset*0.8;
+
+        let arrow_head = start + offset * 0.8;
 
         let k = offset.rotate_90deg_right().normalize_to(1.0);
         let start1 = start + k * radius;
@@ -173,9 +173,9 @@ impl ArrowSession<'_>{
         let end1 = arrow_head + k * radius;
         let end2 = arrow_head - k * radius;
 
-        let end11 =arrow_head + k * radius *2.5;
-        let end22 =arrow_head - k * radius * 2.5;
-        let arr = [start1, start2, end1, start2, end1, end2, end,end11,end22];
+        let end11 = arrow_head + k * radius * 2.5;
+        let end22 = arrow_head - k * radius * 2.5;
+        let arr = [start1, start2, end1, start2, end1, end2, end, end11, end22];
 
         for a in arr.iter() {
             self.sys
@@ -183,9 +183,8 @@ impl ArrowSession<'_>{
                 .push(circle_program::Vertex([a.x, a.y]));
         }
         self
-    }   
+    }
 }
-
 
 pub struct LineSession<'a> {
     sys: &'a mut MySys,
@@ -240,7 +239,7 @@ pub struct DrawSession<'a> {
     sys: &'a mut MySys,
 }
 impl DrawSession<'_> {
-    pub fn circles(&mut self,color: [f32; 4], radius: f32) -> CircleSession {
+    pub fn circles(&mut self, color: [f32; 4], radius: f32) -> CircleSession {
         unsafe {
             gl::UseProgram(self.sys.circle_program.program);
             gl_ok!();
@@ -264,7 +263,7 @@ impl DrawSession<'_> {
 
         CircleSession { sys: self.sys }
     }
-    pub fn squares(&mut self, color: [f32; 4],radius: f32) -> SquareSession {
+    pub fn squares(&mut self, color: [f32; 4], radius: f32) -> SquareSession {
         unsafe {
             gl::UseProgram(self.sys.circle_program.program);
             gl_ok!();
@@ -313,7 +312,7 @@ impl DrawSession<'_> {
         RectSession { sys: self.sys }
     }
 
-    pub fn arrows(&mut self, color: [f32; 4],radius: f32) -> ArrowSession {
+    pub fn arrows(&mut self, color: [f32; 4], radius: f32) -> ArrowSession {
         let kk = self.sys.point_mul.0;
 
         unsafe {
@@ -340,7 +339,7 @@ impl DrawSession<'_> {
         }
     }
 
-    pub fn lines(&mut self, color: [f32; 4],radius: f32) -> LineSession {
+    pub fn lines(&mut self, color: [f32; 4], radius: f32) -> LineSession {
         let kk = self.sys.point_mul.0;
 
         unsafe {
