@@ -7,7 +7,7 @@ readme = "README.md"
 edition = "2018"
 description = "Simple 2D graphics library"
 license = "MIT/Apache-2.0"
-keywords = ["2d graphics", "2d","graphics","opengl"]
+keywords = ["2d-graphics", "2d","graphics","opengl"]
 
 
 
