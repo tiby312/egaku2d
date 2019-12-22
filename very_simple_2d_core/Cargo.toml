@@ -4,7 +4,6 @@ version = "0.1.0"
 authors = ["Ken <kenakioreed@gmail.com>"]
 build = "build.rs"
 edition = "2018"
-authors = ["Ken Reed <kenakioreed@gmail.com>"]
 description = "Simple 2D graphics library without context creation code"
 license = "MIT/Apache-2.0"
 repository = "https://github.com/tiby312/very_simple_2d"
