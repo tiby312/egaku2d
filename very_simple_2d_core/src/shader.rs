@@ -1,9 +1,8 @@
 use crate::gl;
 use crate::gl::types::*;
+use std::ffi::CString;
 use std::ptr;
 use std::str;
-use std::ffi::CString;
-
 
 pub fn compile_shader(src: &str, ty: GLenum) -> GLuint {
     let shader;
@@ -73,4 +72,3 @@ pub fn link_program(vs: GLuint, fs: GLuint) -> GLuint {
         program
     }
 }
-
