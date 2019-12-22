@@ -3,7 +3,7 @@
 //!
 //! This crate provides the opengl internals without the opengl context creation functionality.
 //! So this crate does not depend on glutin.
-//! 
+//!
 use axgeom::*;
 
 use core::mem;

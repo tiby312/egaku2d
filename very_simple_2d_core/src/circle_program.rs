@@ -69,7 +69,6 @@ impl CircleProgram {
         let tx = -1.0;
         let ty = 1.0;
 
-        
         let matrix = [[scalex, 0.0, 0.0], [0.0, -scaley, 0.0], [tx, ty, 1.0]];
 
         unsafe {

@@ -9,14 +9,14 @@
 //!
 //! ![](https://raw.githubusercontent.com/tiby312/very_simple_2d/master/assets/screenshot.gif)
 //!
-//! 
+//!
 //! ## Example
 //!
 //! ```rust,no_run
 //! use axgeom::*;
 //! let events_loop = glutin::event_loop::EventLoop::new();
 //! let mut glsys = very_simple_2d::WindowedSystem::new(vec2(600., 480.), &events_loop);
-//! 
+//!
 //! let mut sys = glsys.session();
 //!
 //! //Draw some arrows.

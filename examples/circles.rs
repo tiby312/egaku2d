@@ -41,7 +41,8 @@ fn main() {
                     .add(vec2(40., 40.), vec2(200., 40.))
                     .draw();
 
-                {//Draw some moving circles
+                {
+                    //Draw some moving circles
                     let mut k = sys.circles([0., 1., 1., 0.1], 4.0);
                     for x in (0..1000).step_by(12) {
                         for y in (0..1000).step_by(12) {
@@ -54,7 +55,8 @@ fn main() {
                     k.draw();
                 }
 
-                {//Draw some squares
+                {
+                    //Draw some squares
                     let mut k = sys.squares([1., 0., 1., 0.1], 10.0);
                     for x in (0..1000).step_by(100) {
                         for y in (0..1000).step_by(100) {
@@ -70,14 +72,16 @@ fn main() {
                     .add(vec2(10., 300.), vec2(300., 400.))
                     .draw();
 
-                {//Draw a moving line
+                {
+                    //Draw a moving line
                     let c = counter as f32 * 0.07;
                     sys.lines([1., 1., 0.2, 0.2], 10.)
                         .add(vec2(50., 500.), vec2(500., 50. + c.sin() * 50.))
                         .draw();
                 }
 
-                {//Draw a rotating arrow
+                {
+                    //Draw a rotating arrow
                     let c = counter as f32 * 0.04;
                     let center = vec2(400., 400.);
                     sys.arrows([1.0, 0.1, 0.5, 0.5], 10.0)
@@ -92,7 +96,8 @@ fn main() {
                 k.draw();
                 drop(k);
 
-                {//Draw a growing circle
+                {
+                    //Draw a growing circle
                     let c = ((counter as f32 * 0.06).sin() * 40.0).abs();
                     sys.circles([1.0, 1.0, 1.0, 1.0], c)
                         .add(vec2(520., 400.))
