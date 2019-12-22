@@ -13,4 +13,4 @@ members = [ "very_simple_2d_core"]
 [dependencies]
 axgeom = "1.2"
 very_simple_2d_core = {path="./very_simple_2d_core"}
-glutin = {git="https://github.com/rust-windowing/glutin.git"}
+glutin = "0.22.0-alpha5"
