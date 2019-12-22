@@ -9,7 +9,7 @@ edition = "2018"
 
 
 [dependencies]
-axgeom = "1.2"
+axgeom = "1.4"
 
 
 [build-dependencies]
