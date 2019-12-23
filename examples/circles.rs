@@ -60,7 +60,7 @@ fn main() {
                     let mut k = sys.squares([1., 0., 1., 0.1], 10.0);
                     for x in (0..1000).step_by(100) {
                         for y in (0..1000).step_by(100) {
-                            k.add(vec2(x as f32, y as f32));
+                            k.addp(x as f32, y as f32);
                         }
                     }
                     k.draw();
@@ -91,8 +91,8 @@ fn main() {
 
                 //Draw some rectangles
                 let mut k = sys.rects([0.8, 0.8, 1.0, 0.2]);
-                k.add(rect(50., 100., 300., 350.));
-                k.add(rect(400., 420., 300., 400.));
+                k.addp(50., 100., 300., 350.);
+                k.addp(400., 420., 300., 400.);
                 k.draw();
                 drop(k);
 
@@ -100,7 +100,7 @@ fn main() {
                     //Draw a growing circle
                     let c = ((counter as f32 * 0.06).sin() * 40.0).abs();
                     sys.circles([1.0, 1.0, 1.0, 1.0], c)
-                        .add(vec2(520., 400.))
+                        .addp(520., 400.)
                         .draw();
                 }
 

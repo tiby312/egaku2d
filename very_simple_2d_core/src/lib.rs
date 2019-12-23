@@ -38,6 +38,12 @@ impl<'a> SquareSession<'a> {
             .push(circle_program::Vertex([point.x, point.y]));
         self
     }
+
+    #[inline(always)]
+    pub fn addp(&mut self, x:f32,y:f32)->&mut Self{
+        self.add(vec2(x,y))
+    }
+
     pub fn draw(&mut self) {
         self.sys.circle_buffer.update();
 
@@ -87,6 +93,10 @@ impl<'a> CircleSession<'a> {
     }
 
     #[inline(always)]
+    pub fn addp(&mut self, x:f32,y:f32)->&mut Self{
+        self.add(vec2(x,y))
+    }
+    #[inline(always)]
     pub fn add(&mut self, point: Vec2<f32>) -> &mut Self {
         self.sys
             .circle_buffer
@@ -122,6 +132,12 @@ impl RectSession<'_> {
         }
     }
 
+    ///NOTE The argument positions
+    ///It is x1,x2,y1,y2  not  x1,y1,x2,y2.
+    #[inline(always)]
+    pub fn addp(&mut self, x1:f32,x2:f32,y1:f32,y2:f32)->&mut Self{
+        self.add(rect(x1,x2,y1,y2))
+    }
     #[inline(always)]
     pub fn add(&mut self, rect: Rect<f32>) -> &mut Self {
         let [a, b, c, d] = rect.get_corners();
@@ -165,6 +181,10 @@ impl ArrowSession<'_> {
         }
     }
 
+    #[inline(always)]
+    pub fn addp(&mut self, x1:f32,y1:f32,x2:f32,y2:f32)->&mut Self{
+        self.add(vec2(x1,y1),vec2(x2,y2))
+    }
     #[inline(always)]
     pub fn add(&mut self, start: Vec2<f32>, end: Vec2<f32>) -> &mut Self {
         let radius = self.radius;
@@ -219,6 +239,10 @@ impl LineSession<'_> {
         }
     }
 
+    #[inline(always)]
+    pub fn addp(&mut self, x1:f32,y1:f32,x2:f32,y2:f32)->&mut Self{
+        self.add(vec2(x1,y1),vec2(x2,y2))
+    }
     #[inline(always)]
     pub fn add(&mut self, start: Vec2<f32>, end: Vec2<f32>) -> &mut Self {
         let radius = self.radius;

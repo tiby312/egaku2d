@@ -32,6 +32,13 @@
 //!   .add(vec2(9.,5.))
 //!   .draw();
 //!
+//! //Draw some circles from f32 primitives.
+//! sys.circles([0., 1., 1., 0.1], 4.0)
+//!   .addp(5.,6.)
+//!   .addp(7.,8.)
+//!   .addp(9.,5.)
+//!   .draw();
+//!
 //! glsys.swap_buffers();
 //! ```
 
