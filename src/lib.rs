@@ -3,6 +3,7 @@
 //! A library that lets you draw various simple 2d geometry primitives fast using a single
 //! shader program and a single vertex buffer object with a safe api (provided no other libray
 //! is calling opengl functions). Uses the builder pattern for a convinient api.
+//! The main design goal is to be able to draw thousands of shapes efficiently.
 //! Uses glutin and opengl es 3.0.
 //!
 //! ![](https://raw.githubusercontent.com/tiby312/very_simple_2d/master/assets/screenshot.gif)
@@ -15,15 +16,15 @@
 //! --------------------------|-----------------------------
 //! Circles                   | `(point,radius)`              
 //! Axis Aligned Rectangles   | `(startx,endx,starty,endy)`   
-//! Axis AlignedSquares       | `(point,radius)`              
+//! Axis Aligned Squares      | `(point,radius)`              
 //! Lines                     | `(point,point)`               
-//! Arrows                    | `(point,point)`               
+//! Arrows                    | `(point_start,point_end)`               
 //!   
 //!
-//! Each one of these follows the same api.
+//! Each one of these follows the simple api for drawing.
 //!
-//! * `add()` - Fast function that adds one shape to be addded to the one vertex buffer object
-//! * `draw()` - Slow function that sends all the shapes added to the one vertex buffer object and then draws them using DrawArrays. 
+//! * `add()` - **Fast** function that adds one shape to a Vec.
+//! * `draw()` - **Slow** function that sends the Vec to the one vertex buffer object on the gpu and then draws them using DrawArrays. 
 //! 
 //! Using this api, the user can efficiently draw thousands of circles, for example, with the caveat that
 //! they all will be the same radius and color/transparency values. This api does not allow the user
@@ -33,7 +34,7 @@
 //!
 //! # View
 //!
-//! The top left corner is the origin (0,0) and x and y grow to the right and downwards.
+//! The top left corner is the origin (0,0) and x and y grow to the right and downwards respectively.
 //!
 //! In windowed mode, the dimenions of the window defaults to scale exactly to the world. For example,
 //! if the user made a window of size 800,600, and then drew a circle at 400,300, the 
