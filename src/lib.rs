@@ -1,16 +1,38 @@
-//! ## Overview
+//! # Overview
 //!
 //! A library that lets you draw various simple 2d geometry primitives fast using a single
 //! shader program and a single vertex buffer object with a safe api (provided no other libray
-//! is calling opengl functions). Uses the builder pattern for a convinient and expressive api.
+//! is calling opengl functions). Uses the builder pattern for a convinient api.
 //! Uses glutin and opengl es 3.0.
-//!
-//! ## Screenshot
 //!
 //! ![](https://raw.githubusercontent.com/tiby312/very_simple_2d/master/assets/screenshot.gif)
 //!
+//! # User Guide
 //!
-//! ## Example
+//! The user can draw the following:
+//!
+//! Shape                     | Representation       
+//! --------------------------|-----------------------------
+//! Circles                   | `(point,radius)`              
+//! Axis Aligned Rectangles   | `(startx,endx,starty,endy)`   
+//! Axis AlignedSquares       | `(point,radius)`              
+//! Lines                     | `(point,point)`               
+//! Arrows                    | `(point,point)`               
+//!   
+//!
+//! Each one of these follows the same api.
+//!
+//! * `add()` - Fast function that adds one shape to be addded to the one vertex buffer object
+//! * `draw()` - Slow function that sends all the shapes added to the one vertex buffer object and then draws them using DrawArrays. 
+//! 
+//! Using this api, the user can efficiently draw thousands of circles, for example, with the caveat that
+//! they all will be the same radius and color/transparency values. This api does not allow the user
+//! to efficiently draw thousands of circles where each circle has a different color or radius.
+//! This was a design decision to make each vertex as lightweight as possible (just a x and y position),
+//! making it more efficient to set and send to the gpu.
+//! 
+//!
+//! # Example
 //!
 //! ```rust,no_run
 //! use axgeom::*;
