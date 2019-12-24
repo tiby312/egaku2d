@@ -30,7 +30,18 @@
 //! to efficiently draw thousands of circles where each circle has a different color or radius.
 //! This was a design decision to make each vertex as lightweight as possible (just a x and y position),
 //! making it more efficient to set and send to the gpu.
+//!
+//! # View
+//!
+//! The top left corner is the origin (0,0) and x and y grow to the right and downwards.
+//!
+//! In windowed mode, the dimenions of the window defaults to scale exactly to the world. For example,
+//! if the user made a window of size 800,600, and then drew a circle at 400,300, the 
+//! circle would appear in the center of the window.
 //! 
+//! In fullscreen mode, the user is forced to set the scale themselves before any drawing can happen.
+//! This is because there is no reasonable default since the user has no control over the size of
+//! a fullscreen, unlike in windowed mode. The user is forced to scale x and y the same. 
 //!
 //! # Example
 //!
@@ -120,7 +131,7 @@ impl FullScreenSystem {
             .build_windowed(gl_window, &events_loop)
             .unwrap();
 
-        std::thread::sleep(std::time::Duration::from_millis(500));
+        //std::thread::sleep(std::time::Duration::from_millis(500));
 
         let windowed_context = unsafe { windowed_context.make_current().unwrap() };
 
@@ -208,7 +219,7 @@ impl WindowedSystem {
             .build_windowed(gl_window, &events_loop)
             .unwrap();
 
-        std::thread::sleep(std::time::Duration::from_millis(500));
+        //std::thread::sleep(std::time::Duration::from_millis(500));
 
         let windowed_context = unsafe { windowed_context.make_current().unwrap() };
 
