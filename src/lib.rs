@@ -21,7 +21,7 @@
 //! Arrows                    | `(point_start,point_end)`               
 //!   
 //!
-//! Each one of these follows the simple api for drawing.
+//! Each one of these follows the same simple api for drawing:
 //!
 //! * `add()` - **Fast** function that adds one shape to a Vec.
 //! * `draw()` - **Slow** function that sends the Vec to the one vertex buffer object on the gpu and then draws them using DrawArrays. 
@@ -36,13 +36,15 @@
 //!
 //! The top left corner is the origin (0,0) and x and y grow to the right and downwards respectively.
 //!
-//! In windowed mode, the dimenions of the window defaults to scale exactly to the world. For example,
-//! if the user made a window of size 800,600, and then drew a circle at 400,300, the 
+//! In windowed and fullscreen mode, the dimenions of the window defaults to scale exactly to the world.
+//! For example, if the user made a window of size 800,600, and then drew a circle at 400,300, the 
 //! circle would appear in the center of the window.
-//! 
-//! In fullscreen mode, the user is forced to set the scale themselves before any drawing can happen.
-//! This is because there is no reasonable default since the user has no control over the size of
-//! a fullscreen, unlike in windowed mode. The user is forced to scale x and y the same. 
+//! Similarily, if the user had a monitor with a resolution of 800,600 and started in fullscreen mode,
+//! and drew a circle at 400,300, it would also appear in the center of the screen.
+//!
+//! The ratio between the scale of x and y are fixed to be 1:1 so that there is no distortion in the
+//! shapes. The user can manually set the scale either by x or y and the other axis is automaically inferred
+//! so that to keep a 1:1 ratio.
 //!
 //! # Example
 //!
@@ -73,6 +75,7 @@
 //!   .addp(9.,5.)
 //!   .draw();
 //!
+//! //Swap buffers on the opengl context.
 //! glsys.swap_buffers();
 //! ```
 
@@ -115,7 +118,6 @@ impl RefreshTimer {
 pub struct FullScreenSystem {
     inner: MySys,
     windowed_context: glutin::WindowedContext<PossiblyCurrent>,
-    view_port_set: bool,
 }
 impl FullScreenSystem {
     pub fn new(events_loop: &glutin::event_loop::EventLoop<()>) -> Self {
@@ -132,8 +134,6 @@ impl FullScreenSystem {
             .build_windowed(gl_window, &events_loop)
             .unwrap();
 
-        //std::thread::sleep(std::time::Duration::from_millis(500));
-
         let windowed_context = unsafe { windowed_context.make_current().unwrap() };
 
         // Load the OpenGL function pointers
@@ -143,11 +143,14 @@ impl FullScreenSystem {
         let glutin::dpi::LogicalSize { width, height } = windowed_context.window().inner_size();
         let game_world = Rect::new(0.0, width as f32, 0.0, height as f32);
 
-        FullScreenSystem {
+        let mut f = FullScreenSystem {
             windowed_context,
             inner: MySys::new(game_world),
-            view_port_set: false,
-        }
+        };
+
+        f.set_viewport_from_width(width as f32);
+
+        f
     }
 
     pub fn set_viewport_from_width(&mut self, width: f32) {
@@ -157,7 +160,6 @@ impl FullScreenSystem {
         let height = aspect_ratio * width;
         self.inner
             .set_viewport(dim.x, rect(0.0, width, 0.0, height));
-        self.view_port_set = true;
     }
 
     pub fn set_viewport_min(&mut self, d: f32) {
@@ -175,11 +177,9 @@ impl FullScreenSystem {
         let width = aspect_ratio * height;
         self.inner
             .set_viewport(dim.x, rect(0.0, width, 0.0, height));
-        self.view_port_set = true;
     }
 
     pub fn session(&mut self) -> DrawSession {
-        assert!(self.view_port_set);
         self.inner.draw_sys()
     }
     pub fn get_dim(&self) -> Vec2<usize> {
@@ -220,17 +220,11 @@ impl WindowedSystem {
             .build_windowed(gl_window, &events_loop)
             .unwrap();
 
-        //std::thread::sleep(std::time::Duration::from_millis(500));
-
         let windowed_context = unsafe { windowed_context.make_current().unwrap() };
 
         // Load the OpenGL function pointers
         gl::load_with(|symbol| windowed_context.get_proc_address(symbol) as *const _);
         assert_eq!(unsafe { gl::GetError() }, gl::NO_ERROR);
-
-        //let glutin::dpi::LogicalSize{width,height}=windowed_context.window().inner_size();
-
-        //dbg!(width,height);
 
         WindowedSystem {
             windowed_context,

@@ -13,8 +13,7 @@ fn main() {
     let events_loop = glutin::event_loop::EventLoop::new();
     let mut glsys = WindowedSystem::new(vec2(600., 480.), &events_loop);
     //let mut glsys=FullScreenSystem::new(&events_loop);
-    //glsys.set_viewport_min(600.0);
-
+    
     let mut timer = very_simple_2d::RefreshTimer::new(16);
 
     let mut counter = 0;
