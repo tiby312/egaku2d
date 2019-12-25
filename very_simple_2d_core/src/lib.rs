@@ -134,6 +134,9 @@ impl RectSave{
 }
 
 impl RectSession<'_> {
+    pub fn save(&mut self)->RectSave{
+        RectSave{buffer:vbo::StaticBuffer::new(self.sys.circle_buffer.get_verts())}
+    }
     pub fn draw(&mut self) {
         self.sys.circle_buffer.update();
 

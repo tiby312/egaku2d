@@ -29,7 +29,7 @@ impl<V> StaticBuffer<V>{
                 gl::ARRAY_BUFFER,
                 (data.len() * mem::size_of::<V>()) as GLsizeiptr,
                 mem::transmute(data.as_ptr()),
-                gl::STATIC_DRAW,
+                gl::DYNAMIC_DRAW, //TODO change to static
             );
             gl_ok!();
         }
@@ -63,6 +63,9 @@ impl<V> Drop for GrowableBuffer<V> {
 }
 
 impl<V: Default> GrowableBuffer<V> {
+    pub fn get_verts(&self)->&[V]{
+        &self.buffer
+    }
     pub fn new() -> GrowableBuffer<V> {
         let mut vbo = 0;
 
@@ -109,6 +112,7 @@ impl<V: Default> GrowableBuffer<V> {
     }
 
     pub fn push(&mut self, a: V) {
+        //TODO do this at the end on draw!!!!!!!!!!!!!!!!!
         if self.buffer.len() == self.buffer.capacity() {
             self.buffer.push(a);
             //println!("Re-generating vbo to size={:?}",self.buffer.capacity());
@@ -125,6 +129,7 @@ impl<V: Default> GrowableBuffer<V> {
     pub fn clear(&mut self) {
         self.buffer.clear();
     }
+
 
     fn re_generate_buffer(&mut self) {
         let vbo = &mut self.vbo;

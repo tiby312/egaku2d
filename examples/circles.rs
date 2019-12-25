@@ -89,11 +89,13 @@ fn main() {
                 }
 
                 //Draw some rectangles
-                let mut k = sys.rects([0.8, 0.8, 1.0, 0.2]);
-                k.addp(50., 100., 300., 350.);
-                k.addp(400., 420., 300., 400.);
-                k.draw();
-                drop(k);
+                let rect_save={
+                    let mut k = sys.rects([0.8, 0.8, 1.0, 0.2]);
+                    k.addp(50., 100., 300., 350.);
+                    k.addp(400., 420., 300., 400.);
+                    k.save()
+                };
+                rect_save.display(&sys);
 
                 {
                     //Draw a growing circle
