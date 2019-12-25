@@ -1,4 +1,52 @@
+use core::marker::PhantomData;
 use super::*;
+
+
+
+pub struct StaticBuffer<V>{
+    vbo:u32,
+    len:usize,
+    _p:PhantomData<V>
+}
+impl<V> Drop for StaticBuffer<V>{
+    fn drop(&mut self){
+        unsafe{
+            gl::DeleteBuffers(1,&self.vbo);
+        }
+    }
+}
+impl<V> StaticBuffer<V>{
+    pub fn new(data:&[V])->StaticBuffer<V>{
+        let mut vbo = 0;
+
+        unsafe {
+            // Create a Vertex Buffer Object and copy the vertex data to it
+            gl::GenBuffers(1, &mut vbo);
+            gl_ok!();
+            gl::BindBuffer(gl::ARRAY_BUFFER, vbo);
+            gl_ok!();
+            gl::BufferData(
+                gl::ARRAY_BUFFER,
+                (data.len() * mem::size_of::<V>()) as GLsizeiptr,
+                mem::transmute(data.as_ptr()),
+                gl::STATIC_DRAW,
+            );
+            gl_ok!();
+        }
+
+        StaticBuffer{vbo,_p:PhantomData,len:data.len()}
+    }
+
+    pub fn len(&self)->usize{
+         self.len
+    }
+
+    pub fn get_id(&self) -> u32 {
+        self.vbo
+    }
+
+}
+
 
 #[derive(Clone, Debug)]
 pub struct GrowableBuffer<V> {

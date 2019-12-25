@@ -114,6 +114,24 @@ impl Drop for RectSession<'_> {
     }
 }
 
+pub struct RectSave{
+    buffer:vbo::StaticBuffer<circle_program::Vertex>
+}
+impl RectSave{
+    pub fn display(&self,session:&DrawSession){
+         unsafe {
+            gl::UseProgram(session.sys.circle_program.program);
+            gl_ok!();
+
+            //TODO move this down more?
+            gl::BindBuffer(gl::ARRAY_BUFFER, self.buffer.get_id());
+            gl_ok!();
+
+            gl::DrawArrays(gl::TRIANGLES, 0 as i32, self.buffer.len() as i32);
+            gl_ok!();
+        }
+    }
+}
 
 impl RectSession<'_> {
     pub fn draw(&mut self) {
