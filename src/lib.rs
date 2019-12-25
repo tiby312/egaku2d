@@ -179,9 +179,10 @@ impl FullScreenSystem {
             .set_viewport(dim.x, rect(0.0, width, 0.0, height));
     }
 
-    pub fn session(&mut self) -> DrawSession {
-        self.inner.draw_sys()
+    pub fn session(&mut self,back_color:[f32;3]) -> DrawSession {
+        self.inner.draw_sys(back_color)
     }
+
     pub fn get_dim(&self) -> Vec2<usize> {
         let glutin::dpi::LogicalSize { width, height } =
             self.windowed_context.window().inner_size();
@@ -264,8 +265,8 @@ impl WindowedSystem {
         vec2(width as usize, height as usize)
     }
 
-    pub fn session(&mut self) -> DrawSession {
-        self.inner.draw_sys()
+    pub fn session(&mut self,back_color:[f32;3]) -> DrawSession {
+        self.inner.draw_sys(back_color)
     }
     pub fn swap_buffers(&mut self) {
         self.windowed_context.swap_buffers().unwrap();

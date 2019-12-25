@@ -32,7 +32,7 @@ fn main() {
         },
         Event::EventsCleared => {
             if timer.is_ready() {
-                let mut sys = glsys.session();
+                let mut sys = glsys.session([0.2,0.2,0.2]);
 
                 //Draw some arrows
                 sys.arrows([0.0, 1.0, 0.1, 0.5], 5.0)

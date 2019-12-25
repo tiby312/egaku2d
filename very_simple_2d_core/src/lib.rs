@@ -114,6 +114,7 @@ impl Drop for RectSession<'_> {
     }
 }
 
+
 impl RectSession<'_> {
     pub fn draw(&mut self) {
         self.sys.circle_buffer.update();
@@ -402,7 +403,6 @@ impl DrawSession<'_> {
 }
 
 pub struct MySys {
-    back_color: [f32; 3],
     circle_program: CircleProgram,
     point_mul: PointMul,
     circle_buffer: vbo::GrowableBuffer<circle_program::Vertex>,
@@ -419,24 +419,21 @@ impl MySys {
         let mut circle_program = CircleProgram::new();
         let point_mul = circle_program.set_viewport(dim.x.distance(), dim);
 
-        let back_color = [0.2; 3];
-
         MySys {
             point_mul,
-            back_color,
             circle_program,
             circle_buffer,
         }
     }
 
-    pub fn draw_sys(&mut self) -> DrawSession {
-        let back_color = &self.back_color;
+    pub fn draw_sys(&mut self,back_color:[f32;3]) -> DrawSession {
         unsafe {
+
+            gl::ClearColor(back_color[0], back_color[1], back_color[2], 1.0);
+            gl_ok!();
             gl::BlendFunc(gl::SRC_ALPHA, gl::ONE_MINUS_SRC_ALPHA);
             gl_ok!();
             gl::Enable(gl::BLEND);
-            gl_ok!();
-            gl::ClearColor(back_color[0], back_color[1], back_color[2], 1.0);
             gl_ok!();
             gl::Clear(gl::COLOR_BUFFER_BIT);
             gl_ok!();
