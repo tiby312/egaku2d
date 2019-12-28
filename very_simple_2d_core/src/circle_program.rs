@@ -86,6 +86,47 @@ impl CircleProgram {
         PointMul(width / w)
     }
 
+    pub fn set_uniforms(&mut self,point_size:f32,col:[f32;4],square:usize){
+        
+        unsafe {
+            gl::UseProgram(self.program);
+            gl_ok!();
+
+            gl::Uniform1f(self.point_size_uniform, 0.0);
+            gl_ok!();
+            gl::Uniform4fv(
+                self.bcol_uniform,
+                1,
+                col.as_ptr() as *const _
+            );
+            gl_ok!();
+
+            let square = 0;
+            gl::Uniform1i(self.square_uniform, square);
+            gl_ok!();
+        }
+    }
+    pub fn set_buffer_and_draw(&mut self,buffer_id:u32,mode:GLenum,length:usize){
+        unsafe{
+            gl::BindBuffer(gl::ARRAY_BUFFER, buffer_id);
+            gl_ok!();
+                
+            gl::VertexAttribPointer(
+                    self.pos_attr as GLuint,
+                    2,
+                    gl::FLOAT,
+                    gl::FALSE as GLboolean,
+                    /*2 * core::mem::size_of::<f32>() as i32*/ 0 as i32,
+                    core::ptr::null(),
+                );
+            gl_ok!();
+
+            gl::DrawArrays(mode, 0 as i32, length as i32);
+
+            gl_ok!();
+        }
+    }
+
     pub fn new() -> CircleProgram {
         unsafe {
             // Create GLSL shaders
@@ -135,7 +176,7 @@ impl CircleProgram {
                 2,
                 gl::FLOAT,
                 gl::FALSE as GLboolean,
-                2 * core::mem::size_of::<f32>() as i32,
+                /*2 * core::mem::size_of::<f32>() as i32*/ 0 as i32,
                 core::ptr::null(),
             );
             gl_ok!();

@@ -9,11 +9,22 @@ use glutin::event::VirtualKeyCode;
 use glutin::event::WindowEvent;
 use glutin::event_loop::ControlFlow;
 
+
+
+
 fn main() {
     let events_loop = glutin::event_loop::EventLoop::new();
     let mut glsys = WindowedSystem::new(vec2(600., 480.), &events_loop);
     //let mut glsys=FullScreenSystem::new(&events_loop);
     
+    let mut rect_save={
+        let mut k = glsys.session([0.2,0.2,0.2]).rects([0.8, 0.8, 1.0, 0.2]);
+        k.addp(400., 420., 300., 400.);
+        k.addp(50., 100., 300., 350.);
+        k.addp(5., 100., 30., 350.);
+        k.save()
+    };
+
     let mut timer = very_simple_2d::RefreshTimer::new(16);
 
     let mut counter = 0;
@@ -33,7 +44,7 @@ fn main() {
         Event::EventsCleared => {
             if timer.is_ready() {
                 let mut sys = glsys.session([0.2,0.2,0.2]);
-
+                /* 
                 //Draw some arrows
                 sys.arrows([0.0, 1.0, 0.1, 0.5], 5.0)
                     .add(vec2(40., 40.), vec2(40., 200.))
@@ -66,6 +77,7 @@ fn main() {
                 }
 
                 //Draw some lines
+                
                 sys.lines([0., 1.0, 1., 0.3], 3.0)
                     .add(vec2(400., 0.), vec2(300., 10.))
                     .add(vec2(10., 300.), vec2(300., 400.))
@@ -78,7 +90,7 @@ fn main() {
                         .add(vec2(50., 500.), vec2(500., 50. + c.sin() * 50.))
                         .draw();
                 }
-
+                */
                 {
                     //Draw a rotating arrow
                     let c = counter as f32 * 0.04;
@@ -87,23 +99,20 @@ fn main() {
                         .add(center, center + vec2(c.cos() * 80., c.sin() * 80.))
                         .draw();
                 }
-
+                
                 //Draw some rectangles
-                let rect_save={
-                    let mut k = sys.rects([0.8, 0.8, 1.0, 0.2]);
-                    k.addp(50., 100., 300., 350.);
-                    k.addp(400., 420., 300., 400.);
-                    k.save()
-                };
-                rect_save.display(&sys);
+                {
+                    rect_save.display(&mut sys);
+                }
 
+                /*
                 {
                     //Draw a growing circle
                     let c = ((counter as f32 * 0.06).sin() * 40.0).abs();
                     sys.circles([1.0, 1.0, 1.0, 1.0], c)
                         .addp(520., 400.)
                         .draw();
-                }
+                }*/
 
                 //Display what we drew
                 glsys.swap_buffers();

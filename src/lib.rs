@@ -179,7 +179,7 @@ impl FullScreenSystem {
             .set_viewport(dim.x, rect(0.0, width, 0.0, height));
     }
 
-    pub fn session(&mut self,back_color:[f32;3]) -> DrawSession {
+    pub fn session(&mut self,back_color:[f32;3]) -> &mut DrawSession {
         self.inner.draw_sys(back_color)
     }
 
@@ -265,7 +265,7 @@ impl WindowedSystem {
         vec2(width as usize, height as usize)
     }
 
-    pub fn session(&mut self,back_color:[f32;3]) -> DrawSession {
+    pub fn session(&mut self,back_color:[f32;3]) -> &mut DrawSession {
         self.inner.draw_sys(back_color)
     }
     pub fn swap_buffers(&mut self) {

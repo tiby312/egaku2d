@@ -2,10 +2,10 @@ use core::marker::PhantomData;
 use super::*;
 
 
-
+#[derive(Debug)]
 pub struct StaticBuffer<V>{
     vbo:u32,
-    len:usize,
+    length:usize,
     _p:PhantomData<V>
 }
 impl<V> Drop for StaticBuffer<V>{
@@ -15,10 +15,9 @@ impl<V> Drop for StaticBuffer<V>{
         }
     }
 }
-impl<V> StaticBuffer<V>{
+impl<V:core::fmt::Debug+Copy+Clone> StaticBuffer<V>{
     pub fn new(data:&[V])->StaticBuffer<V>{
         let mut vbo = 0;
-
         unsafe {
             // Create a Vertex Buffer Object and copy the vertex data to it
             gl::GenBuffers(1, &mut vbo);
@@ -28,17 +27,15 @@ impl<V> StaticBuffer<V>{
             gl::BufferData(
                 gl::ARRAY_BUFFER,
                 (data.len() * mem::size_of::<V>()) as GLsizeiptr,
-                mem::transmute(data.as_ptr()),
-                gl::DYNAMIC_DRAW, //TODO change to static
+                data.as_ptr() as *const std::ffi::c_void,
+                gl::STATIC_DRAW, //TODO change to static
             );
-            gl_ok!();
         }
-
-        StaticBuffer{vbo,_p:PhantomData,len:data.len()}
+        StaticBuffer{vbo,_p:PhantomData,length:data.len()}
     }
 
     pub fn len(&self)->usize{
-         self.len
+         self.length
     }
 
     pub fn get_id(&self) -> u32 {
@@ -101,7 +98,7 @@ impl<V: Default> GrowableBuffer<V> {
                 gl::ARRAY_BUFFER,
                 0,
                 (self.buffer.len() * mem::size_of::<V>()) as GLsizeiptr,
-                mem::transmute(self.buffer.as_ptr()),
+                self.buffer.as_ptr() as *const _,
             );
             gl_ok!();
         }
