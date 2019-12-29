@@ -39,7 +39,7 @@ pub struct SquareSave{
     buffer:vbo::StaticBuffer<circle_program::Vertex>
 }
 impl SquareSave{
-    pub fn display(&mut self,session:&mut MySys){
+    pub fn display(&self,session:&mut MySys){
         session.circle_program.set_buffer_and_draw(self.radius*GL_POINT_COMP*session.point_mul.0,self.col,0,self.buffer.get_id(),gl::POINTS,self.buffer.len());
     }
 }
@@ -85,7 +85,7 @@ pub struct CircleSave{
     buffer:vbo::StaticBuffer<circle_program::Vertex>
 }
 impl CircleSave{
-    pub fn display(&mut self,session:&mut MySys){
+    pub fn display(&self,session:&mut MySys){
         session.circle_program.set_buffer_and_draw(self.radius*GL_POINT_COMP*session.point_mul.0,self.col,1,self.buffer.get_id(),gl::POINTS,self.buffer.len());
     }
 }
@@ -137,7 +137,7 @@ pub struct RectSave{
     buffer:vbo::StaticBuffer<circle_program::Vertex>
 }
 impl RectSave{
-    pub fn display(&mut self,session:&mut MySys){
+    pub fn display(&self,session:&mut MySys){
         session.circle_program.set_buffer_and_draw(0.0,self.col,0,self.buffer.get_id(),gl::TRIANGLES,self.buffer.len());
     }
 }
@@ -178,7 +178,7 @@ pub struct ArrowSave{
     buffer:vbo::StaticBuffer<circle_program::Vertex>
 }
 impl ArrowSave{
-    pub fn display(&mut self,session:&mut MySys){
+    pub fn display(&self,session:&mut MySys){
         session.circle_program.set_buffer_and_draw(0.0,self.col,0,self.buffer.get_id(),gl::TRIANGLES,self.buffer.len());
     }
 }
@@ -242,7 +242,7 @@ pub struct LineSave{
 
 
 impl LineSave{
-    pub fn display(&mut self,session:&mut MySys){
+    pub fn display(&self,session:&mut MySys){
         let _kk = session.point_mul.0;
         session.circle_program.set_buffer_and_draw(0.0,self.col,0,self.buffer.get_id(),gl::TRIANGLES,self.buffer.len());
     }
@@ -315,6 +315,13 @@ impl MySys {
         let mut circle_program = CircleProgram::new();
         let point_mul = circle_program.set_viewport(dim.x.distance(), dim);
 
+        unsafe{
+            gl::BlendFunc(gl::SRC_ALPHA, gl::ONE_MINUS_SRC_ALPHA);
+            gl_ok!();
+            gl::Enable(gl::BLEND);
+            gl_ok!();
+        }
+
         MySys {
             point_mul,
             circle_program,
@@ -351,16 +358,14 @@ impl MySys {
     }
 
 
-    pub fn clear_screen(&mut self,back_color:[f32;3]){
+    pub fn clear_color(&mut self,back_color:[f32;3]){
         unsafe {
             gl::ClearColor(back_color[0], back_color[1], back_color[2], 1.0);
             gl_ok!();
-            gl::BlendFunc(gl::SRC_ALPHA, gl::ONE_MINUS_SRC_ALPHA);
-            gl_ok!();
-            gl::Enable(gl::BLEND);
-            gl_ok!();
+            
             gl::Clear(gl::COLOR_BUFFER_BIT);
             gl_ok!();
+            
         }
     }
 

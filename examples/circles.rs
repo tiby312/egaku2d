@@ -17,7 +17,7 @@ fn main() {
     let mut sys = WindowedSystem::new(vec2(600., 480.), &events_loop);
     //let mut glsys=FullScreenSystem::new(&events_loop);
     
-    let mut rect_save={
+    let rect_save={
         let mut k = sys.inner_mut().rects([0.8, 0.8, 1.0, 0.2]);
         k.addp(400., 420., 300., 400.);
         k.addp(50., 100., 300., 350.);
@@ -25,7 +25,7 @@ fn main() {
         k.save()
     };
 
-    let mut square_save={
+    let square_save={
         //Draw some squares
         let mut k = sys.inner_mut().squares([1., 0., 1., 0.1], 10.0);
         for x in (0..1000).step_by(100) {
@@ -34,6 +34,22 @@ fn main() {
             }
         }
         k.save()
+    };
+
+    let arrow_save={
+        //Draw some arrows
+        sys.inner_mut().arrows([0.0, 1.0, 0.1, 0.5], 5.0)
+            .add(vec2(40., 40.), vec2(40., 200.))
+            .add(vec2(40., 40.), vec2(200., 40.))
+            .save()
+    };
+
+    let line_save={
+        //Draw some lines            
+        sys.inner_mut().lines([0., 1.0, 1., 0.3], 3.0)
+            .add(vec2(400., 0.), vec2(300., 10.))
+            .add(vec2(10., 300.), vec2(300., 400.))
+            .save()
     };
 
     let mut timer = very_simple_2d::RefreshTimer::new(16);
@@ -55,13 +71,14 @@ fn main() {
         Event::EventsCleared => {
             if timer.is_ready() {
                 let mut glsys=sys.inner_mut();
-                glsys.clear_screen([0.2,0.2,0.2]);
                 
-                //Draw some arrows
-                glsys.arrows([0.0, 1.0, 0.1, 0.5], 5.0)
-                    .add(vec2(40., 40.), vec2(40., 200.))
-                    .add(vec2(40., 40.), vec2(200., 40.))
-                    .draw();
+                glsys.clear_color([0.2,0.2,0.2]);
+                
+                //draw static VBOs already on the gpu.
+                arrow_save.display(&mut glsys);
+                line_save.display(&mut glsys);
+                square_save.display(&mut glsys);
+                rect_save.display(&mut glsys);
 
                 {
                     //Draw some moving circles
@@ -76,14 +93,6 @@ fn main() {
                     }
                     k.draw();
                 }
-
-                square_save.display(&mut glsys);
-
-                //Draw some lines            
-                glsys.lines([0., 1.0, 1., 0.3], 3.0)
-                    .add(vec2(400., 0.), vec2(300., 10.))
-                    .add(vec2(10., 300.), vec2(300., 400.))
-                    .draw();
 
                 {
                     //Draw a moving line
@@ -102,8 +111,6 @@ fn main() {
                         .draw();
                 }
                 
-                //Draw some rectangles
-                rect_save.display(&mut glsys);
                 
                 {
                     //Draw a growing circle
