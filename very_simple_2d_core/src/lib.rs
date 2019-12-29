@@ -61,6 +61,10 @@ impl<'a> SquareSession<'a> {
     pub fn addp(&mut self, x:f32,y:f32)->&mut Self{
         self.add(vec2(x,y))
     }
+    pub fn save(&mut self)->SquareSave{
+        SquareSave{col:self.col,radius:self.radius,buffer:vbo::StaticBuffer::new(self.sys.circle_buffer.get_verts())}
+    }
+
 
     pub fn draw(&mut self) {
         self.sys.circle_buffer.update();
@@ -96,7 +100,7 @@ impl<'a> Drop for CircleSession<'a> {
     }
 }
 impl<'a> CircleSession<'a> {
-     pub fn save(&mut self)->CircleSave{
+    pub fn save(&mut self)->CircleSave{
         CircleSave{col:self.col,radius:self.radius,buffer:vbo::StaticBuffer::new(self.sys.circle_buffer.get_verts())}
     }
 

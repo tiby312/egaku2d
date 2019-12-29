@@ -25,6 +25,17 @@ fn main() {
         k.save()
     };
 
+    let mut square_save={
+        //Draw some squares
+        let mut k = sys.inner_mut().squares([1., 0., 1., 0.1], 10.0);
+        for x in (0..1000).step_by(100) {
+            for y in (0..1000).step_by(100) {
+                k.addp(x as f32, y as f32);
+            }
+        }
+        k.save()
+    };
+
     let mut timer = very_simple_2d::RefreshTimer::new(16);
 
     let mut counter = 0;
@@ -66,19 +77,9 @@ fn main() {
                     k.draw();
                 }
 
-                {
-                    //Draw some squares
-                    let mut k = glsys.squares([1., 0., 1., 0.1], 10.0);
-                    for x in (0..1000).step_by(100) {
-                        for y in (0..1000).step_by(100) {
-                            k.addp(x as f32, y as f32);
-                        }
-                    }
-                    k.draw();
-                }
+                square_save.display(&mut glsys);
 
-                //Draw some lines
-                
+                //Draw some lines            
                 glsys.lines([0., 1.0, 1., 0.3], 3.0)
                     .add(vec2(400., 0.), vec2(300., 10.))
                     .add(vec2(10., 300.), vec2(300., 400.))
