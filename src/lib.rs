@@ -165,7 +165,7 @@ impl FullScreenSystem {
 
         let mut f = FullScreenSystem {
             windowed_context,
-            inner: MySys::new(game_world),
+            inner: unsafe{MySys::new(game_world)},
         };
 
         f.set_viewport_from_width(width as f32);
@@ -249,7 +249,7 @@ impl WindowedSystem {
 
         WindowedSystem {
             windowed_context,
-            inner: MySys::new(game_world),
+            inner: unsafe{MySys::new(game_world)},
         }
     }
 

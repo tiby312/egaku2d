@@ -303,6 +303,10 @@ pub struct MySys {
     point_mul: PointMul,
     circle_buffer: vbo::GrowableBuffer<circle_program::Vertex>,
 }
+
+
+
+
 impl MySys {
     fn reset(&mut self) {
         self.circle_buffer.clear();
@@ -310,17 +314,20 @@ impl MySys {
     pub fn set_viewport(&mut self, width: f32, rect: Rect<f32>) {
         self.point_mul = self.circle_program.set_viewport(width, rect);
     }
-    pub fn new(dim: Rect<f32>) -> MySys {
+
+    //Unsafe since user might create two instances, both of 
+    //which could make opengl calls simultaneously
+    pub unsafe fn new(dim: Rect<f32>) -> MySys {
+        
         let circle_buffer = vbo::GrowableBuffer::new();
         let mut circle_program = CircleProgram::new();
         let point_mul = circle_program.set_viewport(dim.x.distance(), dim);
 
-        unsafe{
-            gl::BlendFunc(gl::SRC_ALPHA, gl::ONE_MINUS_SRC_ALPHA);
-            gl_ok!();
-            gl::Enable(gl::BLEND);
-            gl_ok!();
-        }
+        gl::BlendFunc(gl::SRC_ALPHA, gl::ONE_MINUS_SRC_ALPHA);
+        gl_ok!();
+        gl::Enable(gl::BLEND);
+        gl_ok!();
+        
 
         MySys {
             point_mul,
