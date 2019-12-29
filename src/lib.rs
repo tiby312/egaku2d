@@ -24,13 +24,22 @@
 //! Each one of these follows the same simple api for drawing:
 //!
 //! * `add()` - **Fast** function that adds one shape to a Vec.
-//! * `draw()` - **Slow** function that sends the Vec to the one vertex buffer object on the gpu and then draws them using DrawArrays. 
+//! * `send_and_draw()` - **Slow** function that sends the Vec to the one vertex buffer object on the gpu and then draws them using DrawArrays. 
 //! 
 //! Using this api, the user can efficiently draw thousands of circles, for example, with the caveat that
 //! they all will be the same radius and color/transparency values. This api does not allow the user
 //! to efficiently draw thousands of circles where each circle has a different color or radius.
 //! This was a design decision to make each vertex as lightweight as possible (just a x and y position),
 //! making it more efficient to set and send to the gpu.
+//!
+//! Additionally there are the following functions:
+//!
+//! * `save()` - **Slow** function that creates a static VBO contains the shapes added from `add()`.
+//! * `draw()` - **Fast** function that draws a static VBO. This is fast since the data already exists on the gpu.
+//!
+//! These functions allow the user to efficiently draw thousands of static objects by uploading all
+//! of their shape data just once to the gpu. For dynamic shapes that move every step,
+//! the user should use send_and_draw() every step.
 //!
 //! # View
 //!
@@ -53,27 +62,39 @@
 //! let events_loop = glutin::event_loop::EventLoop::new();
 //! let mut glsys = very_simple_2d::WindowedSystem::new(vec2(600., 480.), &events_loop);
 //!
-//! let mut sys = glsys.session();
+//! let mut sys = glsys.inner_mut();
+//!
+//! //Make the background dark gray.
+//! sys.clear_color([0.2,0.2,0.2]);
+//! 
+//! //Push some squares to a static vertex buffer object on the gpu.
+//! let rect_save = sys.squares([0.0, 1.0, 0.1, 0.5], 5.0)
+//!   .addp(40., 40.)
+//!   .addp(40., 40.)
+//!   .save();
+//!
+//! //Draw the squares we saved.
+//! rect_save.draw(&mut sys);
 //!
 //! //Draw some arrows.
 //! sys.arrows([0.0, 1.0, 0.1, 0.5], 5.0)
 //!   .add(vec2(40., 40.), vec2(40., 200.))
 //!   .add(vec2(40., 40.), vec2(200., 40.))
-//!   .draw();
+//!   .send_and_draw();
 //!
 //! //Draw some circles.
 //! sys.circles([0., 1., 1., 0.1], 4.0)
 //!   .add(vec2(5.,6.))
 //!   .add(vec2(7.,8.))
 //!   .add(vec2(9.,5.))
-//!   .draw();
+//!   .send_and_draw();
 //!
 //! //Draw some circles from f32 primitives.
 //! sys.circles([0., 1., 1., 0.1], 4.0)
 //!   .addp(5.,6.)
 //!   .addp(7.,8.)
 //!   .addp(9.,5.)
-//!   .draw();
+//!   .send_and_draw();
 //!
 //! //Swap buffers on the opengl context.
 //! glsys.swap_buffers();

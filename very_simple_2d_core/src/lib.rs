@@ -39,7 +39,7 @@ pub struct SquareSave{
     buffer:vbo::StaticBuffer<circle_program::Vertex>
 }
 impl SquareSave{
-    pub fn display(&self,session:&mut MySys){
+    pub fn draw(&self,session:&mut MySys){
         session.circle_program.set_buffer_and_draw(self.radius*GL_POINT_COMP*session.point_mul.0,self.col,0,self.buffer.get_id(),gl::POINTS,self.buffer.len());
     }
 }
@@ -66,7 +66,7 @@ impl<'a> SquareSession<'a> {
     }
 
 
-    pub fn draw(&mut self) {
+    pub fn send_and_draw(&mut self) {
         self.sys.circle_buffer.update();
         self.sys.circle_buffer.update();
         self.sys.circle_program.set_buffer_and_draw(self.radius*GL_POINT_COMP*self.sys.point_mul.0,self.col,0,self.sys.circle_buffer.get_id(),gl::POINTS,self.sys.circle_buffer.len());       
@@ -85,7 +85,7 @@ pub struct CircleSave{
     buffer:vbo::StaticBuffer<circle_program::Vertex>
 }
 impl CircleSave{
-    pub fn display(&self,session:&mut MySys){
+    pub fn draw(&self,session:&mut MySys){
         session.circle_program.set_buffer_and_draw(self.radius*GL_POINT_COMP*session.point_mul.0,self.col,1,self.buffer.get_id(),gl::POINTS,self.buffer.len());
     }
 }
@@ -104,7 +104,7 @@ impl<'a> CircleSession<'a> {
         CircleSave{col:self.col,radius:self.radius,buffer:vbo::StaticBuffer::new(self.sys.circle_buffer.get_verts())}
     }
 
-    pub fn draw(&mut self) {
+    pub fn send_and_draw(&mut self) {
         self.sys.circle_buffer.update();
         self.sys.circle_program.set_buffer_and_draw(self.radius*GL_POINT_COMP*self.sys.point_mul.0,self.col,1,self.sys.circle_buffer.get_id(),gl::POINTS,self.sys.circle_buffer.len());       
     }
@@ -137,7 +137,7 @@ pub struct RectSave{
     buffer:vbo::StaticBuffer<circle_program::Vertex>
 }
 impl RectSave{
-    pub fn display(&self,session:&mut MySys){
+    pub fn draw(&self,session:&mut MySys){
         session.circle_program.set_buffer_and_draw(0.0,self.col,0,self.buffer.get_id(),gl::TRIANGLES,self.buffer.len());
     }
 }
@@ -147,7 +147,7 @@ impl RectSession<'_> {
         RectSave{col:self.col,buffer:vbo::StaticBuffer::new(self.sys.circle_buffer.get_verts())}
     }
 
-    pub fn draw(&mut self) {
+    pub fn send_and_draw(&mut self) {
         self.sys.circle_buffer.update();
         self.sys.circle_program.set_buffer_and_draw(0.0,self.col,0,self.sys.circle_buffer.get_id(),gl::TRIANGLES,self.sys.circle_buffer.len());       
     }
@@ -178,7 +178,7 @@ pub struct ArrowSave{
     buffer:vbo::StaticBuffer<circle_program::Vertex>
 }
 impl ArrowSave{
-    pub fn display(&self,session:&mut MySys){
+    pub fn draw(&self,session:&mut MySys){
         session.circle_program.set_buffer_and_draw(0.0,self.col,0,self.buffer.get_id(),gl::TRIANGLES,self.buffer.len());
     }
 }
@@ -198,7 +198,7 @@ impl ArrowSession<'_> {
         ArrowSave{col:self.col,buffer:vbo::StaticBuffer::new(self.sys.circle_buffer.get_verts())}
     }
 
-    pub fn draw(&mut self) {
+    pub fn send_and_draw(&mut self) {
         self.sys.circle_buffer.update();
         self.sys.circle_program.set_buffer_and_draw(0.0,self.col,0,self.sys.circle_buffer.get_id(),gl::TRIANGLES,self.sys.circle_buffer.len());
     }
@@ -242,7 +242,7 @@ pub struct LineSave{
 
 
 impl LineSave{
-    pub fn display(&self,session:&mut MySys){
+    pub fn draw(&self,session:&mut MySys){
         let _kk = session.point_mul.0;
         session.circle_program.set_buffer_and_draw(0.0,self.col,0,self.buffer.get_id(),gl::TRIANGLES,self.buffer.len());
     }
@@ -263,7 +263,7 @@ impl LineSession<'_> {
         LineSave{col:self.col,buffer:vbo::StaticBuffer::new(self.sys.circle_buffer.get_verts())}
     }
 
-    pub fn draw(&mut self) {
+    pub fn send_and_draw(&mut self) {
         self.sys.circle_buffer.update();
         self.sys.circle_program.set_buffer_and_draw(0.0,self.col,0,self.sys.circle_buffer.get_id(),gl::TRIANGLES,self.sys.circle_buffer.len());
     }
@@ -362,7 +362,7 @@ impl MySys {
         unsafe {
             gl::ClearColor(back_color[0], back_color[1], back_color[2], 1.0);
             gl_ok!();
-            
+
             gl::Clear(gl::COLOR_BUFFER_BIT);
             gl_ok!();
             

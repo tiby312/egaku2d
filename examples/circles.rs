@@ -75,10 +75,10 @@ fn main() {
                 glsys.clear_color([0.2,0.2,0.2]);
                 
                 //draw static VBOs already on the gpu.
-                arrow_save.display(&mut glsys);
-                line_save.display(&mut glsys);
-                square_save.display(&mut glsys);
-                rect_save.display(&mut glsys);
+                arrow_save.draw(&mut glsys);
+                line_save.draw(&mut glsys);
+                square_save.draw(&mut glsys);
+                rect_save.draw(&mut glsys);
 
                 {
                     //Draw some moving circles
@@ -91,7 +91,7 @@ fn main() {
                             k.add(pos + vec2(c.sin() * y as f32 * 0.1, c.cos() * x as f32 * 0.1));
                         }
                     }
-                    k.draw();
+                    k.send_and_draw();
                 }
 
                 {
@@ -99,7 +99,7 @@ fn main() {
                     let c = counter as f32 * 0.07;
                     glsys.lines([1., 1., 0.2, 0.2], 10.)
                         .add(vec2(50., 500.), vec2(500., 50. + c.sin() * 50.))
-                        .draw();
+                        .send_and_draw();
                 }
                 
                 {
@@ -108,7 +108,7 @@ fn main() {
                     let center = vec2(400., 400.);
                     glsys.arrows([1.0, 0.1, 0.5, 0.5], 10.0)
                         .add(center, center + vec2(c.cos() * 80., c.sin() * 80.))
-                        .draw();
+                        .send_and_draw();
                 }
                 
                 
@@ -117,7 +117,7 @@ fn main() {
                     let c = ((counter as f32 * 0.06).sin() * 40.0).abs();
                     glsys.circles([1.0, 1.0, 1.0, 1.0], c)
                         .addp(520., 400.)
-                        .draw();
+                        .send_and_draw();
                 }
 
                 //Display what we drew
