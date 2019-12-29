@@ -84,7 +84,6 @@ pub use glutin;
 use glutin::PossiblyCurrent;
 pub use very_simple_2d_core;
 use very_simple_2d_core::gl;
-pub use very_simple_2d_core::DrawSession;
 use very_simple_2d_core::MySys;
 
 ///A timer to determine how often to refresh the screen.
@@ -179,8 +178,8 @@ impl FullScreenSystem {
             .set_viewport(dim.x, rect(0.0, width, 0.0, height));
     }
 
-    pub fn session(&mut self,back_color:[f32;3]) -> &mut DrawSession {
-        self.inner.draw_sys(back_color)
+    pub fn inner_mut(&mut self) -> &mut MySys {
+        &mut self.inner
     }
 
     pub fn get_dim(&self) -> Vec2<usize> {
@@ -265,8 +264,8 @@ impl WindowedSystem {
         vec2(width as usize, height as usize)
     }
 
-    pub fn session(&mut self,back_color:[f32;3]) -> &mut DrawSession {
-        self.inner.draw_sys(back_color)
+    pub fn inner_mut(&mut self) -> &mut MySys {
+        &mut self.inner
     }
     pub fn swap_buffers(&mut self) {
         self.windowed_context.swap_buffers().unwrap();

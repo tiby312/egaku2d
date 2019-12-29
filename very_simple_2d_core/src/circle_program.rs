@@ -86,13 +86,13 @@ impl CircleProgram {
         PointMul(width / w)
     }
 
-    pub fn set_uniforms(&mut self,point_size:f32,col:[f32;4],square:usize){
+    fn set_uniforms(&mut self,point_size:f32,col:[f32;4],square:usize){
         
         unsafe {
             gl::UseProgram(self.program);
             gl_ok!();
 
-            gl::Uniform1f(self.point_size_uniform, 0.0);
+            gl::Uniform1f(self.point_size_uniform, point_size);
             gl_ok!();
             gl::Uniform4fv(
                 self.bcol_uniform,
@@ -101,12 +101,14 @@ impl CircleProgram {
             );
             gl_ok!();
 
-            let square = 0;
-            gl::Uniform1i(self.square_uniform, square);
+            gl::Uniform1i(self.square_uniform, square as i32);
             gl_ok!();
         }
     }
-    pub fn set_buffer_and_draw(&mut self,buffer_id:u32,mode:GLenum,length:usize){
+    pub fn set_buffer_and_draw(&mut self,point_size:f32,col:[f32;4],square:usize,buffer_id:u32,mode:GLenum,length:usize){
+        self.set_uniforms(point_size,col,square); 
+        
+
         unsafe{
             gl::BindBuffer(gl::ARRAY_BUFFER, buffer_id);
             gl_ok!();
