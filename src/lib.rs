@@ -32,9 +32,9 @@
 //! This was a design decision to make each vertex as lightweight as possible (just a x and y position),
 //! making it more efficient to set and send to the gpu.
 //!
-//! Additionally there are the following functions:
+//! Additionally there are the following functions to optionally save off verticies onto the gpu:
 //!
-//! * `save()` - **Slow** function that creates a static VBO contains the shapes added from `add()`.
+//! * `save()` - **Slow** function that creates a new static VBO containing the shapes added from `add()`.
 //! * `draw()` - **Fast** function that draws a static VBO. This is fast since the data already exists on the gpu.
 //!
 //! These functions allow the user to efficiently draw thousands of static objects by uploading all
@@ -62,39 +62,39 @@
 //! let events_loop = glutin::event_loop::EventLoop::new();
 //! let mut glsys = very_simple_2d::WindowedSystem::new(vec2(600., 480.), &events_loop);
 //!
-//! let mut sys = glsys.inner_mut();
+//! let mut canvas = glsys.canvas_mut();
 //!
 //! //Make the background dark gray.
-//! sys.clear_color([0.2,0.2,0.2]);
+//! canvas.clear_color([0.2,0.2,0.2]);
 //! 
 //! //Push some squares to a static vertex buffer object on the gpu.
-//! let rect_save = sys.squares([0.0, 1.0, 0.1, 0.5], 5.0)
+//! let rect_save = canvas.squares(5.0)
 //!   .addp(40., 40.)
 //!   .addp(40., 40.)
 //!   .save();
 //!
 //! //Draw the squares we saved.
-//! rect_save.draw(&mut sys);
+//! rect_save.draw(&mut canvas,[0.0, 1.0, 0.1, 0.5]);
 //!
 //! //Draw some arrows.
-//! sys.arrows([0.0, 1.0, 0.1, 0.5], 5.0)
+//! canvas.arrows(5.0)
 //!   .add(vec2(40., 40.), vec2(40., 200.))
 //!   .add(vec2(40., 40.), vec2(200., 40.))
-//!   .send_and_draw();
+//!   .send_and_draw([0.0, 1.0, 0.1, 0.5]);
 //!
 //! //Draw some circles.
-//! sys.circles([0., 1., 1., 0.1], 4.0)
+//! canvas.circles(4.0)
 //!   .add(vec2(5.,6.))
 //!   .add(vec2(7.,8.))
 //!   .add(vec2(9.,5.))
-//!   .send_and_draw();
+//!   .send_and_draw([0., 1., 1., 0.1]);
 //!
 //! //Draw some circles from f32 primitives.
-//! sys.circles([0., 1., 1., 0.1], 4.0)
+//! canvas.circles(4.0)
 //!   .addp(5.,6.)
 //!   .addp(7.,8.)
 //!   .addp(9.,5.)
-//!   .send_and_draw();
+//!   .send_and_draw([0., 1., 1., 0.1]);
 //!
 //! //Swap buffers on the opengl context.
 //! glsys.swap_buffers();
@@ -105,7 +105,7 @@ pub use glutin;
 use glutin::PossiblyCurrent;
 pub use very_simple_2d_core;
 use very_simple_2d_core::gl;
-use very_simple_2d_core::MySys;
+use very_simple_2d_core::SimpleCanvas;
 
 ///A timer to determine how often to refresh the screen.
 ///You pass it the desired refresh rate, then you can poll
@@ -136,7 +136,7 @@ impl RefreshTimer {
 ///After construction, the user must set the viewport using the window dimension
 ///information.
 pub struct FullScreenSystem {
-    inner: MySys,
+    inner: SimpleCanvas,
     windowed_context: glutin::WindowedContext<PossiblyCurrent>,
 }
 impl FullScreenSystem {
@@ -165,7 +165,7 @@ impl FullScreenSystem {
 
         let mut f = FullScreenSystem {
             windowed_context,
-            inner: unsafe{MySys::new(game_world)},
+            inner: unsafe{SimpleCanvas::new(game_world)},
         };
 
         f.set_viewport_from_width(width as f32);
@@ -199,7 +199,11 @@ impl FullScreenSystem {
             .set_viewport(dim.x, rect(0.0, width, 0.0, height));
     }
 
-    pub fn inner_mut(&mut self) -> &mut MySys {
+
+    pub fn canvas(&self) -> &SimpleCanvas {
+        &self.inner
+    }
+    pub fn canvas_mut(&mut self) -> &mut SimpleCanvas {
         &mut self.inner
     }
 
@@ -216,7 +220,7 @@ impl FullScreenSystem {
 
 ///A version where the user can control the size of the window.
 pub struct WindowedSystem {
-    inner: MySys,
+    inner: SimpleCanvas,
     windowed_context: glutin::WindowedContext<PossiblyCurrent>,
 }
 
@@ -249,7 +253,7 @@ impl WindowedSystem {
 
         WindowedSystem {
             windowed_context,
-            inner: unsafe{MySys::new(game_world)},
+            inner: unsafe{SimpleCanvas::new(game_world)},
         }
     }
 
@@ -285,7 +289,11 @@ impl WindowedSystem {
         vec2(width as usize, height as usize)
     }
 
-    pub fn inner_mut(&mut self) -> &mut MySys {
+
+    pub fn canvas(&self) -> &SimpleCanvas {
+        &self.inner
+    }
+    pub fn canvas_mut(&mut self) -> &mut SimpleCanvas {
         &mut self.inner
     }
     pub fn swap_buffers(&mut self) {

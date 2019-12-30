@@ -34,19 +34,17 @@ const GL_POINT_COMP:f32=2.5;
 
 
 pub struct SquareSave{
-    col:[f32;4],
     radius:f32,
     buffer:vbo::StaticBuffer<circle_program::Vertex>
 }
 impl SquareSave{
-    pub fn draw(&self,session:&mut MySys){
-        session.circle_program.set_buffer_and_draw(self.radius*GL_POINT_COMP*session.point_mul.0,self.col,0,self.buffer.get_id(),gl::POINTS,self.buffer.len());
+    pub fn draw(&self,session:&mut SimpleCanvas,col:[f32;4]){
+        session.circle_program.set_buffer_and_draw(self.radius*GL_POINT_COMP*session.point_mul.0,col,0,self.buffer.get_id(),gl::POINTS,self.buffer.len());
     }
 }
 pub struct SquareSession<'a> {
-    col:[f32;4],
     radius:f32,
-    sys: &'a mut MySys,
+    sys: &'a mut SimpleCanvas,
 }
 impl<'a> SquareSession<'a> {
     #[inline(always)]
@@ -62,14 +60,14 @@ impl<'a> SquareSession<'a> {
         self.add(vec2(x,y))
     }
     pub fn save(&mut self)->SquareSave{
-        SquareSave{col:self.col,radius:self.radius,buffer:vbo::StaticBuffer::new(self.sys.circle_buffer.get_verts())}
+        SquareSave{radius:self.radius,buffer:vbo::StaticBuffer::new(self.sys.circle_buffer.get_verts())}
     }
 
 
-    pub fn send_and_draw(&mut self) {
+    pub fn send_and_draw(&mut self,col:[f32;4]) {
         self.sys.circle_buffer.update();
         self.sys.circle_buffer.update();
-        self.sys.circle_program.set_buffer_and_draw(self.radius*GL_POINT_COMP*self.sys.point_mul.0,self.col,0,self.sys.circle_buffer.get_id(),gl::POINTS,self.sys.circle_buffer.len());       
+        self.sys.circle_program.set_buffer_and_draw(self.radius*GL_POINT_COMP*self.sys.point_mul.0,col,0,self.sys.circle_buffer.get_id(),gl::POINTS,self.sys.circle_buffer.len());       
     }
 }
 impl<'a> Drop for SquareSession<'a> {
@@ -80,19 +78,17 @@ impl<'a> Drop for SquareSession<'a> {
 
 
 pub struct CircleSave{
-    col:[f32;4],
     radius:f32,
     buffer:vbo::StaticBuffer<circle_program::Vertex>
 }
 impl CircleSave{
-    pub fn draw(&self,session:&mut MySys){
-        session.circle_program.set_buffer_and_draw(self.radius*GL_POINT_COMP*session.point_mul.0,self.col,1,self.buffer.get_id(),gl::POINTS,self.buffer.len());
+    pub fn draw(&self,session:&mut SimpleCanvas,col:[f32;4]){
+        session.circle_program.set_buffer_and_draw(self.radius*GL_POINT_COMP*session.point_mul.0,col,1,self.buffer.get_id(),gl::POINTS,self.buffer.len());
     }
 }
 pub struct CircleSession<'a> {
     radius:f32,
-    col:[f32;4],
-    sys: &'a mut MySys,
+    sys: &'a mut SimpleCanvas,
 }
 impl<'a> Drop for CircleSession<'a> {
     fn drop(&mut self) {
@@ -101,12 +97,12 @@ impl<'a> Drop for CircleSession<'a> {
 }
 impl<'a> CircleSession<'a> {
     pub fn save(&mut self)->CircleSave{
-        CircleSave{col:self.col,radius:self.radius,buffer:vbo::StaticBuffer::new(self.sys.circle_buffer.get_verts())}
+        CircleSave{radius:self.radius,buffer:vbo::StaticBuffer::new(self.sys.circle_buffer.get_verts())}
     }
 
-    pub fn send_and_draw(&mut self) {
+    pub fn send_and_draw(&mut self,col:[f32;4]) {
         self.sys.circle_buffer.update();
-        self.sys.circle_program.set_buffer_and_draw(self.radius*GL_POINT_COMP*self.sys.point_mul.0,self.col,1,self.sys.circle_buffer.get_id(),gl::POINTS,self.sys.circle_buffer.len());       
+        self.sys.circle_program.set_buffer_and_draw(self.radius*GL_POINT_COMP*self.sys.point_mul.0,col,1,self.sys.circle_buffer.get_id(),gl::POINTS,self.sys.circle_buffer.len());       
     }
 
     #[inline(always)]
@@ -123,8 +119,7 @@ impl<'a> CircleSession<'a> {
 }
 
 pub struct RectSession<'a> {
-    col:[f32;4],
-    sys: &'a mut MySys,
+    sys: &'a mut SimpleCanvas,
 }
 impl Drop for RectSession<'_> {
     fn drop(&mut self) {
@@ -133,23 +128,22 @@ impl Drop for RectSession<'_> {
 }
 
 pub struct RectSave{
-    col:[f32;4],
     buffer:vbo::StaticBuffer<circle_program::Vertex>
 }
 impl RectSave{
-    pub fn draw(&self,session:&mut MySys){
-        session.circle_program.set_buffer_and_draw(0.0,self.col,0,self.buffer.get_id(),gl::TRIANGLES,self.buffer.len());
+    pub fn draw(&self,session:&mut SimpleCanvas,col:[f32;4]){
+        session.circle_program.set_buffer_and_draw(0.0,col,0,self.buffer.get_id(),gl::TRIANGLES,self.buffer.len());
     }
 }
 
 impl RectSession<'_> {
     pub fn save(&mut self)->RectSave{
-        RectSave{col:self.col,buffer:vbo::StaticBuffer::new(self.sys.circle_buffer.get_verts())}
+        RectSave{buffer:vbo::StaticBuffer::new(self.sys.circle_buffer.get_verts())}
     }
 
-    pub fn send_and_draw(&mut self) {
+    pub fn send_and_draw(&mut self,col:[f32;4]) {
         self.sys.circle_buffer.update();
-        self.sys.circle_program.set_buffer_and_draw(0.0,self.col,0,self.sys.circle_buffer.get_id(),gl::TRIANGLES,self.sys.circle_buffer.len());       
+        self.sys.circle_program.set_buffer_and_draw(0.0,col,0,self.sys.circle_buffer.get_id(),gl::TRIANGLES,self.sys.circle_buffer.len());       
     }
 
     ///NOTE The argument positions
@@ -174,17 +168,15 @@ impl RectSession<'_> {
 }
 
 pub struct ArrowSave{
-    col:[f32;4],
     buffer:vbo::StaticBuffer<circle_program::Vertex>
 }
 impl ArrowSave{
-    pub fn draw(&self,session:&mut MySys){
-        session.circle_program.set_buffer_and_draw(0.0,self.col,0,self.buffer.get_id(),gl::TRIANGLES,self.buffer.len());
+    pub fn draw(&self,session:&mut SimpleCanvas,col:[f32;4]){
+        session.circle_program.set_buffer_and_draw(0.0,col,0,self.buffer.get_id(),gl::TRIANGLES,self.buffer.len());
     }
 }
 pub struct ArrowSession<'a> {
-    sys: &'a mut MySys,
-    col:[f32;4],
+    sys: &'a mut SimpleCanvas,
     radius: f32,
 }
 impl Drop for ArrowSession<'_> {
@@ -195,12 +187,12 @@ impl Drop for ArrowSession<'_> {
 
 impl ArrowSession<'_> {
     pub fn save(&mut self)->ArrowSave{
-        ArrowSave{col:self.col,buffer:vbo::StaticBuffer::new(self.sys.circle_buffer.get_verts())}
+        ArrowSave{buffer:vbo::StaticBuffer::new(self.sys.circle_buffer.get_verts())}
     }
 
-    pub fn send_and_draw(&mut self) {
+    pub fn send_and_draw(&mut self,col:[f32;4]) {
         self.sys.circle_buffer.update();
-        self.sys.circle_program.set_buffer_and_draw(0.0,self.col,0,self.sys.circle_buffer.get_id(),gl::TRIANGLES,self.sys.circle_buffer.len());
+        self.sys.circle_program.set_buffer_and_draw(0.0,col,0,self.sys.circle_buffer.get_id(),gl::TRIANGLES,self.sys.circle_buffer.len());
     }
 
     #[inline(always)]
@@ -236,22 +228,20 @@ impl ArrowSession<'_> {
 
 
 pub struct LineSave{
-    col:[f32;4],
     buffer:vbo::StaticBuffer<circle_program::Vertex>
 }
 
 
 impl LineSave{
-    pub fn draw(&self,session:&mut MySys){
+    pub fn draw(&self,session:&mut SimpleCanvas,col:[f32;4]){
         let _kk = session.point_mul.0;
-        session.circle_program.set_buffer_and_draw(0.0,self.col,0,self.buffer.get_id(),gl::TRIANGLES,self.buffer.len());
+        session.circle_program.set_buffer_and_draw(0.0,col,0,self.buffer.get_id(),gl::TRIANGLES,self.buffer.len());
     }
 }
 
 pub struct LineSession<'a> {
-    sys: &'a mut MySys,
-    radius: f32,
-    col:[f32;4]
+    sys: &'a mut SimpleCanvas,
+    radius: f32
 }
 impl Drop for LineSession<'_> {
     fn drop(&mut self) {
@@ -260,12 +250,12 @@ impl Drop for LineSession<'_> {
 }
 impl LineSession<'_> {
     pub fn save(&mut self)->LineSave{
-        LineSave{col:self.col,buffer:vbo::StaticBuffer::new(self.sys.circle_buffer.get_verts())}
+        LineSave{buffer:vbo::StaticBuffer::new(self.sys.circle_buffer.get_verts())}
     }
 
-    pub fn send_and_draw(&mut self) {
+    pub fn send_and_draw(&mut self,col:[f32;4]) {
         self.sys.circle_buffer.update();
-        self.sys.circle_program.set_buffer_and_draw(0.0,self.col,0,self.sys.circle_buffer.get_id(),gl::TRIANGLES,self.sys.circle_buffer.len());
+        self.sys.circle_program.set_buffer_and_draw(0.0,col,0,self.sys.circle_buffer.get_id(),gl::TRIANGLES,self.sys.circle_buffer.len());
     }
 
     #[inline(always)]
@@ -298,7 +288,7 @@ impl LineSession<'_> {
 ///The top left corner is the origin.
 ///y grows as you go down.
 ///x grows as you go right.
-pub struct MySys {
+pub struct SimpleCanvas {
     circle_program: CircleProgram,
     point_mul: PointMul,
     circle_buffer: vbo::GrowableBuffer<circle_program::Vertex>,
@@ -307,7 +297,7 @@ pub struct MySys {
 
 
 
-impl MySys {
+impl SimpleCanvas {
     fn reset(&mut self) {
         self.circle_buffer.clear();
     }
@@ -317,48 +307,47 @@ impl MySys {
 
     //Unsafe since user might create two instances, both of 
     //which could make opengl calls simultaneously
-    pub unsafe fn new(dim: Rect<f32>) -> MySys {
+    pub unsafe fn new(dim: Rect<f32>) -> SimpleCanvas {
         
         let circle_buffer = vbo::GrowableBuffer::new();
         let mut circle_program = CircleProgram::new();
         let point_mul = circle_program.set_viewport(dim.x.distance(), dim);
 
-        gl::BlendFunc(gl::SRC_ALPHA, gl::ONE_MINUS_SRC_ALPHA);
-        gl_ok!();
         gl::Enable(gl::BLEND);
         gl_ok!();
+        gl::BlendFunc(gl::SRC_ALPHA, gl::ONE_MINUS_SRC_ALPHA);
+        gl_ok!();
+        
         
 
-        MySys {
+        SimpleCanvas {
             point_mul,
             circle_program,
             circle_buffer,
         }
     }
 
-    pub fn circles(&mut self, color: [f32; 4], radius: f32) -> CircleSession {
-        CircleSession { col:color,radius,sys: self }
+    pub fn circles(&mut self, radius: f32) -> CircleSession {
+        CircleSession { radius,sys: self }
     }
-    pub fn squares(&mut self, color: [f32; 4], radius: f32) -> SquareSession {
-        SquareSession { col:color,radius,sys: self }
+    pub fn squares(&mut self, radius: f32) -> SquareSession {
+        SquareSession { radius,sys: self }
     }
-    pub fn rects(&mut self, color: [f32; 4]) -> RectSession {
-        RectSession { col:color,sys: self }
+    pub fn rects(&mut self) -> RectSession {
+        RectSession { sys: self }
     }
-    pub fn arrows(&mut self, color: [f32; 4], radius: f32) -> ArrowSession {
+    pub fn arrows(&mut self ,radius: f32) -> ArrowSession {
         let kk = self.point_mul.0;
 
         ArrowSession {
-            col:color,
             sys: self,
             radius: radius * kk,
         }
     }
 
-    pub fn lines(&mut self, color: [f32; 4], radius: f32) -> LineSession {
+    pub fn lines(&mut self, radius: f32) -> LineSession {
         let kk=self.point_mul.0;
         LineSession {
-            col:color,
             sys: self,
             radius: radius * kk,
         }
@@ -367,9 +356,12 @@ impl MySys {
 
     pub fn clear_color(&mut self,back_color:[f32;3]){
         unsafe {
+            
             gl::ClearColor(back_color[0], back_color[1], back_color[2], 1.0);
             gl_ok!();
 
+
+            //self.rects()
             gl::Clear(gl::COLOR_BUFFER_BIT);
             gl_ok!();
             

@@ -1,6 +1,6 @@
 [package]
 name = "very_simple_2d"
-version = "0.2.2"
+version = "0.3.0"
 authors = ["Ken Reed <kenakioreed@gmail.com>"]
 repository = "https://github.com/tiby312/very_simple_2d"
 readme = "README.md"
@@ -16,5 +16,5 @@ members = [ "very_simple_2d_core"]
 
 [dependencies]
 axgeom = "1.4"
-very_simple_2d_core = {version="0.2.1", path="./very_simple_2d_core"}
+very_simple_2d_core = {version="0.3.0", path="./very_simple_2d_core"}
 glutin = "0.22.0-alpha5"
