@@ -24,8 +24,8 @@
 //! Each one of these follows the same simple api for drawing:
 //!
 //! * `add()` - **Fast** function that adds one shape to a Vec.
-//! * `send_and_draw()` - **Slow** function that sends the Vec to the one vertex buffer object on the gpu and then draws them using DrawArrays. 
-//! 
+//! * `send_and_draw()` - **Slow** function that sends the Vec to the one vertex buffer object on the gpu and then draws them using DrawArrays.
+//!
 //! Using this api, the user can efficiently draw thousands of circles, for example, with the caveat that
 //! they all will be the same radius and color/transparency values. This api does not allow the user
 //! to efficiently draw thousands of circles where each circle has a different color or radius.
@@ -46,7 +46,7 @@
 //! The top left corner is the origin (0,0) and x and y grow to the right and downwards respectively.
 //!
 //! In windowed and fullscreen mode, the dimenions of the window defaults to scale exactly to the world.
-//! For example, if the user made a window of size 800,600, and then drew a circle at 400,300, the 
+//! For example, if the user made a window of size 800,600, and then drew a circle at 400,300, the
 //! circle would appear in the center of the window.
 //! Similarily, if the user had a monitor with a resolution of 800,600 and started in fullscreen mode,
 //! and drew a circle at 400,300, it would also appear in the center of the screen.
@@ -66,7 +66,7 @@
 //!
 //! //Make the background dark gray.
 //! canvas.clear_color([0.2,0.2,0.2]);
-//! 
+//!
 //! //Push some squares to a static vertex buffer object on the gpu.
 //! let rect_save = canvas.squares(5.0)
 //!   .addp(40., 40.)
@@ -107,8 +107,8 @@ use glutin::PossiblyCurrent;
 use very_simple_2d_core;
 use very_simple_2d_core::gl;
 
-pub use very_simple_2d_core::SimpleCanvas;
 pub use very_simple_2d_core::shapes;
+pub use very_simple_2d_core::SimpleCanvas;
 
 ///A timer to determine how often to refresh the screen.
 ///You pass it the desired refresh rate, then you can poll
@@ -140,7 +140,7 @@ impl RefreshTimer {
 ///information.
 pub struct FullScreenSystem {
     inner: SimpleCanvas,
-    window_dim:Vec2AspectRatio,
+    window_dim: Vec2AspectRatio,
     windowed_context: glutin::WindowedContext<PossiblyCurrent>,
 }
 impl FullScreenSystem {
@@ -152,31 +152,32 @@ impl FullScreenSystem {
 
         //we are targeting only opengl 3.0 es. and glsl 300 es.
 
-
         let windowed_context = glutin::ContextBuilder::new()
             .with_gl(glutin::GlRequest::Specific(glutin::Api::OpenGlEs, (3, 0)))
             .with_vsync(true)
             .build_windowed(gl_window, &events_loop)
             .unwrap();
 
-   
         let windowed_context = unsafe { windowed_context.make_current().unwrap() };
 
         // Load the OpenGL function pointers
         gl::load_with(|symbol| windowed_context.get_proc_address(symbol) as *const _);
         assert_eq!(unsafe { gl::GetError() }, gl::NO_ERROR);
 
+        let dpi = windowed_context.window().hidpi_factor();
+        let glutin::dpi::PhysicalSize { width, height } =
+            windowed_context.window().inner_size().to_physical(dpi);
 
-        let dpi=windowed_context.window().hidpi_factor();
-        let glutin::dpi::PhysicalSize { width, height } = windowed_context.window().inner_size().to_physical(dpi);
-
-        let window_dim=axgeom::Vec2AspectRatio{ratio:AspectRatio(vec2(width,height)),width};
+        let window_dim = axgeom::Vec2AspectRatio {
+            ratio: AspectRatio(vec2(width, height)),
+            width,
+        };
 
         //let game_world = Rect::new(0.0, width as f32, 0.0, height as f32);
         let mut f = FullScreenSystem {
             windowed_context,
             window_dim,
-            inner: unsafe{SimpleCanvas::new(window_dim)},
+            inner: unsafe { SimpleCanvas::new(window_dim) },
         };
 
         f.set_viewport_from_width(width as f32);
@@ -189,8 +190,7 @@ impl FullScreenSystem {
         //let aspect_ratio = dim.y / dim.x;
 
         //let height = aspect_ratio * width;
-        self.inner
-            .set_viewport(self.window_dim, width);
+        self.inner.set_viewport(self.window_dim, width);
     }
 
     pub fn set_viewport_min(&mut self, d: f32) {
@@ -206,11 +206,9 @@ impl FullScreenSystem {
         //let aspect_ratio = dim.x / dim.y;
 
         //let width = aspect_ratio * height;
-        let width=self.window_dim.ratio.width_over_height() as f32*height;
-        self.inner
-            .set_viewport(self.window_dim, width);
+        let width = self.window_dim.ratio.width_over_height() as f32 * height;
+        self.inner.set_viewport(self.window_dim, width);
     }
-
 
     pub fn canvas(&self) -> &SimpleCanvas {
         &self.inner
@@ -233,13 +231,17 @@ impl FullScreenSystem {
 ///A version where the user can control the size of the window.
 pub struct WindowedSystem {
     inner: SimpleCanvas,
-    window_dim:Vec2AspectRatio,
+    window_dim: Vec2AspectRatio,
     windowed_context: glutin::WindowedContext<PossiblyCurrent>,
 }
 
 impl WindowedSystem {
-    pub fn newp(dimx:f32,dimy:f32,events_loop: &glutin::event_loop::EventLoop<()>) -> WindowedSystem {
-        Self::new(vec2(dimx,dimy),events_loop)
+    pub fn newp(
+        dimx: f32,
+        dimy: f32,
+        events_loop: &glutin::event_loop::EventLoop<()>,
+    ) -> WindowedSystem {
+        Self::new(vec2(dimx, dimy), events_loop)
     }
     pub fn new(dim: Vec2<f32>, events_loop: &glutin::event_loop::EventLoop<()>) -> WindowedSystem {
         let game_world = Rect::new(0.0, dim.x, 0.0, dim.y);
@@ -267,12 +269,15 @@ impl WindowedSystem {
         gl::load_with(|symbol| windowed_context.get_proc_address(symbol) as *const _);
         assert_eq!(unsafe { gl::GetError() }, gl::NO_ERROR);
 
-        let window_dim=axgeom::Vec2AspectRatio{ratio:AspectRatio(vec2(width,height)),width};
+        let window_dim = axgeom::Vec2AspectRatio {
+            ratio: AspectRatio(vec2(width, height)),
+            width,
+        };
 
         WindowedSystem {
             windowed_context,
             window_dim,
-            inner: unsafe{SimpleCanvas::new(window_dim)},
+            inner: unsafe { SimpleCanvas::new(window_dim) },
         }
     }
 
@@ -281,8 +286,7 @@ impl WindowedSystem {
         //let aspect_ratio = dim.y / dim.x;
 
         //let height = aspect_ratio * width;
-        self.inner
-            .set_viewport(self.window_dim, width);
+        self.inner.set_viewport(self.window_dim, width);
     }
 
     pub fn set_viewport_min(&mut self, d: f32) {
@@ -298,12 +302,11 @@ impl WindowedSystem {
         //let aspect_ratio = dim.x / dim.y;
 
         //let width = aspect_ratio * height;
-        let width=self.window_dim.ratio.width_over_height() as f32*height;
-        self.inner
-            .set_viewport(self.window_dim, width);
+        let width = self.window_dim.ratio.width_over_height() as f32 * height;
+        self.inner.set_viewport(self.window_dim, width);
     }
 
-    pub fn get_dimp(&self) -> [usize;2] {
+    pub fn get_dimp(&self) -> [usize; 2] {
         let glutin::dpi::LogicalSize { width, height } =
             self.windowed_context.window().inner_size();
         [width as usize, height as usize]
@@ -313,7 +316,6 @@ impl WindowedSystem {
             self.windowed_context.window().inner_size();
         vec2(width as usize, height as usize)
     }
-
 
     pub fn canvas(&self) -> &SimpleCanvas {
         &self.inner
@@ -340,6 +342,3 @@ fn prompt_for_monitor(el: &EventLoop<()>) -> MonitorHandle {
 
     monitor
 }
-
-
-

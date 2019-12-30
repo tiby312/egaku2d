@@ -2,7 +2,6 @@ use crate::gl;
 use crate::gl::types::*;
 use crate::shader::*;
 use axgeom;
-use axgeom::*;
 use std::ffi::CString;
 use std::str;
 
@@ -58,11 +57,14 @@ pub struct CircleProgram {
 pub struct PointMul(pub f32);
 
 impl CircleProgram {
-    pub fn set_viewport(&mut self,window_dim:axgeom::Vec2AspectRatio,game_width:f32)->PointMul{
-        dbg!(window_dim,game_width);
-        
-        let game_height=window_dim.ratio.height_over_width() as f32*game_width;
+    pub fn set_viewport(
+        &mut self,
+        window_dim: axgeom::Vec2AspectRatio,
+        game_width: f32,
+    ) -> PointMul {
+        dbg!(window_dim, game_width);
 
+        let game_height = window_dim.ratio.height_over_width() as f32 * game_width;
 
         //let ((x1, x2), (y1, y2)) = game_world.get();
         //let w = x2 - x1;
@@ -91,41 +93,43 @@ impl CircleProgram {
         PointMul(window_dim.width as f32 / game_width)
     }
 
-    fn set_uniforms(&mut self,point_size:f32,col:[f32;4],square:usize){
-        
+    fn set_uniforms(&mut self, point_size: f32, col: [f32; 4], square: usize) {
         unsafe {
             gl::UseProgram(self.program);
             gl_ok!();
 
             gl::Uniform1f(self.point_size_uniform, point_size);
             gl_ok!();
-            gl::Uniform4fv(
-                self.bcol_uniform,
-                1,
-                col.as_ptr() as *const _
-            );
+            gl::Uniform4fv(self.bcol_uniform, 1, col.as_ptr() as *const _);
             gl_ok!();
 
             gl::Uniform1i(self.square_uniform, square as i32);
             gl_ok!();
         }
     }
-    pub fn set_buffer_and_draw(&mut self,point_size:f32,col:[f32;4],square:usize,buffer_id:u32,mode:GLenum,length:usize){
-        self.set_uniforms(point_size,col,square); 
-        
+    pub fn set_buffer_and_draw(
+        &mut self,
+        point_size: f32,
+        col: [f32; 4],
+        square: usize,
+        buffer_id: u32,
+        mode: GLenum,
+        length: usize,
+    ) {
+        self.set_uniforms(point_size, col, square);
 
-        unsafe{
+        unsafe {
             gl::BindBuffer(gl::ARRAY_BUFFER, buffer_id);
             gl_ok!();
-                
+
             gl::VertexAttribPointer(
-                    self.pos_attr as GLuint,
-                    2,
-                    gl::FLOAT,
-                    gl::FALSE as GLboolean,
-                    /*2 * core::mem::size_of::<f32>() as i32*/ 0 as i32,
-                    core::ptr::null(),
-                );
+                self.pos_attr as GLuint,
+                2,
+                gl::FLOAT,
+                gl::FALSE as GLboolean,
+                /*2 * core::mem::size_of::<f32>() as i32*/ 0 as i32,
+                core::ptr::null(),
+            );
             gl_ok!();
 
             gl::DrawArrays(mode, 0 as i32, length as i32);

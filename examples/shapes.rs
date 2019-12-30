@@ -2,19 +2,18 @@ extern crate axgeom;
 extern crate very_simple_2d;
 
 use axgeom::*;
-use very_simple_2d::*;
 use glutin::event::Event;
 use glutin::event::VirtualKeyCode;
 use glutin::event::WindowEvent;
 use glutin::event_loop::ControlFlow;
+use very_simple_2d::*;
 
 fn main() {
     let events_loop = glutin::event_loop::EventLoop::new();
     let mut sys = WindowedSystem::newp(640., 480., &events_loop);
     //let mut sys=FullScreenSystem::new(&events_loop);
-    
 
-    let rect_save={
+    let rect_save = {
         let mut k = sys.canvas_mut().rects();
         k.addp(400., 420., 300., 400.);
         k.addp(50., 100., 300., 350.);
@@ -22,7 +21,7 @@ fn main() {
         k.save()
     };
 
-    let square_save={
+    let square_save = {
         //Draw some squares
         let mut k = sys.canvas_mut().squares(10.0);
         for x in (0..1000).step_by(100) {
@@ -33,17 +32,19 @@ fn main() {
         k.save()
     };
 
-    let arrow_save={
+    let arrow_save = {
         //Draw some arrows
-        sys.canvas_mut().arrows( 5.0)
+        sys.canvas_mut()
+            .arrows(5.0)
             .add(vec2(40., 40.), vec2(40., 200.))
             .add(vec2(40., 40.), vec2(200., 40.))
             .save()
     };
 
-    let line_save={
-        //Draw some lines            
-        sys.canvas_mut().lines( 3.0)
+    let line_save = {
+        //Draw some lines
+        sys.canvas_mut()
+            .lines(3.0)
             .add(vec2(400., 0.), vec2(300., 10.))
             .add(vec2(10., 300.), vec2(300., 400.))
             .save()
@@ -67,21 +68,21 @@ fn main() {
         },
         Event::EventsCleared => {
             if timer.is_ready() {
-                let mut canvas=sys.canvas_mut();
-                
-                canvas.clear_color([0.2,0.2,0.2]);
+                let mut canvas = sys.canvas_mut();
+
+                canvas.clear_color([0.2, 0.2, 0.2]);
                 //Use this instead of clear_color for an interesting fade effect.
                 //canvas.rects().addp(0.0,640.0,0.0,480.0).send_and_draw([0.2,0.2,0.2,0.3]);
 
                 //draw static VBOs already on the gpu.
-                arrow_save.draw(&mut canvas,[0.0, 1.0, 0.1, 0.5]);
-                line_save.draw(&mut canvas,[0., 1.0, 1., 0.3]);
-                square_save.draw(&mut canvas,[1., 0., 1., 0.1]);
-                rect_save.draw(&mut canvas,[0.8, 0.8, 1.0, 0.2]);
+                arrow_save.draw(&mut canvas, [0.0, 1.0, 0.1, 0.5]);
+                line_save.draw(&mut canvas, [0., 1.0, 1., 0.3]);
+                square_save.draw(&mut canvas, [1., 0., 1., 0.1]);
+                rect_save.draw(&mut canvas, [0.8, 0.8, 1.0, 0.2]);
 
                 {
                     //Draw some moving circles
-                    let mut k = canvas.circles( 4.0);
+                    let mut k = canvas.circles(4.0);
                     for x in (0..1000).step_by(12) {
                         for y in (0..1000).step_by(12) {
                             let c = (counter + x + y) as f32 * 0.01;
@@ -96,25 +97,27 @@ fn main() {
                 {
                     //Draw a moving line
                     let c = counter as f32 * 0.07;
-                    canvas.lines(10.)
+                    canvas
+                        .lines(10.)
                         .add(vec2(50., 500.), vec2(500., 50. + c.sin() * 50.))
                         .send_and_draw([1., 1., 0.2, 0.2]);
                 }
-                
+
                 {
                     //Draw a rotating arrow
                     let c = counter as f32 * 0.04;
                     let center = vec2(400., 400.);
-                    canvas.arrows(10.0)
+                    canvas
+                        .arrows(10.0)
                         .add(center, center + vec2(c.cos() * 80., c.sin() * 80.))
                         .send_and_draw([1.0, 0.1, 0.5, 0.5]);
                 }
-                
-                
+
                 {
                     //Draw a growing circle
                     let c = ((counter as f32 * 0.06).sin() * 40.0).abs();
-                    canvas.circles(c)
+                    canvas
+                        .circles(c)
                         .addp(520., 400.)
                         .send_and_draw([1.0, 1.0, 1.0, 1.0]);
                 }

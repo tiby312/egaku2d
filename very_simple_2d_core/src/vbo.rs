@@ -1,22 +1,21 @@
-use core::marker::PhantomData;
 use super::*;
-
+use core::marker::PhantomData;
 
 #[derive(Debug)]
-pub struct StaticBuffer<V>{
-    vbo:u32,
-    length:usize,
-    _p:PhantomData<V>
+pub struct StaticBuffer<V> {
+    vbo: u32,
+    length: usize,
+    _p: PhantomData<V>,
 }
-impl<V> Drop for StaticBuffer<V>{
-    fn drop(&mut self){
-        unsafe{
-            gl::DeleteBuffers(1,&self.vbo);
+impl<V> Drop for StaticBuffer<V> {
+    fn drop(&mut self) {
+        unsafe {
+            gl::DeleteBuffers(1, &self.vbo);
         }
     }
 }
-impl<V:core::fmt::Debug+Copy+Clone> StaticBuffer<V>{
-    pub fn new(data:&[V])->StaticBuffer<V>{
+impl<V: core::fmt::Debug + Copy + Clone> StaticBuffer<V> {
+    pub fn new(data: &[V]) -> StaticBuffer<V> {
         let mut vbo = 0;
         unsafe {
             // Create a Vertex Buffer Object and copy the vertex data to it
@@ -31,19 +30,21 @@ impl<V:core::fmt::Debug+Copy+Clone> StaticBuffer<V>{
                 gl::STATIC_DRAW, //TODO change to static
             );
         }
-        StaticBuffer{vbo,_p:PhantomData,length:data.len()}
+        StaticBuffer {
+            vbo,
+            _p: PhantomData,
+            length: data.len(),
+        }
     }
 
-    pub fn len(&self)->usize{
-         self.length
+    pub fn len(&self) -> usize {
+        self.length
     }
 
     pub fn get_id(&self) -> u32 {
         self.vbo
     }
-
 }
-
 
 #[derive(Clone, Debug)]
 pub struct GrowableBuffer<V> {
@@ -60,7 +61,7 @@ impl<V> Drop for GrowableBuffer<V> {
 }
 
 impl<V: Default> GrowableBuffer<V> {
-    pub fn get_verts(&self)->&[V]{
+    pub fn get_verts(&self) -> &[V] {
         &self.buffer
     }
     pub fn new() -> GrowableBuffer<V> {
@@ -126,7 +127,6 @@ impl<V: Default> GrowableBuffer<V> {
     pub fn clear(&mut self) {
         self.buffer.clear();
     }
-
 
     fn re_generate_buffer(&mut self) {
         let vbo = &mut self.vbo;

@@ -4,8 +4,8 @@
 //! This crate provides the opengl internals without the opengl context creation functionality.
 //! So this crate does not depend on glutin.
 //!
-use axgeom::*;
 use crate::shapes::*;
+use axgeom::*;
 
 use core::mem;
 use gl::types::*;
@@ -25,7 +25,6 @@ use circle_program::CircleProgram;
 use circle_program::PointMul;
 mod circle_program;
 
-
 ///All the opengl functions generated from the gl_generator crate.
 pub mod gl {
     include!(concat!(env!("OUT_DIR"), "/bindings.rs"));
@@ -35,13 +34,8 @@ pub mod gl {
 ///They all follow the same api outlined in the crate documentation.
 pub mod shapes;
 
-
-
-const GL_POINT_COMP:f32=2.5;
+const GL_POINT_COMP: f32 = 2.5;
 //const GL_POINT_COMP:f32=2.0;
-
-
-
 
 ///Allows the user to start drawing shapes.
 ///The top left corner is the origin.
@@ -53,33 +47,26 @@ pub struct SimpleCanvas {
     circle_buffer: vbo::GrowableBuffer<circle_program::Vertex>,
 }
 
-
-
-
 impl SimpleCanvas {
     fn reset(&mut self) {
         self.circle_buffer.clear();
     }
-    pub fn set_viewport(&mut self,window_dim:axgeom::Vec2AspectRatio,game_width:f32){
-        self.point_mul = self.circle_program.set_viewport(window_dim,game_width);
+    pub fn set_viewport(&mut self, window_dim: axgeom::Vec2AspectRatio, game_width: f32) {
+        self.point_mul = self.circle_program.set_viewport(window_dim, game_width);
     }
 
-
-    //Unsafe since user might create two instances, both of 
+    //Unsafe since user might create two instances, both of
     //which could make opengl calls simultaneously
-    pub unsafe fn new(window_dim:axgeom::Vec2AspectRatio,) -> SimpleCanvas {
-        
+    pub unsafe fn new(window_dim: axgeom::Vec2AspectRatio) -> SimpleCanvas {
         let circle_buffer = vbo::GrowableBuffer::new();
         let mut circle_program = CircleProgram::new();
 
-        let point_mul = circle_program.set_viewport(window_dim,window_dim.width as f32);
+        let point_mul = circle_program.set_viewport(window_dim, window_dim.width as f32);
 
         gl::Enable(gl::BLEND);
         gl_ok!();
         gl::BlendFunc(gl::SRC_ALPHA, gl::ONE_MINUS_SRC_ALPHA);
         gl_ok!();
-        
-        
 
         SimpleCanvas {
             point_mul,
@@ -89,15 +76,15 @@ impl SimpleCanvas {
     }
 
     pub fn circles(&mut self, radius: f32) -> CircleSession {
-        CircleSession { radius,sys: self }
+        CircleSession { radius, sys: self }
     }
     pub fn squares(&mut self, radius: f32) -> SquareSession {
-        SquareSession { radius,sys: self }
+        SquareSession { radius, sys: self }
     }
     pub fn rects(&mut self) -> RectSession {
         RectSession { sys: self }
     }
-    pub fn arrows(&mut self ,radius: f32) -> ArrowSession {
+    pub fn arrows(&mut self, radius: f32) -> ArrowSession {
         let kk = self.point_mul.0;
 
         ArrowSession {
@@ -107,26 +94,21 @@ impl SimpleCanvas {
     }
 
     pub fn lines(&mut self, radius: f32) -> LineSession {
-        let kk=self.point_mul.0;
+        let kk = self.point_mul.0;
         LineSession {
             sys: self,
             radius: radius * kk,
         }
     }
 
-
-    pub fn clear_color(&mut self,back_color:[f32;3]){
+    pub fn clear_color(&mut self, back_color: [f32; 3]) {
         unsafe {
-            
             gl::ClearColor(back_color[0], back_color[1], back_color[2], 1.0);
             gl_ok!();
-
 
             //self.rects()
             gl::Clear(gl::COLOR_BUFFER_BIT);
             gl_ok!();
-            
         }
     }
-
 }
