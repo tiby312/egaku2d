@@ -160,6 +160,7 @@ impl FullScreenSystem {
 
         let windowed_context = unsafe { windowed_context.make_current().unwrap() };
 
+
         // Load the OpenGL function pointers
         gl::load_with(|symbol| windowed_context.get_proc_address(symbol) as *const _);
         assert_eq!(unsafe { gl::GetError() }, gl::NO_ERROR);
@@ -263,6 +264,8 @@ impl WindowedSystem {
 
         let windowed_context = unsafe { windowed_context.make_current().unwrap() };
 
+        //panic!("api={:?}",windowed_context.get_api());
+        
         // Load the OpenGL function pointers
         gl::load_with(|symbol| windowed_context.get_proc_address(symbol) as *const _);
         assert_eq!(unsafe { gl::GetError() }, gl::NO_ERROR);

@@ -12,7 +12,7 @@ fn main() {
     let events_loop = glutin::event_loop::EventLoop::new();
     let mut sys = WindowedSystem::newp(640., 480., &events_loop);
     //let mut sys=FullScreenSystem::new(&events_loop);
-
+    
     let rect_save = {
         let mut k = sys.canvas_mut().rects();
         k.addp(400., 420., 300., 400.);
@@ -49,6 +49,7 @@ fn main() {
             .add(vec2(10., 300.), vec2(300., 400.))
             .save()
     };
+    
 
     let mut timer = very_simple_2d::RefreshTimer::new(16);
 
@@ -78,20 +79,33 @@ fn main() {
                 arrow_save.draw(&mut canvas, [0.0, 1.0, 0.1, 0.5]);
                 line_save.draw(&mut canvas, [0., 1.0, 1., 0.3]);
                 square_save.draw(&mut canvas, [1., 0., 1., 0.1]);
+                
+                
                 rect_save.draw(&mut canvas, [0.8, 0.8, 1.0, 0.2]);
 
                 {
                     //Draw some moving circles
-                    let mut k = canvas.circles(4.0);
+                    let mut k = canvas.circles(8.0);
                     for x in (0..1000).step_by(12) {
                         for y in (0..1000).step_by(12) {
                             let c = (counter + x + y) as f32 * 0.01;
 
                             let pos = vec2(x, y).inner_as();
+                            
                             k.add(pos + vec2(c.sin() * y as f32 * 0.1, c.cos() * x as f32 * 0.1));
                         }
                     }
-                    k.send_and_draw([0., 1., 1., 0.1]);
+                    k.send_and_draw([1., 1., 1., 0.1]);
+                }
+
+
+                {
+                    //Draw a growing circle
+                    let c = ((counter as f32 * 0.06).sin() * 40.0).abs();
+                    canvas
+                        .circles(c)
+                        .addp(520., 400.)
+                        .send_and_draw([1.0, 1.0, 1.0, 1.0]);
                 }
 
                 {
@@ -102,7 +116,6 @@ fn main() {
                         .add(vec2(50., 500.), vec2(500., 50. + c.sin() * 50.))
                         .send_and_draw([1., 1., 0.2, 0.2]);
                 }
-
                 {
                     //Draw a rotating arrow
                     let c = counter as f32 * 0.04;
@@ -113,14 +126,12 @@ fn main() {
                         .send_and_draw([1.0, 0.1, 0.5, 0.5]);
                 }
 
-                {
-                    //Draw a growing circle
-                    let c = ((counter as f32 * 0.06).sin() * 40.0).abs();
-                    canvas
-                        .circles(c)
-                        .addp(520., 400.)
-                        .send_and_draw([1.0, 1.0, 1.0, 1.0]);
-                }
+
+                
+
+                
+
+                
 
                 //Display what we drew
                 sys.swap_buffers();

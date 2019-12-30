@@ -50,6 +50,7 @@ impl<V: core::fmt::Debug + Copy + Clone> StaticBuffer<V> {
 pub struct GrowableBuffer<V> {
     vbo: u32,
     buffer: Vec<V>,
+    vbo_size:Option<usize>
 }
 impl<V> Drop for GrowableBuffer<V> {
     fn drop(&mut self) {
@@ -80,19 +81,32 @@ impl<V: Default> GrowableBuffer<V> {
             gl::BufferData(
                 gl::ARRAY_BUFFER,
                 (buffer.capacity() * mem::size_of::<V>()) as GLsizeiptr,
-                mem::transmute(buffer.as_ptr()),
+                buffer.as_ptr() as *const _,
                 gl::DYNAMIC_DRAW,
             );
             gl_ok!();
         }
 
-        GrowableBuffer { vbo, buffer }
+        GrowableBuffer { vbo, buffer,vbo_size:None }
     }
 
     pub fn update(&mut self) {
-        let vbo = &mut self.vbo;
+        let vbo = self.vbo;
+        
+        match self.vbo_size{
+            Some(l)=>{
+                if l<self.buffer.capacity(){
+                    self.re_generate_buffer();
+                }
+                assert!(self.vbo_size.unwrap()>=self.buffer.capacity());
+            },
+            None=>{
+                self.re_generate_buffer();
+            }
+        }
+
         unsafe {
-            gl::BindBuffer(gl::ARRAY_BUFFER, *vbo);
+            gl::BindBuffer(gl::ARRAY_BUFFER, vbo);
             gl_ok!();
 
             gl::BufferSubData(
@@ -110,14 +124,7 @@ impl<V: Default> GrowableBuffer<V> {
     }
 
     pub fn push(&mut self, a: V) {
-        //TODO do this at the end on draw!!!!!!!!!!!!!!!!!
-        if self.buffer.len() == self.buffer.capacity() {
-            self.buffer.push(a);
-            //println!("Re-generating vbo to size={:?}",self.buffer.capacity());
-            self.re_generate_buffer();
-        } else {
-            self.buffer.push(a);
-        }
+        self.buffer.push(a);
     }
 
     pub fn len(&self) -> usize {
@@ -129,16 +136,20 @@ impl<V: Default> GrowableBuffer<V> {
     }
 
     fn re_generate_buffer(&mut self) {
+
         let vbo = &mut self.vbo;
         unsafe {
             gl::BindBuffer(gl::ARRAY_BUFFER, *vbo);
             gl::BufferData(
                 gl::ARRAY_BUFFER,
                 (self.buffer.capacity() * mem::size_of::<V>()) as GLsizeiptr,
-                mem::transmute(self.buffer.as_ptr()),
+                self.buffer.as_ptr() as *const _,
                 gl::DYNAMIC_DRAW,
             );
         }
+        //TODO first confirm the vbo resized??
+        self.vbo_size=Some(self.buffer.capacity());
+        dbg!("regen buffer={:?}",self.vbo_size);
         assert_eq!(unsafe { gl::GetError() }, gl::NO_ERROR);
     }
 }

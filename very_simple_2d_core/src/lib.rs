@@ -76,15 +76,19 @@ impl SimpleCanvas {
     }
 
     pub fn circles(&mut self, radius: f32) -> CircleSession {
+        assert_eq!(self.circle_buffer.len(),0);
         CircleSession { radius, sys: self }
     }
     pub fn squares(&mut self, radius: f32) -> SquareSession {
+        assert_eq!(self.circle_buffer.len(),0);
         SquareSession { radius, sys: self }
     }
     pub fn rects(&mut self) -> RectSession {
+        assert_eq!(self.circle_buffer.len(),0);
         RectSession { sys: self }
     }
     pub fn arrows(&mut self, radius: f32) -> ArrowSession {
+        assert_eq!(self.circle_buffer.len(),0);
         let kk = self.point_mul.0;
 
         ArrowSession {
@@ -94,6 +98,7 @@ impl SimpleCanvas {
     }
 
     pub fn lines(&mut self, radius: f32) -> LineSession {
+        assert_eq!(self.circle_buffer.len(),0);
         let kk = self.point_mul.0;
         LineSession {
             sys: self,

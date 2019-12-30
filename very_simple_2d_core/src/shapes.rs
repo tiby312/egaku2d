@@ -41,7 +41,7 @@ impl<'a> SquareSession<'a> {
     }
 
     pub fn send_and_draw(&mut self, col: [f32; 4]) {
-        self.sys.circle_buffer.update();
+        //self.sys.circle_buffer.update();
         self.sys.circle_buffer.update();
         self.sys.circle_program.set_buffer_and_draw(
             self.radius * GL_POINT_COMP * self.sys.point_mul.0,
@@ -93,7 +93,23 @@ impl<'a> CircleSession<'a> {
     }
 
     pub fn send_and_draw(&mut self, col: [f32; 4]) {
+        
+        //TODO NO IDEA WHY THIS IS NEEDED ON LINUX.
+        //Without this function call, on linux not every shape gets drawn.
+        //gl_PointCoord will always return zero if you you try 
+        //and draw some circles after drawing a rect save.
+        //It is something to do with changing between gl::TRIANGLES to gl::POINTS.
+        //but this shouldnt be a problem since they are seperate vbos.
+        self.sys.circle_program.set_buffer_and_draw(
+            0.,
+            col,
+            1,
+            self.sys.circle_buffer.get_id(),
+            gl::POINTS,
+            1,
+        );
         self.sys.circle_buffer.update();
+        
         self.sys.circle_program.set_buffer_and_draw(
             self.radius * GL_POINT_COMP * self.sys.point_mul.0,
             col,
@@ -129,8 +145,10 @@ impl Drop for RectSession<'_> {
 pub struct RectSave {
     buffer: vbo::StaticBuffer<circle_program::Vertex>,
 }
+
 impl RectSave {
     pub fn draw(&self, session: &mut SimpleCanvas, col: [f32; 4]) {
+        assert_eq!(self.buffer.len() % 3, 0);
         session.circle_program.set_buffer_and_draw(
             0.0,
             col,
@@ -150,6 +168,7 @@ impl RectSession<'_> {
     }
 
     pub fn send_and_draw(&mut self, col: [f32; 4]) {
+        assert_eq!(self.sys.circle_buffer.len() % 3, 0);
         self.sys.circle_buffer.update();
         self.sys.circle_program.set_buffer_and_draw(
             0.0,
