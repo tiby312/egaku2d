@@ -140,7 +140,7 @@ impl RefreshTimer {
 ///information.
 pub struct FullScreenSystem {
     inner: SimpleCanvas,
-    window_dim: Vec2AspectRatio,
+    window_dim: FixedAspectVec2,
     windowed_context: glutin::WindowedContext<PossiblyCurrent>,
 }
 impl FullScreenSystem {
@@ -168,7 +168,7 @@ impl FullScreenSystem {
         let glutin::dpi::PhysicalSize { width, height } =
             windowed_context.window().inner_size().to_physical(dpi);
 
-        let window_dim = axgeom::Vec2AspectRatio {
+        let window_dim = axgeom::FixedAspectVec2 {
             ratio: AspectRatio(vec2(width, height)),
             width,
         };
@@ -218,7 +218,7 @@ impl FullScreenSystem {
     }
 
     pub fn get_dim(&self) -> Vec2<usize> {
-        self.window_dim.vec().inner_as()
+        self.window_dim.as_vec().inner_as()
     }
     pub fn swap_buffers(&mut self) {
         self.windowed_context.swap_buffers().unwrap();
@@ -229,7 +229,7 @@ impl FullScreenSystem {
 ///A version where the user can control the size of the window.
 pub struct WindowedSystem {
     inner: SimpleCanvas,
-    window_dim: Vec2AspectRatio,
+    window_dim: FixedAspectVec2,
     windowed_context: glutin::WindowedContext<PossiblyCurrent>,
 }
 
@@ -267,7 +267,7 @@ impl WindowedSystem {
         gl::load_with(|symbol| windowed_context.get_proc_address(symbol) as *const _);
         assert_eq!(unsafe { gl::GetError() }, gl::NO_ERROR);
 
-        let window_dim = axgeom::Vec2AspectRatio {
+        let window_dim = axgeom::FixedAspectVec2 {
             ratio: AspectRatio(vec2(width, height)),
             width,
         };
@@ -305,11 +305,11 @@ impl WindowedSystem {
     }
 
     pub fn get_dimp(&self) -> [usize; 2] {
-        let k=self.window_dim.vec().inner_as();
+        let k=self.window_dim.as_vec().inner_as();
         [k.x,k.y]
     }
     pub fn get_dim(&self) -> Vec2<usize> {
-        self.window_dim.vec().inner_as()
+        self.window_dim.as_vec().inner_as()
     }
 
     pub fn canvas(&self) -> &SimpleCanvas {

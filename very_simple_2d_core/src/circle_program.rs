@@ -59,7 +59,7 @@ pub struct PointMul(pub f32);
 impl CircleProgram {
     pub fn set_viewport(
         &mut self,
-        window_dim: axgeom::Vec2AspectRatio,
+        window_dim: axgeom::FixedAspectVec2,
         game_width: f32,
     ) -> PointMul {
         dbg!(window_dim, game_width);

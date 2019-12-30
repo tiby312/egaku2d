@@ -51,13 +51,13 @@ impl SimpleCanvas {
     fn reset(&mut self) {
         self.circle_buffer.clear();
     }
-    pub fn set_viewport(&mut self, window_dim: axgeom::Vec2AspectRatio, game_width: f32) {
+    pub fn set_viewport(&mut self, window_dim: axgeom::FixedAspectVec2, game_width: f32) {
         self.point_mul = self.circle_program.set_viewport(window_dim, game_width);
     }
 
     //Unsafe since user might create two instances, both of
     //which could make opengl calls simultaneously
-    pub unsafe fn new(window_dim: axgeom::Vec2AspectRatio) -> SimpleCanvas {
+    pub unsafe fn new(window_dim: axgeom::FixedAspectVec2) -> SimpleCanvas {
         let circle_buffer = vbo::GrowableBuffer::new();
         let mut circle_program = CircleProgram::new();
 
