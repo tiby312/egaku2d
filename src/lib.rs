@@ -218,9 +218,7 @@ impl FullScreenSystem {
     }
 
     pub fn get_dim(&self) -> Vec2<usize> {
-        let glutin::dpi::LogicalSize { width, height } =
-            self.windowed_context.window().inner_size();
-        vec2(width as usize, height as usize)
+        self.window_dim.vec().inner_as()
     }
     pub fn swap_buffers(&mut self) {
         self.windowed_context.swap_buffers().unwrap();
@@ -307,14 +305,11 @@ impl WindowedSystem {
     }
 
     pub fn get_dimp(&self) -> [usize; 2] {
-        let glutin::dpi::LogicalSize { width, height } =
-            self.windowed_context.window().inner_size();
-        [width as usize, height as usize]
+        let k=self.window_dim.vec().inner_as();
+        [k.x,k.y]
     }
     pub fn get_dim(&self) -> Vec2<usize> {
-        let glutin::dpi::LogicalSize { width, height } =
-            self.windowed_context.window().inner_size();
-        vec2(width as usize, height as usize)
+        self.window_dim.vec().inner_as()
     }
 
     pub fn canvas(&self) -> &SimpleCanvas {
