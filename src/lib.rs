@@ -17,8 +17,8 @@
 //! Circles                   | `(point,radius)`              
 //! Axis Aligned Rectangles   | `(startx,endx,starty,endy)`   
 //! Axis Aligned Squares      | `(point,radius)`              
-//! Lines                     | `(point,point)`               
-//! Arrows                    | `(point_start,point_end)`               
+//! Lines                     | `(point,point,thickness)`               
+//! Arrows                    | `(point_start,point_end,thickness)`               
 //!   
 //!
 //! Each one of these follows the same simple api for drawing:
@@ -60,7 +60,7 @@
 //! ```rust,no_run
 //! use axgeom::*;
 //! let events_loop = glutin::event_loop::EventLoop::new();
-//! let mut glsys = very_simple_2d::WindowedSystem::new(vec2(600., 480.), &events_loop);
+//! let mut glsys = very_simple_2d::WindowedSystem::newp(600., 480., &events_loop);
 //!
 //! let mut canvas = glsys.canvas_mut();
 //!
@@ -103,9 +103,12 @@
 use axgeom::*;
 pub use glutin;
 use glutin::PossiblyCurrent;
-pub use very_simple_2d_core;
+
+use very_simple_2d_core;
 use very_simple_2d_core::gl;
-use very_simple_2d_core::SimpleCanvas;
+
+pub use very_simple_2d_core::SimpleCanvas;
+pub use very_simple_2d_core::shapes;
 
 ///A timer to determine how often to refresh the screen.
 ///You pass it the desired refresh rate, then you can poll
@@ -225,6 +228,9 @@ pub struct WindowedSystem {
 }
 
 impl WindowedSystem {
+    pub fn newp(dimx:f32,dimy:f32,events_loop: &glutin::event_loop::EventLoop<()>) -> WindowedSystem {
+        Self::new(vec2(dimx,dimy),events_loop)
+    }
     pub fn new(dim: Vec2<f32>, events_loop: &glutin::event_loop::EventLoop<()>) -> WindowedSystem {
         let game_world = Rect::new(0.0, dim.x, 0.0, dim.y);
         //use glutin::window::Fullscreen;
@@ -283,6 +289,11 @@ impl WindowedSystem {
         }
     }
 
+    pub fn get_dimp(&self) -> [usize;2] {
+        let glutin::dpi::LogicalSize { width, height } =
+            self.windowed_context.window().inner_size();
+        [width as usize, height as usize]
+    }
     pub fn get_dim(&self) -> Vec2<usize> {
         let glutin::dpi::LogicalSize { width, height } =
             self.windowed_context.window().inner_size();

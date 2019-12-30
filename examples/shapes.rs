@@ -3,18 +3,14 @@ extern crate very_simple_2d;
 
 use axgeom::*;
 use very_simple_2d::*;
-
 use glutin::event::Event;
 use glutin::event::VirtualKeyCode;
 use glutin::event::WindowEvent;
 use glutin::event_loop::ControlFlow;
 
-
-
-
 fn main() {
     let events_loop = glutin::event_loop::EventLoop::new();
-    let mut sys = WindowedSystem::new(vec2(640., 480.), &events_loop);
+    let mut sys = WindowedSystem::newp(640., 480., &events_loop);
     //let mut glsys=FullScreenSystem::new(&events_loop);
     
     let rect_save={
