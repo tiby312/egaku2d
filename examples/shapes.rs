@@ -11,8 +11,9 @@ use glutin::event_loop::ControlFlow;
 fn main() {
     let events_loop = glutin::event_loop::EventLoop::new();
     let mut sys = WindowedSystem::newp(640., 480., &events_loop);
-    //let mut glsys=FullScreenSystem::new(&events_loop);
+    //let mut sys=FullScreenSystem::new(&events_loop);
     
+
     let rect_save={
         let mut k = sys.canvas_mut().rects();
         k.addp(400., 420., 300., 400.);
@@ -68,8 +69,9 @@ fn main() {
             if timer.is_ready() {
                 let mut canvas=sys.canvas_mut();
                 
-                //glsys.clear_color([0.2,0.2,0.2]);
-                canvas.rects().addp(0.0,640.0,0.0,480.0).send_and_draw([0.2,0.2,0.2,0.3]);
+                canvas.clear_color([0.2,0.2,0.2]);
+                //Use this instead of clear_color for an interesting fade effect.
+                //canvas.rects().addp(0.0,640.0,0.0,480.0).send_and_draw([0.2,0.2,0.2,0.3]);
 
                 //draw static VBOs already on the gpu.
                 arrow_save.draw(&mut canvas,[0.0, 1.0, 0.1, 0.5]);

@@ -140,6 +140,7 @@ impl RefreshTimer {
 ///information.
 pub struct FullScreenSystem {
     inner: SimpleCanvas,
+    window_dim:Vec2AspectRatio,
     windowed_context: glutin::WindowedContext<PossiblyCurrent>,
 }
 impl FullScreenSystem {
@@ -151,24 +152,31 @@ impl FullScreenSystem {
 
         //we are targeting only opengl 3.0 es. and glsl 300 es.
 
+
         let windowed_context = glutin::ContextBuilder::new()
             .with_gl(glutin::GlRequest::Specific(glutin::Api::OpenGlEs, (3, 0)))
             .with_vsync(true)
             .build_windowed(gl_window, &events_loop)
             .unwrap();
 
+   
         let windowed_context = unsafe { windowed_context.make_current().unwrap() };
 
         // Load the OpenGL function pointers
         gl::load_with(|symbol| windowed_context.get_proc_address(symbol) as *const _);
         assert_eq!(unsafe { gl::GetError() }, gl::NO_ERROR);
 
-        let glutin::dpi::LogicalSize { width, height } = windowed_context.window().inner_size();
-        let game_world = Rect::new(0.0, width as f32, 0.0, height as f32);
 
+        let dpi=windowed_context.window().hidpi_factor();
+        let glutin::dpi::PhysicalSize { width, height } = windowed_context.window().inner_size().to_physical(dpi);
+
+        let window_dim=axgeom::Vec2AspectRatio{ratio:AspectRatio(vec2(width,height)),width};
+
+        //let game_world = Rect::new(0.0, width as f32, 0.0, height as f32);
         let mut f = FullScreenSystem {
             windowed_context,
-            inner: unsafe{SimpleCanvas::new(game_world)},
+            window_dim,
+            inner: unsafe{SimpleCanvas::new(window_dim)},
         };
 
         f.set_viewport_from_width(width as f32);
@@ -177,12 +185,12 @@ impl FullScreenSystem {
     }
 
     pub fn set_viewport_from_width(&mut self, width: f32) {
-        let dim = self.get_dim().inner_as::<f32>();
-        let aspect_ratio = dim.y / dim.x;
+        //let dim = self.get_dim().inner_as::<f32>();
+        //let aspect_ratio = dim.y / dim.x;
 
-        let height = aspect_ratio * width;
+        //let height = aspect_ratio * width;
         self.inner
-            .set_viewport(dim.x, rect(0.0, width, 0.0, height));
+            .set_viewport(self.window_dim, width);
     }
 
     pub fn set_viewport_min(&mut self, d: f32) {
@@ -194,12 +202,13 @@ impl FullScreenSystem {
     }
 
     pub fn set_viewport_from_height(&mut self, height: f32) {
-        let dim = self.get_dim().inner_as::<f32>();
-        let aspect_ratio = dim.x / dim.y;
+        //let dim = self.get_dim().inner_as::<f32>();
+        //let aspect_ratio = dim.x / dim.y;
 
-        let width = aspect_ratio * height;
+        //let width = aspect_ratio * height;
+        let width=self.window_dim.ratio.width_over_height() as f32*height;
         self.inner
-            .set_viewport(dim.x, rect(0.0, width, 0.0, height));
+            .set_viewport(self.window_dim, width);
     }
 
 
@@ -224,6 +233,7 @@ impl FullScreenSystem {
 ///A version where the user can control the size of the window.
 pub struct WindowedSystem {
     inner: SimpleCanvas,
+    window_dim:Vec2AspectRatio,
     windowed_context: glutin::WindowedContext<PossiblyCurrent>,
 }
 
@@ -257,28 +267,22 @@ impl WindowedSystem {
         gl::load_with(|symbol| windowed_context.get_proc_address(symbol) as *const _);
         assert_eq!(unsafe { gl::GetError() }, gl::NO_ERROR);
 
+        let window_dim=axgeom::Vec2AspectRatio{ratio:AspectRatio(vec2(width,height)),width};
+
         WindowedSystem {
             windowed_context,
-            inner: unsafe{SimpleCanvas::new(game_world)},
+            window_dim,
+            inner: unsafe{SimpleCanvas::new(window_dim)},
         }
     }
 
-    pub fn set_viewport_from_height(&mut self, height: f32) {
-        let dim = self.get_dim().inner_as::<f32>();
-        let aspect_ratio = dim.x / dim.y;
-
-        let width = aspect_ratio * height;
-        self.inner
-            .set_viewport(dim.x, rect(0.0, width, 0.0, height));
-    }
-
     pub fn set_viewport_from_width(&mut self, width: f32) {
-        let dim = self.get_dim().inner_as::<f32>();
-        let aspect_ratio = dim.y / dim.x;
+        //let dim = self.get_dim().inner_as::<f32>();
+        //let aspect_ratio = dim.y / dim.x;
 
-        let height = aspect_ratio * width;
+        //let height = aspect_ratio * width;
         self.inner
-            .set_viewport(dim.x, rect(0.0, width, 0.0, height));
+            .set_viewport(self.window_dim, width);
     }
 
     pub fn set_viewport_min(&mut self, d: f32) {
@@ -287,6 +291,16 @@ impl WindowedSystem {
         } else {
             self.set_viewport_from_height(d);
         }
+    }
+
+    pub fn set_viewport_from_height(&mut self, height: f32) {
+        //let dim = self.get_dim().inner_as::<f32>();
+        //let aspect_ratio = dim.x / dim.y;
+
+        //let width = aspect_ratio * height;
+        let width=self.window_dim.ratio.width_over_height() as f32*height;
+        self.inner
+            .set_viewport(self.window_dim, width);
     }
 
     pub fn get_dimp(&self) -> [usize;2] {
@@ -326,3 +340,6 @@ fn prompt_for_monitor(el: &EventLoop<()>) -> MonitorHandle {
 
     monitor
 }
+
+
+

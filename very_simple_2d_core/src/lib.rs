@@ -38,6 +38,7 @@ pub mod shapes;
 
 
 const GL_POINT_COMP:f32=2.5;
+//const GL_POINT_COMP:f32=2.0;
 
 
 
@@ -59,17 +60,19 @@ impl SimpleCanvas {
     fn reset(&mut self) {
         self.circle_buffer.clear();
     }
-    pub fn set_viewport(&mut self, width: f32, rect: Rect<f32>) {
-        self.point_mul = self.circle_program.set_viewport(width, rect);
+    pub fn set_viewport(&mut self,window_dim:axgeom::Vec2AspectRatio,game_width:f32){
+        self.point_mul = self.circle_program.set_viewport(window_dim,game_width);
     }
+
 
     //Unsafe since user might create two instances, both of 
     //which could make opengl calls simultaneously
-    pub unsafe fn new(dim: Rect<f32>) -> SimpleCanvas {
+    pub unsafe fn new(window_dim:axgeom::Vec2AspectRatio,) -> SimpleCanvas {
         
         let circle_buffer = vbo::GrowableBuffer::new();
         let mut circle_program = CircleProgram::new();
-        let point_mul = circle_program.set_viewport(dim.x.distance(), dim);
+
+        let point_mul = circle_program.set_viewport(window_dim,window_dim.width as f32);
 
         gl::Enable(gl::BLEND);
         gl_ok!();

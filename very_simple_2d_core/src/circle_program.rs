@@ -58,13 +58,18 @@ pub struct CircleProgram {
 pub struct PointMul(pub f32);
 
 impl CircleProgram {
-    pub fn set_viewport(&mut self, width: f32, game_world: Rect<f32>) -> PointMul {
-        let ((x1, x2), (y1, y2)) = game_world.get();
-        let w = x2 - x1;
-        let h = y2 - y1;
+    pub fn set_viewport(&mut self,window_dim:axgeom::Vec2AspectRatio,game_width:f32)->PointMul{
+        dbg!(window_dim,game_width);
+        
+        let game_height=window_dim.ratio.height_over_width() as f32*game_width;
 
-        let scalex = 2.0 / w;
-        let scaley = 2.0 / h;
+
+        //let ((x1, x2), (y1, y2)) = game_world.get();
+        //let w = x2 - x1;
+        //let h = y2 - y1;
+
+        let scalex = 2.0 / game_width;
+        let scaley = 2.0 / game_height;
 
         let tx = -1.0;
         let ty = 1.0;
@@ -83,7 +88,7 @@ impl CircleProgram {
             gl_ok!();
         }
 
-        PointMul(width / w)
+        PointMul(window_dim.width as f32 / game_width)
     }
 
     fn set_uniforms(&mut self,point_size:f32,col:[f32;4],square:usize){
