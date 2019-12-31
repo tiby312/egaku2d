@@ -339,8 +339,8 @@ impl WindowedSystem {
         let dpi = windowed_context.window().hidpi_factor();
         let glutin::dpi::PhysicalSize { width, height } =
             windowed_context.window().inner_size().to_physical(dpi);
-        assert_eq!(width as usize,dim.x as usize);
-        assert_eq!(height as usize,dim.y as usize);
+        //assert_eq!(width as usize,dim.x as usize);
+        //assert_eq!(height as usize,dim.y as usize);
 
 
         let window_dim = axgeom::FixedAspectVec2 {
