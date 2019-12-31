@@ -275,19 +275,7 @@ pub mod fullscreen{
         }
     }
     
-    use glutin::event_loop::EventLoop;
-    use glutin::monitor::MonitorHandle;
-
-    // Enumerate monitors and prompt user to choose one
-    fn prompt_for_monitor(el: &EventLoop<()>) -> MonitorHandle {
-        let num = 0;
-        let monitor = el
-            .available_monitors()
-            .nth(num)
-            .expect("Please enter a valid ID");
-
-        monitor
-    }
+    
 
 }
 
@@ -314,8 +302,13 @@ impl WindowedSystem {
 
         let width = game_world.x.distance() as f64;
         let height = game_world.y.distance() as f64;
+
+        let monitor=prompt_for_monitor(events_loop);
+        let dpi=monitor.hidpi_factor();
+        let p=glutin::dpi::PhysicalSize{width,height}.to_logical(dpi);
+
         let gl_window = glutin::window::WindowBuilder::new()
-            .with_inner_size(glutin::dpi::LogicalSize { width, height })
+            .with_inner_size(p)
             .with_resizable(false)
             .with_title(title);
 
@@ -339,8 +332,8 @@ impl WindowedSystem {
         let dpi = windowed_context.window().hidpi_factor();
         let glutin::dpi::PhysicalSize { width, height } =
             windowed_context.window().inner_size().to_physical(dpi);
-        //assert_eq!(width as usize,dim.x as usize);
-        //assert_eq!(height as usize,dim.y as usize);
+        assert_eq!(width as usize,dim.x as usize);
+        assert_eq!(height as usize,dim.y as usize);
 
 
         let window_dim = axgeom::FixedAspectVec2 {
@@ -398,4 +391,18 @@ impl WindowedSystem {
         self.windowed_context.swap_buffers().unwrap();
         assert_eq!(unsafe { gl::GetError() }, gl::NO_ERROR);
     }
+}
+
+use glutin::event_loop::EventLoop;
+use glutin::monitor::MonitorHandle;
+
+// Enumerate monitors and prompt user to choose one
+fn prompt_for_monitor(el: &EventLoop<()>) -> MonitorHandle {
+    let num = 0;
+    let monitor = el
+        .available_monitors()
+        .nth(num)
+        .expect("Please enter a valid ID");
+
+    monitor
 }
