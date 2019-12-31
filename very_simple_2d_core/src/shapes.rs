@@ -94,20 +94,7 @@ impl<'a> CircleSession<'a> {
 
     pub fn send_and_draw(&mut self, col: [f32; 4]) {
         
-        //TODO NO IDEA WHY THIS IS NEEDED ON LINUX.
-        //Without this function call, on linux not every shape gets drawn.
-        //gl_PointCoord will always return zero if you you try 
-        //and draw some circles after drawing a rect save.
-        //It is something to do with changing between gl::TRIANGLES to gl::POINTS.
-        //but this shouldnt be a problem since they are seperate vbos.
-        self.sys.circle_program.set_buffer_and_draw(
-            0.,
-            col,
-            1,
-            self.sys.circle_buffer.get_id(),
-            gl::POINTS,
-            1,
-        );
+        
         self.sys.circle_buffer.update();
         
         self.sys.circle_program.set_buffer_and_draw(

@@ -105,6 +105,23 @@ impl CircleProgram {
         mode: GLenum,
         length: usize,
     ) {
+        //TODO NO IDEA WHY THIS IS NEEDED ON LINUX.
+        //Without this function call, on linux not every shape gets drawn.
+        //gl_PointCoord will always return zero if you you try 
+        //and draw some circles after drawing a rect save.
+        //It is something to do with changing between gl::TRIANGLES to gl::POINTS.
+        //but this shouldnt be a problem since they are seperate vbos.
+        unsafe{
+            gl::BindBuffer(gl::ARRAY_BUFFER, buffer_id);
+            gl_ok!();
+
+            gl::DrawArrays(mode,0,1);
+            gl_ok!();
+
+            gl::BindBuffer(gl::ARRAY_BUFFER,0);
+            gl_ok!();
+        }
+
         unsafe {
             gl::UseProgram(self.program);
             gl_ok!();

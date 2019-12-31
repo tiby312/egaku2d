@@ -10,7 +10,7 @@ use very_simple_2d::*;
 
 fn main() {
     let events_loop = glutin::event_loop::EventLoop::new();
-    let mut sys = WindowedSystem::newp(640., 480., &events_loop);
+    let mut sys = WindowedSystem::newp(640., 480., &events_loop,"shapes example");
     //let mut sys=FullScreenSystem::new(&events_loop);
     
     let rect_save = {
@@ -64,9 +64,15 @@ fn main() {
             },
             WindowEvent::CloseRequested => {
                 *control_flow = ControlFlow::Exit;
+            },
+            WindowEvent::Resized(logical_size) => {
+                //dbg!(logical_size);
+                //sys.update_window_dim();
+                //sys.set_viewport_from_height(640.);
             }
             _ => {}
         },
+
         Event::EventsCleared => {
             if timer.is_ready() {
                 let mut canvas = sys.canvas_mut();

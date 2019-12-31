@@ -141,7 +141,7 @@ impl RefreshTimer {
 pub struct FullScreenSystem {
     inner: SimpleCanvas,
     window_dim: FixedAspectVec2,
-    windowed_context: glutin::WindowedContext<PossiblyCurrent>,
+    windowed_context: Option<glutin::WindowedContext<PossiblyCurrent>>,
 }
 impl FullScreenSystem {
     pub fn new(events_loop: &glutin::event_loop::EventLoop<()>) -> Self {
@@ -149,6 +149,9 @@ impl FullScreenSystem {
         let fullscreen = Fullscreen::Borderless(prompt_for_monitor(events_loop));
 
         let gl_window = glutin::window::WindowBuilder::new().with_fullscreen(Some(fullscreen));
+
+
+        //std::thread::sleep(std::time::Duration::from_millis(5000));
 
         //we are targeting only opengl 3.0 es. and glsl 300 es.
 
@@ -158,21 +161,34 @@ impl FullScreenSystem {
             .build_windowed(gl_window, &events_loop)
             .unwrap();
 
+
+        
+
         let windowed_context = unsafe { windowed_context.make_current().unwrap() };
+
+
+
+
+        let dpi = windowed_context.window().hidpi_factor();
+        let glutin::dpi::PhysicalSize { width, height } =
+            windowed_context.window().inner_size().to_physical(dpi);
+
+        dbg!(width,height);
 
 
         // Load the OpenGL function pointers
         gl::load_with(|symbol| windowed_context.get_proc_address(symbol) as *const _);
         assert_eq!(unsafe { gl::GetError() }, gl::NO_ERROR);
 
-        let dpi = windowed_context.window().hidpi_factor();
-        let glutin::dpi::PhysicalSize { width, height } =
-            windowed_context.window().inner_size().to_physical(dpi);
+
+
 
         let window_dim = axgeom::FixedAspectVec2 {
             ratio: AspectRatio(vec2(width, height)),
             width,
         };
+
+        let windowed_context=Some(windowed_context);
 
         //let game_world = Rect::new(0.0, width as f32, 0.0, height as f32);
         let mut f = FullScreenSystem {
@@ -185,6 +201,27 @@ impl FullScreenSystem {
 
         f
     }
+
+    //After this is called, you should update the viewport!!!!
+    pub fn update_window_dim(&mut self){
+
+
+        let dpi = self.windowed_context.as_ref().unwrap().window().hidpi_factor();
+        
+        let size =
+            self.windowed_context.as_ref().unwrap().window().inner_size().to_physical(dpi);
+
+        println!("resizing context!!! {:?}",(dpi,size));
+
+        self.windowed_context.as_mut().unwrap().resize(size);
+        self.window_dim=axgeom::FixedAspectVec2{ratio:AspectRatio(vec2(size.width,size.height)),width:size.width};
+
+        let ctx = unsafe { self.windowed_context.take().unwrap().make_not_current().unwrap() };
+
+        self.windowed_context = Some(unsafe { ctx.make_current().unwrap() });
+
+    }
+
 
     pub fn set_viewport_from_width(&mut self, width: f32) {
         //let dim = self.get_dim().inner_as::<f32>();
@@ -222,7 +259,7 @@ impl FullScreenSystem {
         self.window_dim.as_vec().inner_as()
     }
     pub fn swap_buffers(&mut self) {
-        self.windowed_context.swap_buffers().unwrap();
+        self.windowed_context.as_mut().unwrap().swap_buffers().unwrap();
         assert_eq!(unsafe { gl::GetError() }, gl::NO_ERROR);
     }
 }
@@ -239,10 +276,11 @@ impl WindowedSystem {
         dimx: f32,
         dimy: f32,
         events_loop: &glutin::event_loop::EventLoop<()>,
+        title:&str
     ) -> WindowedSystem {
-        Self::new(vec2(dimx, dimy), events_loop)
+        Self::new(vec2(dimx, dimy), events_loop, title)
     }
-    pub fn new(dim: Vec2<f32>, events_loop: &glutin::event_loop::EventLoop<()>) -> WindowedSystem {
+    pub fn new(dim: Vec2<f32>, events_loop: &glutin::event_loop::EventLoop<()>,title:&str) -> WindowedSystem {
         let game_world = Rect::new(0.0, dim.x, 0.0, dim.y);
         //use glutin::window::Fullscreen;
         //let fullscreen = Fullscreen::Borderless(prompt_for_monitor(events_loop));
@@ -252,7 +290,7 @@ impl WindowedSystem {
         let gl_window = glutin::window::WindowBuilder::new()
             .with_inner_size(glutin::dpi::LogicalSize { width, height })
             .with_resizable(false)
-            .with_title("very_simple_2d");
+            .with_title(title);
 
         //we are targeting only opengl 3.0 es. and glsl 300 es.
 
