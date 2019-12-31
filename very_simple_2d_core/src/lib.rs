@@ -34,7 +34,7 @@ pub mod gl {
 ///They all follow the same api outlined in the crate documentation.
 pub mod shapes;
 
-const GL_POINT_COMP: f32 = 2.5;
+const GL_POINT_COMP: f32 = 2.0;
 //const GL_POINT_COMP:f32=2.0;
 
 ///Allows the user to start drawing shapes.

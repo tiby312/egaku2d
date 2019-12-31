@@ -348,6 +348,10 @@ impl WindowedSystem {
         }
     }
 
+    pub fn get_hidpi_factor(&self)->f64{
+        self.windowed_context.window().hidpi_factor()
+    }
+
     pub fn set_viewport_from_width(&mut self, width: f32) {
         //let dim = self.get_dim().inner_as::<f32>();
         //let aspect_ratio = dim.y / dim.x;
