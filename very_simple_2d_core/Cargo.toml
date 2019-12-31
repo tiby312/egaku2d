@@ -1,6 +1,6 @@
 [package]
 name = "very_simple_2d_core"
-version = "0.3.2"
+version = "0.4"
 authors = ["Ken <kenakioreed@gmail.com>"]
 build = "build.rs"
 edition = "2018"

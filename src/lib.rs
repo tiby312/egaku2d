@@ -45,7 +45,7 @@
 //!
 //! The top left corner is the origin (0,0) and x and y grow to the right and downwards respectively.
 //!
-//! In windowed and fullscreen mode, the dimenions of the window defaults to scale exactly to the world.
+//! In windowed mode, the dimenions of the window defaults to scale exactly to the world.
 //! For example, if the user made a window of size 800,600, and then drew a circle at 400,300, the
 //! circle would appear in the center of the window.
 //! Similarily, if the user had a monitor with a resolution of 800,600 and started in fullscreen mode,
@@ -54,6 +54,13 @@
 //! The ratio between the scale of x and y are fixed to be 1:1 so that there is no distortion in the
 //! shapes. The user can manually set the scale either by x or y and the other axis is automaically inferred
 //! so that to keep a 1:1 ratio.
+//!
+//! # Fullscreen
+//!
+//! Fullscreen is kept behind a feature gate since on certain platforms like wayland linux it does not work.
+//! I suspect this is a problem with glutin, so I have just disabled it for the time behing in the hope that
+//! once glutin leaves alpha it will work. I think the problem is that when the window is resized, I can't manually change
+//! the size of the context to match using resize().
 //!
 //! # Example
 //!
@@ -138,130 +145,150 @@ impl RefreshTimer {
 ///window we end up with.
 ///After construction, the user must set the viewport using the window dimension
 ///information.
-pub struct FullScreenSystem {
-    inner: SimpleCanvas,
-    window_dim: FixedAspectVec2,
-    windowed_context: Option<glutin::WindowedContext<PossiblyCurrent>>,
-}
-impl FullScreenSystem {
-    pub fn new(events_loop: &glutin::event_loop::EventLoop<()>) -> Self {
-        use glutin::window::Fullscreen;
-        let fullscreen = Fullscreen::Borderless(prompt_for_monitor(events_loop));
-
-        let gl_window = glutin::window::WindowBuilder::new().with_fullscreen(Some(fullscreen));
-
-
-        //std::thread::sleep(std::time::Duration::from_millis(5000));
-
-        //we are targeting only opengl 3.0 es. and glsl 300 es.
-
-        let windowed_context = glutin::ContextBuilder::new()
-            .with_gl(glutin::GlRequest::Specific(glutin::Api::OpenGlEs, (3, 0)))
-            .with_vsync(true)
-            .build_windowed(gl_window, &events_loop)
-            .unwrap();
-
-
-        
-
-        let windowed_context = unsafe { windowed_context.make_current().unwrap() };
-
-
-
-
-        let dpi = windowed_context.window().hidpi_factor();
-        let glutin::dpi::PhysicalSize { width, height } =
-            windowed_context.window().inner_size().to_physical(dpi);
-
-        dbg!(width,height);
-
-
-        // Load the OpenGL function pointers
-        gl::load_with(|symbol| windowed_context.get_proc_address(symbol) as *const _);
-        assert_eq!(unsafe { gl::GetError() }, gl::NO_ERROR);
-
-
-
-
-        let window_dim = axgeom::FixedAspectVec2 {
-            ratio: AspectRatio(vec2(width, height)),
-            width,
-        };
-
-        let windowed_context=Some(windowed_context);
-
-        //let game_world = Rect::new(0.0, width as f32, 0.0, height as f32);
-        let mut f = FullScreenSystem {
-            windowed_context,
-            window_dim,
-            inner: unsafe { SimpleCanvas::new(window_dim) },
-        };
-
-        f.set_viewport_from_width(width as f32);
-
-        f
+#[cfg(feature = "fullscreen")]
+pub use self::fullscreen::FullScreenSystem;
+#[cfg(feature = "fullscreen")]
+pub mod fullscreen{
+    pub struct FullScreenSystem {
+        inner: SimpleCanvas,
+        window_dim: FixedAspectVec2,
+        windowed_context: Option<glutin::WindowedContext<PossiblyCurrent>>,
     }
+    impl FullScreenSystem {
+        pub fn new(events_loop: &glutin::event_loop::EventLoop<()>) -> Self {
+            use glutin::window::Fullscreen;
+            let fullscreen = Fullscreen::Borderless(prompt_for_monitor(events_loop));
 
-    //After this is called, you should update the viewport!!!!
-    pub fn update_window_dim(&mut self){
-
-
-        let dpi = self.windowed_context.as_ref().unwrap().window().hidpi_factor();
-        
-        let size =
-            self.windowed_context.as_ref().unwrap().window().inner_size().to_physical(dpi);
-
-        println!("resizing context!!! {:?}",(dpi,size));
-
-        self.windowed_context.as_mut().unwrap().resize(size);
-        self.window_dim=axgeom::FixedAspectVec2{ratio:AspectRatio(vec2(size.width,size.height)),width:size.width};
-
-        let ctx = unsafe { self.windowed_context.take().unwrap().make_not_current().unwrap() };
-
-        self.windowed_context = Some(unsafe { ctx.make_current().unwrap() });
-
-    }
+            let gl_window = glutin::window::WindowBuilder::new().with_fullscreen(Some(fullscreen));
 
 
-    pub fn set_viewport_from_width(&mut self, width: f32) {
-        //let dim = self.get_dim().inner_as::<f32>();
-        //let aspect_ratio = dim.y / dim.x;
+            //std::thread::sleep(std::time::Duration::from_millis(5000));
 
-        //let height = aspect_ratio * width;
-        self.inner.set_viewport(self.window_dim, width);
-    }
+            //we are targeting only opengl 3.0 es. and glsl 300 es.
 
-    pub fn set_viewport_min(&mut self, d: f32) {
-        if self.get_dim().x < self.get_dim().y {
-            self.set_viewport_from_width(d);
-        } else {
-            self.set_viewport_from_height(d);
+            let windowed_context = glutin::ContextBuilder::new()
+                .with_gl(glutin::GlRequest::Specific(glutin::Api::OpenGlEs, (3, 0)))
+                .with_vsync(true)
+                .build_windowed(gl_window, &events_loop)
+                .unwrap();
+
+
+            
+
+            let windowed_context = unsafe { windowed_context.make_current().unwrap() };
+
+
+
+
+            let dpi = windowed_context.window().hidpi_factor();
+            let glutin::dpi::PhysicalSize { width, height } =
+                windowed_context.window().inner_size().to_physical(dpi);
+
+            dbg!(width,height);
+
+
+            // Load the OpenGL function pointers
+            gl::load_with(|symbol| windowed_context.get_proc_address(symbol) as *const _);
+            assert_eq!(unsafe { gl::GetError() }, gl::NO_ERROR);
+
+
+
+
+            let window_dim = axgeom::FixedAspectVec2 {
+                ratio: AspectRatio(vec2(width, height)),
+                width,
+            };
+
+            let windowed_context=Some(windowed_context);
+
+            //let game_world = Rect::new(0.0, width as f32, 0.0, height as f32);
+            let mut f = FullScreenSystem {
+                windowed_context,
+                window_dim,
+                inner: unsafe { SimpleCanvas::new(window_dim) },
+            };
+
+            f.set_viewport_from_width(width as f32);
+
+            f
+        }
+
+        //After this is called, you should update the viewport!!!!
+        pub fn update_window_dim(&mut self){
+
+
+            let dpi = self.windowed_context.as_ref().unwrap().window().hidpi_factor();
+            
+            let size =
+                self.windowed_context.as_ref().unwrap().window().inner_size().to_physical(dpi);
+
+            println!("resizing context!!! {:?}",(dpi,size));
+
+            self.windowed_context.as_mut().unwrap().resize(size);
+            self.window_dim=axgeom::FixedAspectVec2{ratio:AspectRatio(vec2(size.width,size.height)),width:size.width};
+
+            let ctx = unsafe { self.windowed_context.take().unwrap().make_not_current().unwrap() };
+
+            self.windowed_context = Some(unsafe { ctx.make_current().unwrap() });
+
+        }
+
+
+        pub fn set_viewport_from_width(&mut self, width: f32) {
+            //let dim = self.get_dim().inner_as::<f32>();
+            //let aspect_ratio = dim.y / dim.x;
+
+            //let height = aspect_ratio * width;
+            self.inner.set_viewport(self.window_dim, width);
+        }
+
+        pub fn set_viewport_min(&mut self, d: f32) {
+            if self.get_dim().x < self.get_dim().y {
+                self.set_viewport_from_width(d);
+            } else {
+                self.set_viewport_from_height(d);
+            }
+        }
+
+        pub fn set_viewport_from_height(&mut self, height: f32) {
+            //let dim = self.get_dim().inner_as::<f32>();
+            //let aspect_ratio = dim.x / dim.y;
+
+            //let width = aspect_ratio * height;
+            let width = self.window_dim.ratio.width_over_height() as f32 * height;
+            self.inner.set_viewport(self.window_dim, width);
+        }
+
+        pub fn canvas(&self) -> &SimpleCanvas {
+            &self.inner
+        }
+        pub fn canvas_mut(&mut self) -> &mut SimpleCanvas {
+            &mut self.inner
+        }
+
+        pub fn get_dim(&self) -> Vec2<usize> {
+            self.window_dim.as_vec().inner_as()
+        }
+        pub fn swap_buffers(&mut self) {
+            self.windowed_context.as_mut().unwrap().swap_buffers().unwrap();
+            assert_eq!(unsafe { gl::GetError() }, gl::NO_ERROR);
         }
     }
+    
+    use glutin::event_loop::EventLoop;
+    use glutin::monitor::MonitorHandle;
 
-    pub fn set_viewport_from_height(&mut self, height: f32) {
-        //let dim = self.get_dim().inner_as::<f32>();
-        //let aspect_ratio = dim.x / dim.y;
+    // Enumerate monitors and prompt user to choose one
+    fn prompt_for_monitor(el: &EventLoop<()>) -> MonitorHandle {
+        let num = 0;
+        let monitor = el
+            .available_monitors()
+            .nth(num)
+            .expect("Please enter a valid ID");
 
-        //let width = aspect_ratio * height;
-        let width = self.window_dim.ratio.width_over_height() as f32 * height;
-        self.inner.set_viewport(self.window_dim, width);
-    }
-
-    pub fn canvas(&self) -> &SimpleCanvas {
-        &self.inner
-    }
-    pub fn canvas_mut(&mut self) -> &mut SimpleCanvas {
-        &mut self.inner
+        monitor
     }
 
-    pub fn get_dim(&self) -> Vec2<usize> {
-        self.window_dim.as_vec().inner_as()
-    }
-    pub fn swap_buffers(&mut self) {
-        self.windowed_context.as_mut().unwrap().swap_buffers().unwrap();
-        assert_eq!(unsafe { gl::GetError() }, gl::NO_ERROR);
-    }
 }
 
 ///A version where the user can control the size of the window.
@@ -371,18 +398,4 @@ impl WindowedSystem {
         self.windowed_context.swap_buffers().unwrap();
         assert_eq!(unsafe { gl::GetError() }, gl::NO_ERROR);
     }
-}
-
-use glutin::event_loop::EventLoop;
-use glutin::monitor::MonitorHandle;
-
-// Enumerate monitors and prompt user to choose one
-fn prompt_for_monitor(el: &EventLoop<()>) -> MonitorHandle {
-    let num = 0;
-    let monitor = el
-        .available_monitors()
-        .nth(num)
-        .expect("Please enter a valid ID");
-
-    monitor
 }
