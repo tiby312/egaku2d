@@ -27,7 +27,7 @@ impl<V: core::fmt::Debug + Copy + Clone> StaticBuffer<V> {
                 gl::ARRAY_BUFFER,
                 (data.len() * mem::size_of::<V>()) as GLsizeiptr,
                 data.as_ptr() as *const std::ffi::c_void,
-                gl::STATIC_DRAW, //TODO change to static
+                gl::STATIC_DRAW, 
             );
         }
         StaticBuffer {
@@ -146,10 +146,10 @@ impl<V: Default> GrowableBuffer<V> {
                 self.buffer.as_ptr() as *const _,
                 gl::DYNAMIC_DRAW,
             );
+            gl_ok!()
         }
         //TODO first confirm the vbo resized??
         self.vbo_size=Some(self.buffer.capacity());
-        dbg!("regen buffer={:?}",self.vbo_size);
-        assert_eq!(unsafe { gl::GetError() }, gl::NO_ERROR);
+        
     }
 }

@@ -288,18 +288,18 @@ pub struct WindowedSystem {
 
 impl WindowedSystem {
     pub fn newp(
-        dimx: f32,
-        dimy: f32,
+        dimx: usize,
+        dimy: usize,
         events_loop: &glutin::event_loop::EventLoop<()>,
         title:&str
     ) -> WindowedSystem {
         Self::new(vec2(dimx, dimy), events_loop, title)
     }
-    pub fn new(dim: Vec2<f32>, events_loop: &glutin::event_loop::EventLoop<()>,title:&str) -> WindowedSystem {
-        let game_world = Rect::new(0.0, dim.x, 0.0, dim.y);
-        //use glutin::window::Fullscreen;
-        //let fullscreen = Fullscreen::Borderless(prompt_for_monitor(events_loop));
+    pub fn new(dim: Vec2<usize>, events_loop: &glutin::event_loop::EventLoop<()>,title:&str) -> WindowedSystem {
+        let dim=dim.inner_as::<f32>();
 
+        let game_world = Rect::new(0.0, dim.x, 0.0, dim.y);
+        
         let width = game_world.x.distance() as f64;
         let height = game_world.y.distance() as f64;
 
@@ -322,7 +322,6 @@ impl WindowedSystem {
 
         let windowed_context = unsafe { windowed_context.make_current().unwrap() };
 
-        //panic!("api={:?}",windowed_context.get_api());
         
         // Load the OpenGL function pointers
         gl::load_with(|symbol| windowed_context.get_proc_address(symbol) as *const _);
@@ -353,10 +352,6 @@ impl WindowedSystem {
     }
 
     pub fn set_viewport_from_width(&mut self, width: f32) {
-        //let dim = self.get_dim().inner_as::<f32>();
-        //let aspect_ratio = dim.y / dim.x;
-
-        //let height = aspect_ratio * width;
         self.inner.set_viewport(self.window_dim, width);
     }
 
@@ -369,10 +364,6 @@ impl WindowedSystem {
     }
 
     pub fn set_viewport_from_height(&mut self, height: f32) {
-        //let dim = self.get_dim().inner_as::<f32>();
-        //let aspect_ratio = dim.x / dim.y;
-
-        //let width = aspect_ratio * height;
         let width = self.window_dim.ratio.width_over_height() as f32 * height;
         self.inner.set_viewport(self.window_dim, width);
     }

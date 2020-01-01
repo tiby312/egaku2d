@@ -10,7 +10,7 @@ use very_simple_2d::*;
 
 fn main() {
     let events_loop = glutin::event_loop::EventLoop::new();
-    let mut sys = WindowedSystem::newp(640., 480., &events_loop,"shapes example");
+    let mut sys = WindowedSystem::newp(640, 480, &events_loop,"shapes example");
     //let mut sys=FullScreenSystem::new(&events_loop);
     
     let rect_save = {
@@ -54,6 +54,7 @@ fn main() {
     let mut timer = very_simple_2d::RefreshTimer::new(16);
 
     let mut counter = 0;
+    let mut cursor=vec2same(0.0);
     events_loop.run(move |event, _, control_flow| match event {
         Event::WindowEvent { event, .. } => match event {
             WindowEvent::KeyboardInput { input, .. } => match input.virtual_keycode {
@@ -62,13 +63,19 @@ fn main() {
                 }
                 _ => {}
             },
+            WindowEvent::CursorMoved {
+                    modifiers: _,
+                    device_id: _,
+                    position: logical_position,
+            } => {
+                let dpi=sys.get_hidpi_factor();
+                let p=logical_position.to_physical(dpi);
+                cursor = vec2(p.x, p.y).inner_as();
+            },
             WindowEvent::CloseRequested => {
                 *control_flow = ControlFlow::Exit;
             },
-            WindowEvent::Resized(logical_size) => {
-                //dbg!(logical_size);
-                //sys.update_window_dim();
-                //sys.set_viewport_from_height(640.);
+            WindowEvent::Resized(_logical_size) => {
             }
             _ => {}
         },
@@ -110,7 +117,7 @@ fn main() {
                     let c = ((counter as f32 * 0.06).sin() * 40.0).abs();
                     canvas
                         .circles(c)
-                        .addp(520., 400.)
+                        .add(cursor)
                         .send_and_draw([1.0, 1.0, 1.0, 1.0]);
                 }
 

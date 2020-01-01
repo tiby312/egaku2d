@@ -65,13 +65,8 @@ impl CircleProgram {
         window_dim: axgeom::FixedAspectVec2,
         game_width: f32,
     ) -> PointMul {
-        dbg!(window_dim, game_width);
 
         let game_height = window_dim.ratio.height_over_width() as f32 * game_width;
-
-        //let ((x1, x2), (y1, y2)) = game_world.get();
-        //let w = x2 - x1;
-        //let h = y2 - y1;
 
         let scalex = 2.0 / game_width;
         let scaley = 2.0 / game_height;
@@ -205,31 +200,15 @@ impl CircleProgram {
                 gl::GetAttribLocation(program, CString::new("position").unwrap().as_ptr());
             gl_ok!();
 
-            /////
-            /*
-            gl::EnableVertexAttribArray(pos_attr as GLuint);
-            gl_ok!();
-            gl::VertexAttribPointer(
-                pos_attr as GLuint,
-                2,
-                gl::FLOAT,
-                gl::FALSE as GLboolean,
-                0 as i32,
-                core::ptr::null(),
-            );
-            gl_ok!();
-            */
-
-            let c=CircleProgram {
+            CircleProgram {
                 program,
                 square_uniform,
                 point_size_uniform,
                 matrix_uniform,
                 bcol_uniform,
                 pos_attr,
-            };
-            dbg!(&c);
-            c
+            }
+            
         }
     }
 }
