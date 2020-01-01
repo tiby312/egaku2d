@@ -67,7 +67,7 @@
 //! ```rust,no_run
 //! use axgeom::*;
 //! let events_loop = glutin::event_loop::EventLoop::new();
-//! let mut glsys = very_simple_2d::WindowedSystem::newp(600., 480., &events_loop,"test window");
+//! let mut glsys = very_simple_2d::WindowedSystem::newp(600, 480, &events_loop,"test window");
 //!
 //! let mut canvas = glsys.canvas_mut();
 //!

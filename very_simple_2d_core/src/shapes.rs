@@ -1,6 +1,16 @@
 use super::*;
 
+
+struct NotSend(*mut usize);
+
+fn ns()->NotSend{
+    NotSend(core::ptr::null_mut())
+}
+
+
+
 pub struct SquareSave {
+    _ns:NotSend,
     radius: f32,
     buffer: vbo::StaticBuffer<circle_program::Vertex>,
 }
@@ -35,6 +45,7 @@ impl<'a> SquareSession<'a> {
     }
     pub fn save(&mut self) -> SquareSave {
         SquareSave {
+            _ns:ns(),
             radius: self.radius,
             buffer: vbo::StaticBuffer::new(self.sys.circle_buffer.get_verts()),
         }
@@ -60,6 +71,7 @@ impl<'a> Drop for SquareSession<'a> {
 }
 
 pub struct CircleSave {
+    _ns:NotSend,
     radius: f32,
     buffer: vbo::StaticBuffer<circle_program::Vertex>,
 }
@@ -87,6 +99,7 @@ impl<'a> Drop for CircleSession<'a> {
 impl<'a> CircleSession<'a> {
     pub fn save(&mut self) -> CircleSave {
         CircleSave {
+            _ns:ns(),
             radius: self.radius,
             buffer: vbo::StaticBuffer::new(self.sys.circle_buffer.get_verts()),
         }
@@ -130,6 +143,7 @@ impl Drop for RectSession<'_> {
 }
 
 pub struct RectSave {
+    _ns:NotSend,
     buffer: vbo::StaticBuffer<circle_program::Vertex>,
 }
 
@@ -150,6 +164,7 @@ impl RectSave {
 impl RectSession<'_> {
     pub fn save(&mut self) -> RectSave {
         RectSave {
+            _ns:ns(),
             buffer: vbo::StaticBuffer::new(self.sys.circle_buffer.get_verts()),
         }
     }
@@ -189,6 +204,7 @@ impl RectSession<'_> {
 }
 
 pub struct ArrowSave {
+    _ns:NotSend,
     buffer: vbo::StaticBuffer<circle_program::Vertex>,
 }
 impl ArrowSave {
@@ -216,6 +232,7 @@ impl Drop for ArrowSession<'_> {
 impl ArrowSession<'_> {
     pub fn save(&mut self) -> ArrowSave {
         ArrowSave {
+            _ns:ns(),
             buffer: vbo::StaticBuffer::new(self.sys.circle_buffer.get_verts()),
         }
     }
@@ -264,6 +281,7 @@ impl ArrowSession<'_> {
 }
 
 pub struct LineSave {
+    _ns:NotSend,
     buffer: vbo::StaticBuffer<circle_program::Vertex>,
 }
 
@@ -293,6 +311,7 @@ impl Drop for LineSession<'_> {
 impl LineSession<'_> {
     pub fn save(&mut self) -> LineSave {
         LineSave {
+            _ns:ns(),
             buffer: vbo::StaticBuffer::new(self.sys.circle_buffer.get_verts()),
         }
     }
