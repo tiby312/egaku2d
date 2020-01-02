@@ -139,9 +139,18 @@ fn main() {
                         .send_and_draw([1.0, 0.1, 0.5, 0.5]);
                 }
 
-                let mut texture = canvas.texture("test1.png".to_string()).unwrap();
-                texture.sprites(canvas).addp(200.,200.).send_and_draw();
 
+                let mut texture = canvas.texture("test1.png".to_string()).unwrap();
+                let mut k=texture.sprites(canvas);
+                for x in (0..600).step_by(20){
+                    for y in (0..600).step_by(20){
+                        let (x,y)=(x as f32,y as f32);
+                        let l=counter as f32 * 0.06;
+                        k.addp(x+l.cos()*5.,y+l.sin()*5.);
+                    }
+                }
+                k.send_and_draw();
+                drop(k);
 
                 //Display what we drew
                 sys.swap_buffers();

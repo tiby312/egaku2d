@@ -60,7 +60,7 @@ impl Texture {
                 };
 
                 let id = build_opengl_mipmapped_texture(width, height, img);
-                Ok(Texture { id ,radius:(width.max(height) as f32)})
+                Ok(Texture { id ,radius:(width.max(height) as f32)/2.0})
             }
         }
     }
