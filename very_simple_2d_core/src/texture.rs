@@ -21,7 +21,6 @@ impl SpriteSave {
 
 
 pub struct SpriteSession<'a> {
-    pub(crate) texture: &'a mut Texture,
     pub(crate) sys: &'a mut SimpleCanvas,
 }
 
@@ -41,18 +40,18 @@ impl SpriteSession<'_> {
             buffer: vbo::StaticBuffer::new(self.sys.circle_buffer.get_verts()),
         }
     }
-    pub fn send_and_draw(&mut self) {
+    pub fn send_and_draw(&mut self,texture:&mut Texture) {
         self.sys.circle_buffer.update();
 
 
         self.sys.sprite_program.set_buffer_and_draw(
-            self.texture.radius * GL_POINT_COMP * self.sys.point_mul.0,
+            texture.radius * GL_POINT_COMP * self.sys.point_mul.0,
             [1.0,1.0,1.0,1.0],
             0,
             self.sys.circle_buffer.get_id(),
             gl::POINTS,
             self.sys.circle_buffer.len(),
-            self.texture.id
+            texture.id
         );
     }
 }
@@ -68,9 +67,7 @@ pub struct Texture {
 }
 
 impl Texture {
-    pub fn sprites<'a>(&'a mut self, canvas: &'a mut SimpleCanvas) -> SpriteSession {
-        SpriteSession{sys:canvas,texture:self}
-    }
+    
     pub fn new(file: String) -> image::ImageResult<Texture> {
         match image::open(file.clone()) {
             Err(err) => Err(err),

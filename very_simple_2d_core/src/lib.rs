@@ -92,6 +92,10 @@ impl SimpleCanvas {
         }
     }
 
+    pub fn sprites<'a>(&'a mut self) -> texture::SpriteSession {
+        texture::SpriteSession{sys:self}
+    }
+
     pub fn circles(&mut self, radius: f32) -> CircleSession {
         assert_eq!(self.circle_buffer.len(), 0);
         CircleSession { radius, sys: self }

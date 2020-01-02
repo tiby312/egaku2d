@@ -53,7 +53,7 @@ fn main() {
 
     let mut texture = sys.canvas_mut().texture("test1.png".to_string()).unwrap();
     
-    let mut k=texture.sprites(sys.canvas_mut());
+    let mut k=sys.canvas_mut().sprites();
     for x in (0..600).step_by(20){
         for y in (0..600).step_by(20){
             let (x,y)=(x as f32,y as f32);
@@ -61,12 +61,10 @@ fn main() {
             k.addp(x+l.cos()*5.,y+l.sin()*5.);
         }
     }
-    
+
     let sprite_save=k.save();
     drop(k);
-    //k.send_and_draw();
-    //drop(k);
-
+    
 
     let mut timer = very_simple_2d::RefreshTimer::new(16);
 
