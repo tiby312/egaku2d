@@ -51,6 +51,23 @@ fn main() {
             .save()
     };
 
+    let mut texture = sys.canvas_mut().texture("test1.png".to_string()).unwrap();
+    
+    let mut k=texture.sprites(sys.canvas_mut());
+    for x in (0..600).step_by(20){
+        for y in (0..600).step_by(20){
+            let (x,y)=(x as f32,y as f32);
+            let l=0 as f32 * 0.06;
+            k.addp(x+l.cos()*5.,y+l.sin()*5.);
+        }
+    }
+    
+    let sprite_save=k.save();
+    drop(k);
+    //k.send_and_draw();
+    //drop(k);
+
+
     let mut timer = very_simple_2d::RefreshTimer::new(16);
 
     let mut counter = 0;
@@ -139,18 +156,8 @@ fn main() {
                         .send_and_draw([1.0, 0.1, 0.5, 0.5]);
                 }
 
-
-                let mut texture = canvas.texture("test1.png".to_string()).unwrap();
-                let mut k=texture.sprites(canvas);
-                for x in (0..600).step_by(20){
-                    for y in (0..600).step_by(20){
-                        let (x,y)=(x as f32,y as f32);
-                        let l=counter as f32 * 0.06;
-                        k.addp(x+l.cos()*5.,y+l.sin()*5.);
-                    }
-                }
-                k.send_and_draw();
-                drop(k);
+                sprite_save.draw(canvas,&mut texture);
+                
 
                 //Display what we drew
                 sys.swap_buffers();

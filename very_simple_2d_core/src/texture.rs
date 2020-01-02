@@ -1,5 +1,25 @@
 use super::*;
 
+
+pub struct SpriteSave{
+    _ns: NotSend,
+    buffer: vbo::StaticBuffer<circle_program::Vertex>,
+}
+impl SpriteSave {
+    pub fn draw(&self, session: &mut SimpleCanvas, texture:&mut Texture) {
+        session.sprite_program.set_buffer_and_draw(
+            texture.radius * GL_POINT_COMP * session.point_mul.0,
+            [1.0,1.0,1.0,1.0],
+            0,
+            self.buffer.get_id(),
+            gl::POINTS,
+            self.buffer.len(),
+            texture.id
+        );
+    }
+}
+
+
 pub struct SpriteSession<'a> {
     pub(crate) texture: &'a mut Texture,
     pub(crate) sys: &'a mut SimpleCanvas,
@@ -14,6 +34,12 @@ impl SpriteSession<'_> {
     pub fn addp(&mut self, x:f32,y:f32) -> &mut Self{
         self.sys.circle_buffer.push(circle_program::Vertex([x, y]));
         self
+    }
+    pub fn save(&mut self) -> SpriteSave {
+        SpriteSave {
+            _ns: ns(),
+            buffer: vbo::StaticBuffer::new(self.sys.circle_buffer.get_verts()),
+        }
     }
     pub fn send_and_draw(&mut self) {
         self.sys.circle_buffer.update();
@@ -50,8 +76,7 @@ impl Texture {
             Err(err) => Err(err),
             Ok(img) => {
                 use image::GenericImageView;
-                println!("Dimensions of image are {:?}", img.dimensions());
-
+                
                 let (width, height) = img.dimensions();
 
                 let img = match img {
