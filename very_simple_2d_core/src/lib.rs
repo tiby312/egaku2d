@@ -12,6 +12,8 @@ use gl::types::*;
 
 mod shader;
 mod vbo;
+mod texture;
+
 
 ///Macro that asserts that there are no opengl errors.
 #[macro_export]
@@ -21,9 +23,19 @@ macro_rules! gl_ok {
     };
 }
 
+
+struct NotSend(*mut usize);
+
+fn ns()->NotSend{
+    NotSend(core::ptr::null_mut())
+}
+
+
 use circle_program::CircleProgram;
 use circle_program::PointMul;
 mod circle_program;
+use sprite_program::SpriteProgram;
+mod sprite_program;
 
 ///All the opengl functions generated from the gl_generator crate.
 pub mod gl {
@@ -43,6 +55,7 @@ const GL_POINT_COMP: f32 = 2.0;
 ///x grows as you go right.
 pub struct SimpleCanvas {
     circle_program: CircleProgram,
+    sprite_program: SpriteProgram,
     point_mul: PointMul,
     circle_buffer: vbo::GrowableBuffer<circle_program::Vertex>,
 }
@@ -53,6 +66,7 @@ impl SimpleCanvas {
     }
     pub fn set_viewport(&mut self, window_dim: axgeom::FixedAspectVec2, game_width: f32) {
         self.point_mul = self.circle_program.set_viewport(window_dim, game_width);
+        let _ = self.sprite_program.set_viewport(window_dim,window_dim.width as f32);
     }
 
     //Unsafe since user might create two instances, both of
@@ -61,7 +75,11 @@ impl SimpleCanvas {
         let circle_buffer = vbo::GrowableBuffer::new();
         let mut circle_program = CircleProgram::new();
 
+        let mut sprite_program=SpriteProgram::new();
+
+
         let point_mul = circle_program.set_viewport(window_dim, window_dim.width as f32);
+        let _ = sprite_program.set_viewport(window_dim,window_dim.width as f32);
 
         gl::Enable(gl::BLEND);
         gl_ok!();
@@ -70,6 +88,7 @@ impl SimpleCanvas {
 
         SimpleCanvas {
             point_mul,
+            sprite_program,
             circle_program,
             circle_buffer,
         }
@@ -104,6 +123,9 @@ impl SimpleCanvas {
             sys: self,
             radius: radius * kk,
         }
+    }
+    pub fn texture(&mut self,file: String) -> image::ImageResult<texture::Texture> {
+        texture::Texture::new(file)
     }
 
     pub fn clear_color(&mut self, back_color: [f32; 3]) {

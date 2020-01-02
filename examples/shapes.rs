@@ -13,6 +13,8 @@ fn main() {
     let mut sys = WindowedSystem::newp(640, 480, &events_loop,"shapes example");
     //let mut sys=FullScreenSystem::new(&events_loop);
     
+    let texture=sys.canvas_mut().texture("test.png".to_string()).unwrap();
+
     let rect_save = {
         let mut k = sys.canvas_mut().rects();
         k.addp(400., 420., 300., 400.);

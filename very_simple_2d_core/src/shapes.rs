@@ -1,12 +1,6 @@
 use super::*;
 
 
-struct NotSend(*mut usize);
-
-fn ns()->NotSend{
-    NotSend(core::ptr::null_mut())
-}
-
 
 
 pub struct SquareSave {

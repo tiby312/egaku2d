@@ -17,30 +17,19 @@ void main() {
     gl_Position = vec4(mmatrix*pp.xyz, 1.0);
 }";
 
-//https://blog.lapingames.com/draw-circle-glsl-shader/
-static FS_SRC: &'static str = "
+
+static FS_SRC:&'static str = "
 #version 300 es
 precision mediump float;
-uniform vec4 bcol;
+
+uniform sampler2D tex0;
 out vec4 out_color;
-uniform bool square;
-void main() {
 
-    //This is inefficient, but it does allow us to use only one shader program to
-    //do many things. In most use-cases of a 2d graphics library, the cpu is the bottle
-    //neck not the gpu anyway.
-    if (square){
-        vec2 coord = gl_PointCoord - vec2(0.5);
-        float dis=dot(coord,coord);
-        if(dis > 0.25){                  //outside of circle radius?
-            discard;
-            //out_color = vec4(gl_PointCoord,0.0,bcol[3]);
-            //return;
-        }
-    }
-
-    out_color = bcol;
-}";
+void main() 
+{
+   out_color = texture2D(tex0, gl_PointCoord) ;
+}
+";
 
 
 #[repr(transparent)]
@@ -48,7 +37,7 @@ void main() {
 pub struct Vertex(pub [f32; 2]);
 
 #[derive(Debug)]
-pub struct CircleProgram {
+pub struct SpriteProgram {
     pub program: GLuint,
     pub matrix_uniform: GLint,
     pub square_uniform: GLint,
@@ -60,7 +49,7 @@ pub struct CircleProgram {
 #[derive(Debug)]
 pub struct PointMul(pub f32);
 
-impl CircleProgram {
+impl SpriteProgram {
     pub fn set_viewport(
         &mut self,
         window_dim: axgeom::FixedAspectVec2,
@@ -160,7 +149,7 @@ impl CircleProgram {
     }
 
 
-    pub fn new() -> CircleProgram {
+    pub fn new() -> SpriteProgram {
         unsafe {
             // Create GLSL shaders
             let vs = compile_shader(VS_SRC, gl::VERTEX_SHADER);
@@ -201,7 +190,7 @@ impl CircleProgram {
                 gl::GetAttribLocation(program, CString::new("position").unwrap().as_ptr());
             gl_ok!();
 
-            CircleProgram {
+            SpriteProgram {
                 program,
                 square_uniform,
                 point_size_uniform,
@@ -214,7 +203,7 @@ impl CircleProgram {
     }
 }
 
-impl Drop for CircleProgram {
+impl Drop for SpriteProgram {
     fn drop(&mut self) {
         // Cleanup
         unsafe {
