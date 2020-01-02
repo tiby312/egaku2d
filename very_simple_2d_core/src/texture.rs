@@ -1,61 +1,70 @@
 use super::*;
 
-
-pub struct SpriteSession{
-    pub(crate) radius: f32,
+pub struct SpriteSession<'a> {
+    pub(crate) texture: &'a mut Texture,
     pub(crate) sys: &'a mut SimpleCanvas,
 }
 
+impl SpriteSession<'_> {
+    pub fn add(&mut self, point: Vec2<f32>) -> &mut Self {
+        self.sys.circle_buffer.push(circle_program::Vertex([point.x, point.y]));
+        self
+    }
 
-impl SpriteSession{
-	pub fn add(&mut self,pos:Vec2<f32>){
-    self.sys.circle_buffer.add(pos);
-	}
+    pub fn addp(&mut self, x:f32,y:f32) -> &mut Self{
+        self.sys.circle_buffer.push(circle_program::Vertex([x, y]));
+        self
+    }
+    pub fn send_and_draw(&mut self) {
+        self.sys.circle_buffer.update();
 
-	pub fn send_and_draw(&mut self){
-		unimplemented!()
-	}
-	pub fn save(&mut self){
-		unimplemented!()
-	}
+
+        self.sys.sprite_program.set_buffer_and_draw(
+            self.texture.radius * GL_POINT_COMP * self.sys.point_mul.0,
+            [1.0,1.0,1.0,1.0],
+            0,
+            self.sys.circle_buffer.get_id(),
+            gl::POINTS,
+            self.sys.circle_buffer.len(),
+            self.texture.id
+        );
+    }
 }
-impl Drop for SpriteSession{
-	fn drop(&mut self){
-		unimplemented!()
-	}
+impl Drop for SpriteSession<'_> {
+    fn drop(&mut self) {
+        self.sys.reset();
+    }
 }
 
-pub struct Texture{
-	id:GLuint
+pub struct Texture {
+    radius:f32,
+    id: GLuint,
 }
-
 
 impl Texture {
-
-	pub fn sprites(&mut self,canvas:&mut SimpleCanvas)->SpriteSession{
-		unimplemented!()
-	}
+    pub fn sprites<'a>(&'a mut self, canvas: &'a mut SimpleCanvas) -> SpriteSession {
+        SpriteSession{sys:canvas,texture:self}
+    }
     pub fn new(file: String) -> image::ImageResult<Texture> {
         match image::open(file.clone()) {
             Err(err) => Err(err),
             Ok(img) => {
-            	use image::GenericImageView;
+                use image::GenericImageView;
                 println!("Dimensions of image are {:?}", img.dimensions());
 
                 let (width, height) = img.dimensions();
 
                 let img = match img {
                     image::DynamicImage::ImageRgba8(img) => img,
-                    img => img.to_rgba()
+                    img => img.to_rgba(),
                 };
 
-                let id=build_opengl_mipmapped_texture(width, height, img);
-            	Ok(Texture{id})
+                let id = build_opengl_mipmapped_texture(width, height, img);
+                Ok(Texture { id ,radius:(width.max(height) as f32)})
             }
         }
     }
 }
-
 
 fn build_opengl_mipmapped_texture(width: u32, height: u32, image: image::RgbaImage) -> GLuint {
     unsafe {
@@ -65,26 +74,31 @@ fn build_opengl_mipmapped_texture(width: u32, height: u32, image: image::RgbaIma
 
         gl::BindTexture(gl::TEXTURE_2D, texture_id);
         gl_ok!();
-        
 
-        let raw=image.into_raw();
+        let raw = image.into_raw();
 
         // FIXME of course not always RGBA
-        gl::TexImage2D(gl::TEXTURE_2D,
-                       0,
-                       gl::RGBA as i32,
-                       width as i32,
-                       height as i32,
-                       0,
-                       gl::RGBA,
-                       gl::UNSIGNED_BYTE,
-                       raw.as_ptr() as *const _);
+        gl::TexImage2D(
+            gl::TEXTURE_2D,
+            0,
+            gl::RGBA as i32,
+            width as i32,
+            height as i32,
+            0,
+            gl::RGBA,
+            gl::UNSIGNED_BYTE,
+            raw.as_ptr() as *const _,
+        );
         gl_ok!();
-        
-  
+
+        gl::TexParameteri(gl::TEXTURE_2D, gl::TEXTURE_MIN_FILTER, gl::NEAREST as i32);
+        gl_ok!();
+        gl::TexParameteri(gl::TEXTURE_2D, gl::TEXTURE_MAG_FILTER, gl::NEAREST as i32);
+        gl_ok!();
+
         gl::BindTexture(gl::TEXTURE_2D, 0);
         gl_ok!();
-        
+
         texture_id
     }
 }

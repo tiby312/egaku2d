@@ -27,7 +27,7 @@ impl<V: core::fmt::Debug + Copy + Clone> StaticBuffer<V> {
                 gl::ARRAY_BUFFER,
                 (data.len() * mem::size_of::<V>()) as GLsizeiptr,
                 data.as_ptr() as *const std::ffi::c_void,
-                gl::STATIC_DRAW, 
+                gl::STATIC_DRAW,
             );
         }
         StaticBuffer {
@@ -50,7 +50,7 @@ impl<V: core::fmt::Debug + Copy + Clone> StaticBuffer<V> {
 pub struct GrowableBuffer<V> {
     vbo: u32,
     buffer: Vec<V>,
-    vbo_size:Option<usize>
+    vbo_size: Option<usize>,
 }
 impl<V> Drop for GrowableBuffer<V> {
     fn drop(&mut self) {
@@ -87,20 +87,24 @@ impl<V: Default> GrowableBuffer<V> {
             gl_ok!();
         }
 
-        GrowableBuffer { vbo, buffer,vbo_size:None }
+        GrowableBuffer {
+            vbo,
+            buffer,
+            vbo_size: None,
+        }
     }
 
     pub fn update(&mut self) {
         let vbo = self.vbo;
-        
-        match self.vbo_size{
-            Some(l)=>{
-                if l<self.buffer.capacity(){
+
+        match self.vbo_size {
+            Some(l) => {
+                if l < self.buffer.capacity() {
                     self.re_generate_buffer();
                 }
-                assert!(self.vbo_size.unwrap()>=self.buffer.capacity());
-            },
-            None=>{
+                assert!(self.vbo_size.unwrap() >= self.buffer.capacity());
+            }
+            None => {
                 self.re_generate_buffer();
             }
         }
@@ -136,7 +140,6 @@ impl<V: Default> GrowableBuffer<V> {
     }
 
     fn re_generate_buffer(&mut self) {
-
         let vbo = &mut self.vbo;
         unsafe {
             gl::BindBuffer(gl::ARRAY_BUFFER, *vbo);
@@ -149,7 +152,6 @@ impl<V: Default> GrowableBuffer<V> {
             gl_ok!()
         }
         //TODO first confirm the vbo resized??
-        self.vbo_size=Some(self.buffer.capacity());
-        
+        self.vbo_size = Some(self.buffer.capacity());
     }
 }

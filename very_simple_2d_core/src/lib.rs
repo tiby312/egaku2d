@@ -11,9 +11,8 @@ use core::mem;
 use gl::types::*;
 
 mod shader;
-mod vbo;
 mod texture;
-
+mod vbo;
 
 ///Macro that asserts that there are no opengl errors.
 #[macro_export]
@@ -23,13 +22,11 @@ macro_rules! gl_ok {
     };
 }
 
-
 struct NotSend(*mut usize);
 
-fn ns()->NotSend{
+fn ns() -> NotSend {
     NotSend(core::ptr::null_mut())
 }
-
 
 use circle_program::CircleProgram;
 use circle_program::PointMul;
@@ -66,7 +63,9 @@ impl SimpleCanvas {
     }
     pub fn set_viewport(&mut self, window_dim: axgeom::FixedAspectVec2, game_width: f32) {
         self.point_mul = self.circle_program.set_viewport(window_dim, game_width);
-        let _ = self.sprite_program.set_viewport(window_dim,window_dim.width as f32);
+        let _ = self
+            .sprite_program
+            .set_viewport(window_dim, window_dim.width as f32);
     }
 
     //Unsafe since user might create two instances, both of
@@ -75,11 +74,10 @@ impl SimpleCanvas {
         let circle_buffer = vbo::GrowableBuffer::new();
         let mut circle_program = CircleProgram::new();
 
-        let mut sprite_program=SpriteProgram::new();
-
+        let mut sprite_program = SpriteProgram::new();
 
         let point_mul = circle_program.set_viewport(window_dim, window_dim.width as f32);
-        let _ = sprite_program.set_viewport(window_dim,window_dim.width as f32);
+        let _ = sprite_program.set_viewport(window_dim, window_dim.width as f32);
 
         gl::Enable(gl::BLEND);
         gl_ok!();
@@ -95,19 +93,19 @@ impl SimpleCanvas {
     }
 
     pub fn circles(&mut self, radius: f32) -> CircleSession {
-        assert_eq!(self.circle_buffer.len(),0);
+        assert_eq!(self.circle_buffer.len(), 0);
         CircleSession { radius, sys: self }
     }
     pub fn squares(&mut self, radius: f32) -> SquareSession {
-        assert_eq!(self.circle_buffer.len(),0);
+        assert_eq!(self.circle_buffer.len(), 0);
         SquareSession { radius, sys: self }
     }
     pub fn rects(&mut self) -> RectSession {
-        assert_eq!(self.circle_buffer.len(),0);
+        assert_eq!(self.circle_buffer.len(), 0);
         RectSession { sys: self }
     }
     pub fn arrows(&mut self, radius: f32) -> ArrowSession {
-        assert_eq!(self.circle_buffer.len(),0);
+        assert_eq!(self.circle_buffer.len(), 0);
         let kk = self.point_mul.0;
 
         ArrowSession {
@@ -117,14 +115,14 @@ impl SimpleCanvas {
     }
 
     pub fn lines(&mut self, radius: f32) -> LineSession {
-        assert_eq!(self.circle_buffer.len(),0);
+        assert_eq!(self.circle_buffer.len(), 0);
         let kk = self.point_mul.0;
         LineSession {
             sys: self,
             radius: radius * kk,
         }
     }
-    pub fn texture(&mut self,file: String) -> image::ImageResult<texture::Texture> {
+    pub fn texture(&mut self, file: String) -> image::ImageResult<texture::Texture> {
         texture::Texture::new(file)
     }
 

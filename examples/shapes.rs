@@ -10,10 +10,9 @@ use very_simple_2d::*;
 
 fn main() {
     let events_loop = glutin::event_loop::EventLoop::new();
-    let mut sys = WindowedSystem::newp(640, 480, &events_loop,"shapes example");
+    let mut sys = WindowedSystem::newp(640, 480, &events_loop, "shapes example");
     //let mut sys=FullScreenSystem::new(&events_loop);
-    
-    let texture=sys.canvas_mut().texture("test.png".to_string()).unwrap();
+
 
     let rect_save = {
         let mut k = sys.canvas_mut().rects();
@@ -51,12 +50,11 @@ fn main() {
             .add(vec2(10., 300.), vec2(300., 400.))
             .save()
     };
-    
 
     let mut timer = very_simple_2d::RefreshTimer::new(16);
 
     let mut counter = 0;
-    let mut cursor=vec2same(0.0);
+    let mut cursor = vec2same(0.0);
     events_loop.run(move |event, _, control_flow| match event {
         Event::WindowEvent { event, .. } => match event {
             WindowEvent::KeyboardInput { input, .. } => match input.virtual_keycode {
@@ -66,19 +64,18 @@ fn main() {
                 _ => {}
             },
             WindowEvent::CursorMoved {
-                    modifiers: _,
-                    device_id: _,
-                    position: logical_position,
+                modifiers: _,
+                device_id: _,
+                position: logical_position,
             } => {
-                let dpi=sys.get_hidpi_factor();
-                let p=logical_position.to_physical(dpi);
+                let dpi = sys.get_hidpi_factor();
+                let p = logical_position.to_physical(dpi);
                 cursor = vec2(p.x, p.y).inner_as();
-            },
+            }
             WindowEvent::CloseRequested => {
                 *control_flow = ControlFlow::Exit;
-            },
-            WindowEvent::Resized(_logical_size) => {
             }
+            WindowEvent::Resized(_logical_size) => {}
             _ => {}
         },
 
@@ -87,6 +84,9 @@ fn main() {
                 let mut canvas = sys.canvas_mut();
 
                 canvas.clear_color([0.2, 0.2, 0.2]);
+
+
+              
                 //Use this instead of clear_color for an interesting fade effect.
                 //canvas.rects().addp(0.0,640.0,0.0,480.0).send_and_draw([0.2,0.2,0.2,0.3]);
 
@@ -94,8 +94,7 @@ fn main() {
                 arrow_save.draw(&mut canvas, [0.0, 1.0, 0.1, 0.5]);
                 line_save.draw(&mut canvas, [0., 1.0, 1., 0.3]);
                 square_save.draw(&mut canvas, [1., 0., 1., 0.1]);
-                
-                
+
                 rect_save.draw(&mut canvas, [0.8, 0.8, 1.0, 0.2]);
 
                 {
@@ -106,13 +105,12 @@ fn main() {
                             let c = (counter + x + y) as f32 * 0.01;
 
                             let pos = vec2(x, y).inner_as();
-                            
+
                             k.add(pos + vec2(c.sin() * y as f32 * 0.1, c.cos() * x as f32 * 0.1));
                         }
                     }
                     k.send_and_draw([1., 1., 1., 0.1]);
                 }
-
 
                 {
                     //Draw a growing circle
@@ -141,12 +139,9 @@ fn main() {
                         .send_and_draw([1.0, 0.1, 0.5, 0.5]);
                 }
 
+                let mut texture = canvas.texture("test1.png".to_string()).unwrap();
+                texture.sprites(canvas).addp(200.,200.).send_and_draw();
 
-                
-
-                
-
-                
 
                 //Display what we drew
                 sys.swap_buffers();

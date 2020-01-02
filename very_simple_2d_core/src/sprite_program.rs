@@ -17,8 +17,7 @@ void main() {
     gl_Position = vec4(mmatrix*pp.xyz, 1.0);
 }";
 
-
-static FS_SRC:&'static str = "
+static FS_SRC: &'static str = "
 #version 300 es
 precision mediump float;
 
@@ -30,7 +29,6 @@ void main()
    out_color = texture2D(tex0, gl_PointCoord) ;
 }
 ";
-
 
 #[repr(transparent)]
 #[derive(Copy, Clone, Debug, Default)]
@@ -44,6 +42,7 @@ pub struct SpriteProgram {
     pub point_size_uniform: GLint,
     pub bcol_uniform: GLint,
     pub pos_attr: GLint,
+    pub sample_location: GLint
 }
 
 #[derive(Debug)]
@@ -55,7 +54,6 @@ impl SpriteProgram {
         window_dim: axgeom::FixedAspectVec2,
         game_width: f32,
     ) -> PointMul {
-
         let game_height = window_dim.ratio.height_over_width() as f32 * game_width;
 
         let scalex = 2.0 / game_width;
@@ -89,21 +87,23 @@ impl SpriteProgram {
         buffer_id: u32,
         mode: GLenum,
         length: usize,
+        texture_id:u32
     ) {
+
         //TODO NO IDEA WHY THIS IS NEEDED ON LINUX.
         //Without this function call, on linux not every shape gets drawn.
-        //gl_PointCoord will always return zero if you you try 
+        //gl_PointCoord will always return zero if you you try
         //and draw some circles after drawing a rect save.
         //It is something to do with changing between gl::TRIANGLES to gl::POINTS.
         //but this shouldnt be a problem since they are seperate vbos.
-        unsafe{
+        unsafe {
             gl::BindBuffer(gl::ARRAY_BUFFER, buffer_id);
             gl_ok!();
 
-            gl::DrawArrays(mode,0,1);
+            gl::DrawArrays(mode, 0, 1);
             gl_ok!();
 
-            gl::BindBuffer(gl::ARRAY_BUFFER,0);
+            gl::BindBuffer(gl::ARRAY_BUFFER, 0);
             gl_ok!();
         }
 
@@ -114,19 +114,34 @@ impl SpriteProgram {
             gl::Uniform1f(self.point_size_uniform, point_size);
             gl_ok!();
 
-
             gl::Uniform4fv(self.bcol_uniform, 1, col.as_ptr() as *const _);
             gl_ok!();
 
             gl::Uniform1i(self.square_uniform, square as i32);
             gl_ok!();
-        
+
             gl::BindBuffer(gl::ARRAY_BUFFER, buffer_id);
             gl_ok!();
 
+
+
+            gl::ActiveTexture(gl::TEXTURE0);
+            gl_ok!();
+
+            gl::BindTexture(gl::TEXTURE_2D, texture_id);
+            gl_ok!();            
+            
+            
+            gl::Uniform1i(self.sample_location,0);   
+            gl_ok!();
+
+
+        
+
+
+
             gl::EnableVertexAttribArray(self.pos_attr as GLuint);
             gl_ok!();
-            
 
             gl::VertexAttribPointer(
                 self.pos_attr as GLuint,
@@ -138,16 +153,14 @@ impl SpriteProgram {
             );
             gl_ok!();
 
-
             gl::DrawArrays(mode, 0 as i32, length as i32);
 
             gl_ok!();
 
-            gl::BindBuffer(gl::ARRAY_BUFFER,0);
+            gl::BindBuffer(gl::ARRAY_BUFFER, 0);
             gl_ok!();
         }
     }
-
 
     pub fn new() -> SpriteProgram {
         unsafe {
@@ -190,7 +203,12 @@ impl SpriteProgram {
                 gl::GetAttribLocation(program, CString::new("position").unwrap().as_ptr());
             gl_ok!();
 
+            let sample_location = 
+                gl::GetAttribLocation(program, CString::new("tex0").unwrap().as_ptr());
+            gl_ok!();
+
             SpriteProgram {
+                sample_location,
                 program,
                 square_uniform,
                 point_size_uniform,
@@ -198,7 +216,6 @@ impl SpriteProgram {
                 bcol_uniform,
                 pos_attr,
             }
-            
         }
     }
 }

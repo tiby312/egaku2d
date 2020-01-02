@@ -148,7 +148,7 @@ impl RefreshTimer {
 #[cfg(feature = "fullscreen")]
 pub use self::fullscreen::FullScreenSystem;
 #[cfg(feature = "fullscreen")]
-pub mod fullscreen{
+pub mod fullscreen {
     pub struct FullScreenSystem {
         inner: SimpleCanvas,
         window_dim: FixedAspectVec2,
@@ -161,7 +161,6 @@ pub mod fullscreen{
 
             let gl_window = glutin::window::WindowBuilder::new().with_fullscreen(Some(fullscreen));
 
-
             //std::thread::sleep(std::time::Duration::from_millis(5000));
 
             //we are targeting only opengl 3.0 es. and glsl 300 es.
@@ -172,34 +171,24 @@ pub mod fullscreen{
                 .build_windowed(gl_window, &events_loop)
                 .unwrap();
 
-
-            
-
             let windowed_context = unsafe { windowed_context.make_current().unwrap() };
-
-
-
 
             let dpi = windowed_context.window().hidpi_factor();
             let glutin::dpi::PhysicalSize { width, height } =
                 windowed_context.window().inner_size().to_physical(dpi);
 
-            dbg!(width,height);
-
+            dbg!(width, height);
 
             // Load the OpenGL function pointers
             gl::load_with(|symbol| windowed_context.get_proc_address(symbol) as *const _);
             assert_eq!(unsafe { gl::GetError() }, gl::NO_ERROR);
-
-
-
 
             let window_dim = axgeom::FixedAspectVec2 {
                 ratio: AspectRatio(vec2(width, height)),
                 width,
             };
 
-            let windowed_context=Some(windowed_context);
+            let windowed_context = Some(windowed_context);
 
             //let game_world = Rect::new(0.0, width as f32, 0.0, height as f32);
             let mut f = FullScreenSystem {
@@ -214,25 +203,40 @@ pub mod fullscreen{
         }
 
         //After this is called, you should update the viewport!!!!
-        pub fn update_window_dim(&mut self){
+        pub fn update_window_dim(&mut self) {
+            let dpi = self
+                .windowed_context
+                .as_ref()
+                .unwrap()
+                .window()
+                .hidpi_factor();
 
+            let size = self
+                .windowed_context
+                .as_ref()
+                .unwrap()
+                .window()
+                .inner_size()
+                .to_physical(dpi);
 
-            let dpi = self.windowed_context.as_ref().unwrap().window().hidpi_factor();
-            
-            let size =
-                self.windowed_context.as_ref().unwrap().window().inner_size().to_physical(dpi);
-
-            println!("resizing context!!! {:?}",(dpi,size));
+            println!("resizing context!!! {:?}", (dpi, size));
 
             self.windowed_context.as_mut().unwrap().resize(size);
-            self.window_dim=axgeom::FixedAspectVec2{ratio:AspectRatio(vec2(size.width,size.height)),width:size.width};
+            self.window_dim = axgeom::FixedAspectVec2 {
+                ratio: AspectRatio(vec2(size.width, size.height)),
+                width: size.width,
+            };
 
-            let ctx = unsafe { self.windowed_context.take().unwrap().make_not_current().unwrap() };
+            let ctx = unsafe {
+                self.windowed_context
+                    .take()
+                    .unwrap()
+                    .make_not_current()
+                    .unwrap()
+            };
 
             self.windowed_context = Some(unsafe { ctx.make_current().unwrap() });
-
         }
-
 
         pub fn set_viewport_from_width(&mut self, width: f32) {
             //let dim = self.get_dim().inner_as::<f32>();
@@ -270,13 +274,14 @@ pub mod fullscreen{
             self.window_dim.as_vec().inner_as()
         }
         pub fn swap_buffers(&mut self) {
-            self.windowed_context.as_mut().unwrap().swap_buffers().unwrap();
+            self.windowed_context
+                .as_mut()
+                .unwrap()
+                .swap_buffers()
+                .unwrap();
             assert_eq!(unsafe { gl::GetError() }, gl::NO_ERROR);
         }
     }
-    
-    
-
 }
 
 ///A version where the user can control the size of the window.
@@ -291,21 +296,25 @@ impl WindowedSystem {
         dimx: usize,
         dimy: usize,
         events_loop: &glutin::event_loop::EventLoop<()>,
-        title:&str
+        title: &str,
     ) -> WindowedSystem {
         Self::new(vec2(dimx, dimy), events_loop, title)
     }
-    pub fn new(dim: Vec2<usize>, events_loop: &glutin::event_loop::EventLoop<()>,title:&str) -> WindowedSystem {
-        let dim=dim.inner_as::<f32>();
+    pub fn new(
+        dim: Vec2<usize>,
+        events_loop: &glutin::event_loop::EventLoop<()>,
+        title: &str,
+    ) -> WindowedSystem {
+        let dim = dim.inner_as::<f32>();
 
         let game_world = Rect::new(0.0, dim.x, 0.0, dim.y);
-        
+
         let width = game_world.x.distance() as f64;
         let height = game_world.y.distance() as f64;
 
-        let monitor=prompt_for_monitor(events_loop);
-        let dpi=monitor.hidpi_factor();
-        let p=glutin::dpi::PhysicalSize{width,height}.to_logical(dpi);
+        let monitor = prompt_for_monitor(events_loop);
+        let dpi = monitor.hidpi_factor();
+        let p = glutin::dpi::PhysicalSize { width, height }.to_logical(dpi);
 
         let gl_window = glutin::window::WindowBuilder::new()
             .with_inner_size(p)
@@ -322,18 +331,15 @@ impl WindowedSystem {
 
         let windowed_context = unsafe { windowed_context.make_current().unwrap() };
 
-        
         // Load the OpenGL function pointers
         gl::load_with(|symbol| windowed_context.get_proc_address(symbol) as *const _);
         assert_eq!(unsafe { gl::GetError() }, gl::NO_ERROR);
 
-
         let dpi = windowed_context.window().hidpi_factor();
         let glutin::dpi::PhysicalSize { width, height } =
             windowed_context.window().inner_size().to_physical(dpi);
-        assert_eq!(width as usize,dim.x as usize);
-        assert_eq!(height as usize,dim.y as usize);
-
+        assert_eq!(width as usize, dim.x as usize);
+        assert_eq!(height as usize, dim.y as usize);
 
         let window_dim = axgeom::FixedAspectVec2 {
             ratio: AspectRatio(vec2(width, height)),
@@ -347,7 +353,7 @@ impl WindowedSystem {
         }
     }
 
-    pub fn get_hidpi_factor(&self)->f64{
+    pub fn get_hidpi_factor(&self) -> f64 {
         self.windowed_context.window().hidpi_factor()
     }
 
@@ -369,8 +375,8 @@ impl WindowedSystem {
     }
 
     pub fn get_dimp(&self) -> [usize; 2] {
-        let k=self.window_dim.as_vec().inner_as();
-        [k.x,k.y]
+        let k = self.window_dim.as_vec().inner_as();
+        [k.x, k.y]
     }
     pub fn get_dim(&self) -> Vec2<usize> {
         self.window_dim.as_vec().inner_as()

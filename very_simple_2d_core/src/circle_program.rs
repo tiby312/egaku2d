@@ -42,7 +42,6 @@ void main() {
     out_color = bcol;
 }";
 
-
 #[repr(transparent)]
 #[derive(Copy, Clone, Debug, Default)]
 pub struct Vertex(pub [f32; 2]);
@@ -66,7 +65,6 @@ impl CircleProgram {
         window_dim: axgeom::FixedAspectVec2,
         game_width: f32,
     ) -> PointMul {
-
         let game_height = window_dim.ratio.height_over_width() as f32 * game_width;
 
         let scalex = 2.0 / game_width;
@@ -103,18 +101,18 @@ impl CircleProgram {
     ) {
         //TODO NO IDEA WHY THIS IS NEEDED ON LINUX.
         //Without this function call, on linux not every shape gets drawn.
-        //gl_PointCoord will always return zero if you you try 
+        //gl_PointCoord will always return zero if you you try
         //and draw some circles after drawing a rect save.
         //It is something to do with changing between gl::TRIANGLES to gl::POINTS.
         //but this shouldnt be a problem since they are seperate vbos.
-        unsafe{
+        unsafe {
             gl::BindBuffer(gl::ARRAY_BUFFER, buffer_id);
             gl_ok!();
 
-            gl::DrawArrays(mode,0,1);
+            gl::DrawArrays(mode, 0, 1);
             gl_ok!();
 
-            gl::BindBuffer(gl::ARRAY_BUFFER,0);
+            gl::BindBuffer(gl::ARRAY_BUFFER, 0);
             gl_ok!();
         }
 
@@ -125,19 +123,17 @@ impl CircleProgram {
             gl::Uniform1f(self.point_size_uniform, point_size);
             gl_ok!();
 
-
             gl::Uniform4fv(self.bcol_uniform, 1, col.as_ptr() as *const _);
             gl_ok!();
 
             gl::Uniform1i(self.square_uniform, square as i32);
             gl_ok!();
-        
+
             gl::BindBuffer(gl::ARRAY_BUFFER, buffer_id);
             gl_ok!();
 
             gl::EnableVertexAttribArray(self.pos_attr as GLuint);
             gl_ok!();
-            
 
             gl::VertexAttribPointer(
                 self.pos_attr as GLuint,
@@ -149,16 +145,14 @@ impl CircleProgram {
             );
             gl_ok!();
 
-
             gl::DrawArrays(mode, 0 as i32, length as i32);
 
             gl_ok!();
 
-            gl::BindBuffer(gl::ARRAY_BUFFER,0);
+            gl::BindBuffer(gl::ARRAY_BUFFER, 0);
             gl_ok!();
         }
     }
-
 
     pub fn new() -> CircleProgram {
         unsafe {
@@ -209,7 +203,6 @@ impl CircleProgram {
                 bcol_uniform,
                 pos_attr,
             }
-            
         }
     }
 }
