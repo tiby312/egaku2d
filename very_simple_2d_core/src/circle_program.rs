@@ -99,6 +99,7 @@ impl CircleProgram {
         mode: GLenum,
         length: usize,
     ) {
+        dbg!(buffer_id);
         //TODO NO IDEA WHY THIS IS NEEDED ON LINUX.
         //Without this function call, on linux not every shape gets drawn.
         //gl_PointCoord will always return zero if you you try
@@ -113,6 +114,9 @@ impl CircleProgram {
             gl::BindBuffer(gl::ARRAY_BUFFER, buffer_id);
             gl_ok!();
 
+            gl::EnableVertexAttribArray(self.pos_attr as GLuint);
+            gl_ok!();
+
             gl::DrawArrays(mode, 0, 1);
             gl_ok!();
 
@@ -121,6 +125,8 @@ impl CircleProgram {
         }
 
         unsafe {
+            gl::UseProgram(self.program);
+            gl_ok!();
             
             gl::Uniform1f(self.point_size_uniform, point_size);
             gl_ok!();

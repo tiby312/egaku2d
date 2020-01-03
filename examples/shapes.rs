@@ -110,7 +110,7 @@ fn main() {
 
                 //draw static VBOs already on the gpu.
                 
-                
+                                
                 arrow_save.draw(&mut canvas, [0.0, 1.0, 0.1, 0.5]);
                 
                 line_save.draw(&mut canvas, [0., 1.0, 1., 0.3]);
@@ -121,7 +121,16 @@ fn main() {
                 
 
 
+                println!("a");
+                let mut k=canvas.sprites();
+                for x in (0..1000).step_by(100){
+                    for y in (0..1000).step_by(100){
+                        k.addp(x as f32,y as f32,counter as f32 * 0.01);
+                    }
+                }
+                k.send_and_draw(&mut texture);
                 
+                drop(k);
                 
                 {
                     //Draw some moving circles
@@ -136,19 +145,10 @@ fn main() {
                         }
                     }
                     k.send_and_draw([1., 1., 1., 0.1]);
-                    //k.send_and_draw([1., 1., 1., 0.1]);
                 }
                 
+                println!("b");
                 
-                let mut k=canvas.sprites();
-                for x in (0..1000).step_by(100){
-                    for y in (0..1000).step_by(100){
-                        k.addp(x as f32,y as f32,counter as f32 * 0.01);
-                    }
-                }
-                k.send_and_draw(&mut texture);
-                
-                drop(k);
                 
                 
 
@@ -162,6 +162,8 @@ fn main() {
                         .send_and_draw([1.0, 1.0, 1.0, 1.0]);
                 }
 
+                println!("c");
+
                 {
                     //Draw a moving line
                     let c = counter as f32 * 0.07;
@@ -170,6 +172,8 @@ fn main() {
                         .add(vec2(50., 500.), vec2(500., 50. + c.sin() * 50.))
                         .send_and_draw([1., 1., 0.2, 0.2]);
                 }
+
+                println!("d");
                 
                 {
                     //Draw a rotating arrow
@@ -180,6 +184,8 @@ fn main() {
                         .add(center, center + vec2(c.cos() * 80., c.sin() * 80.))
                         .send_and_draw([1.0, 0.1, 0.5, 0.5]);
                 }
+
+                println!("e");
                 
 
                 
