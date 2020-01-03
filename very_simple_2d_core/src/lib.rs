@@ -11,7 +11,7 @@ use core::mem;
 use gl::types::*;
 
 mod shader;
-mod texture;
+pub mod sprite;
 mod vbo;
 
 ///Macro that asserts that there are no opengl errors.
@@ -94,8 +94,8 @@ impl SimpleCanvas {
         }
     }
 
-    pub fn sprites<'a>(&'a mut self) -> texture::SpriteSession {
-        texture::SpriteSession{sys:self}
+    pub fn sprites<'a>(&'a mut self) -> sprite::SpriteSession {
+        sprite::SpriteSession{sys:self}
     }
 
     pub fn circles(&mut self, radius: f32) -> CircleSession {
@@ -128,8 +128,8 @@ impl SimpleCanvas {
             radius: radius * kk,
         }
     }
-    pub fn texture(&mut self, file: String) -> image::ImageResult<texture::Texture> {
-        texture::Texture::new(file)
+    pub fn texture(&mut self, file: String) -> image::ImageResult<sprite::Texture> {
+        sprite::Texture::new(file)
     }
 
     pub fn clear_color(&mut self, back_color: [f32; 3]) {
@@ -137,7 +137,6 @@ impl SimpleCanvas {
             gl::ClearColor(back_color[0], back_color[1], back_color[2], 1.0);
             gl_ok!();
 
-            //self.rects()
             gl::Clear(gl::COLOR_BUFFER_BIT);
             gl_ok!();
         }

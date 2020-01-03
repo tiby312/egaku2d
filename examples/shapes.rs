@@ -101,7 +101,7 @@ fn main() {
             if timer.is_ready() {
                 let mut canvas = sys.canvas_mut();
 
-                canvas.clear_color([1.0;3]);
+                canvas.clear_color([0.2;3]);
 
 
               
@@ -109,12 +109,20 @@ fn main() {
                 //canvas.rects().addp(0.0,640.0,0.0,480.0).send_and_draw([0.2,0.2,0.2,0.3]);
 
                 //draw static VBOs already on the gpu.
+                
+                /*
                 arrow_save.draw(&mut canvas, [0.0, 1.0, 0.1, 0.5]);
+                
                 line_save.draw(&mut canvas, [0., 1.0, 1., 0.3]);
                 square_save.draw(&mut canvas, [1., 0., 1., 0.1]);
-
+                */
+                
                 rect_save.draw(&mut canvas, [0.8, 0.8, 1.0, 0.2]);
+                
 
+
+                
+                
                 {
                     //Draw some moving circles
                     let mut k = canvas.circles(8.0);
@@ -128,8 +136,23 @@ fn main() {
                         }
                     }
                     k.send_and_draw([1., 1., 1., 0.1]);
+                    //k.send_and_draw([1., 1., 1., 0.1]);
                 }
+                
+                /*
+                let mut k=canvas.sprites();
+                for x in (0..1000).step_by(100){
+                    for y in (0..1000).step_by(100){
+                        k.addp(x as f32,y as f32,counter as f32 * 0.01);
+                    }
+                }
+                k.send_and_draw(&mut texture);
+                
+                drop(k);
+                */
+                
 
+                
                 {
                     //Draw a growing circle
                     let c = ((counter as f32 * 0.06).sin() * 40.0).abs();
@@ -147,6 +170,7 @@ fn main() {
                         .add(vec2(50., 500.), vec2(500., 50. + c.sin() * 50.))
                         .send_and_draw([1., 1., 0.2, 0.2]);
                 }
+                
                 {
                     //Draw a rotating arrow
                     let c = counter as f32 * 0.04;
@@ -156,20 +180,12 @@ fn main() {
                         .add(center, center + vec2(c.cos() * 80., c.sin() * 80.))
                         .send_and_draw([1.0, 0.1, 0.5, 0.5]);
                 }
+                
 
+                
+                
                 //sprite_save.draw(canvas,&mut texture);
                 
-                let mut k=canvas.sprites();
-                for x in (0..1000).step_by(100){
-                    for y in (0..1000).step_by(100){
-                        //let (x,y)=(x as f32,y as f32);
-                        //let l=0 as f32 * 0.06;
-                        k.addp(x as f32,y as f32,counter as f32 * 0.01);
-                    }
-                }
-
-                k.send_and_draw(&mut texture);
-                drop(k);
                 //let sprite_save=k.save();
                 //drop(k);
 

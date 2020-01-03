@@ -99,7 +99,6 @@ fn build_opengl_mipmapped_texture(width: u32, height: u32, image: image::RgbaIma
 
         let raw = image.into_raw();
 
-        // FIXME of course not always RGBA
         gl::TexImage2D(
             gl::TEXTURE_2D,
             0,
@@ -112,12 +111,7 @@ fn build_opengl_mipmapped_texture(width: u32, height: u32, image: image::RgbaIma
             raw.as_ptr() as *const _,
         );
         gl_ok!();
-        /*
-        gl::TexParameteri(gl::TEXTURE_2D, gl::TEXTURE_MIN_FILTER, gl::NEAREST as i32);
-        gl_ok!();
-        gl::TexParameteri(gl::TEXTURE_2D, gl::TEXTURE_MAG_FILTER, gl::NEAREST as i32);
-        gl_ok!();
-        */
+        
         gl::TexParameteri(gl::TEXTURE_2D, gl::TEXTURE_MIN_FILTER, gl::LINEAR as i32);
         gl_ok!();
         gl::TexParameteri(gl::TEXTURE_2D, gl::TEXTURE_MAG_FILTER, gl::LINEAR as i32);
