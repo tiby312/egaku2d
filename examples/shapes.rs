@@ -110,12 +110,12 @@ fn main() {
 
                 //draw static VBOs already on the gpu.
                 
-                /*
+                
                 arrow_save.draw(&mut canvas, [0.0, 1.0, 0.1, 0.5]);
                 
                 line_save.draw(&mut canvas, [0., 1.0, 1., 0.3]);
                 square_save.draw(&mut canvas, [1., 0., 1., 0.1]);
-                */
+                
                 
                 rect_save.draw(&mut canvas, [0.8, 0.8, 1.0, 0.2]);
                 
@@ -139,7 +139,7 @@ fn main() {
                     //k.send_and_draw([1., 1., 1., 0.1]);
                 }
                 
-                /*
+                
                 let mut k=canvas.sprites();
                 for x in (0..1000).step_by(100){
                     for y in (0..1000).step_by(100){
@@ -149,7 +149,7 @@ fn main() {
                 k.send_and_draw(&mut texture);
                 
                 drop(k);
-                */
+                
                 
 
                 
