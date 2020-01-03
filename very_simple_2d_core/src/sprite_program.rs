@@ -8,13 +8,20 @@ use std::str;
 // Shader sources
 static VS_SRC: &'static str = "
 #version 300 es
-in vec2 position;
+in vec3 position;
+out mat2 rotation;
 uniform mat3 mmatrix;
 uniform float point_size;
 void main() {
     gl_PointSize = point_size;
-    vec3 pp=vec3(position,1.0);
+    vec3 pp=vec3(position.xy,1.0);
     gl_Position = vec4(mmatrix*pp.xyz, 1.0);
+
+    float c=cos(position.z);
+    float s=sin(position.z);
+
+    rotation[0]=vec2(c,-s);
+    rotation[1]=vec2(s,c);
 }";
 
 static FS_SRC: &'static str = "
@@ -22,17 +29,30 @@ static FS_SRC: &'static str = "
 precision mediump float;
 
 uniform sampler2D tex0;
+in mat2 rotation;
 out vec4 out_color;
 
 void main() 
 {
-   out_color = texture2D(tex0, gl_PointCoord) ;
+    vec2 foo=(gl_PointCoord-vec2(0.5,0.5))*2.0;
+
+    
+    if (foo.x<-0.5 || foo.x>0.5){
+        discard;
+    }
+    if (foo.y<-0.5 || foo.y>0.5){
+        discard;
+    }
+    
+    
+    vec2 texCoord = (rotation * foo)+vec2(0.5,0.5);
+    out_color = texture(tex0, texCoord) ;
 }
 ";
 
 #[repr(transparent)]
 #[derive(Copy, Clone, Debug, Default)]
-pub struct Vertex(pub [f32; 2]);
+pub struct Vertex(pub [f32; 3]);
 
 #[derive(Debug)]
 pub struct SpriteProgram {
@@ -131,7 +151,7 @@ impl SpriteProgram {
             gl::BindTexture(gl::TEXTURE_2D, texture_id);
             gl_ok!();            
             
-            
+
             gl::Uniform1i(self.sample_location,0);   
             gl_ok!();
 
@@ -145,7 +165,7 @@ impl SpriteProgram {
 
             gl::VertexAttribPointer(
                 self.pos_attr as GLuint,
-                2,
+                3,
                 gl::FLOAT,
                 gl::FALSE as GLboolean,
                 0 as i32,

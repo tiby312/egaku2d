@@ -55,12 +55,11 @@ pub struct SimpleCanvas {
     sprite_program: SpriteProgram,
     point_mul: PointMul,
     circle_buffer: vbo::GrowableBuffer<circle_program::Vertex>,
+    sprite_buffer: vbo::GrowableBuffer<sprite_program::Vertex>,
 }
 
 impl SimpleCanvas {
-    fn reset(&mut self) {
-        self.circle_buffer.clear();
-    }
+    
     pub fn set_viewport(&mut self, window_dim: axgeom::FixedAspectVec2, game_width: f32) {
         self.point_mul = self.circle_program.set_viewport(window_dim, game_width);
         let _ = self
@@ -72,6 +71,8 @@ impl SimpleCanvas {
     //which could make opengl calls simultaneously
     pub unsafe fn new(window_dim: axgeom::FixedAspectVec2) -> SimpleCanvas {
         let circle_buffer = vbo::GrowableBuffer::new();
+        let sprite_buffer = vbo::GrowableBuffer::new();
+
         let mut circle_program = CircleProgram::new();
 
         let mut sprite_program = SpriteProgram::new();
@@ -89,6 +90,7 @@ impl SimpleCanvas {
             sprite_program,
             circle_program,
             circle_buffer,
+            sprite_buffer
         }
     }
 

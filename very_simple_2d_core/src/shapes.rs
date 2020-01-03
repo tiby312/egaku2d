@@ -17,6 +17,8 @@ impl SquareSave {
         );
     }
 }
+
+
 pub struct SquareSession<'a> {
     pub(crate) radius: f32,
     pub(crate) sys: &'a mut SimpleCanvas,
@@ -57,7 +59,7 @@ impl<'a> SquareSession<'a> {
 }
 impl<'a> Drop for SquareSession<'a> {
     fn drop(&mut self) {
-        self.sys.reset();
+        self.sys.circle_buffer.clear();
     }
 }
 
@@ -84,7 +86,7 @@ pub struct CircleSession<'a> {
 }
 impl<'a> Drop for CircleSession<'a> {
     fn drop(&mut self) {
-        self.sys.reset();
+        self.sys.circle_buffer.clear();
     }
 }
 impl<'a> CircleSession<'a> {
@@ -127,7 +129,7 @@ pub struct RectSession<'a> {
 }
 impl Drop for RectSession<'_> {
     fn drop(&mut self) {
-        self.sys.reset();
+        self.sys.circle_buffer.clear();
     }
 }
 
@@ -214,7 +216,7 @@ pub struct ArrowSession<'a> {
 }
 impl Drop for ArrowSession<'_> {
     fn drop(&mut self) {
-        self.sys.reset();
+        self.sys.circle_buffer.clear();
     }
 }
 
@@ -294,7 +296,7 @@ pub struct LineSession<'a> {
 }
 impl Drop for LineSession<'_> {
     fn drop(&mut self) {
-        self.sys.reset();
+        self.sys.circle_buffer.clear();
     }
 }
 impl LineSession<'_> {

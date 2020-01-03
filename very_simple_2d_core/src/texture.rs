@@ -3,7 +3,7 @@ use super::*;
 
 pub struct SpriteSave{
     _ns: NotSend,
-    buffer: vbo::StaticBuffer<circle_program::Vertex>,
+    buffer: vbo::StaticBuffer<sprite_program::Vertex>,
 }
 impl SpriteSave {
     pub fn draw(&self, session: &mut SimpleCanvas, texture:&mut Texture) {
@@ -25,39 +25,39 @@ pub struct SpriteSession<'a> {
 }
 
 impl SpriteSession<'_> {
-    pub fn add(&mut self, point: Vec2<f32>) -> &mut Self {
-        self.sys.circle_buffer.push(circle_program::Vertex([point.x, point.y]));
+    pub fn add(&mut self, point: Vec2<f32>,rotation:f32) -> &mut Self {
+        self.sys.sprite_buffer.push(sprite_program::Vertex([point.x, point.y,rotation]));
         self
     }
 
-    pub fn addp(&mut self, x:f32,y:f32) -> &mut Self{
-        self.sys.circle_buffer.push(circle_program::Vertex([x, y]));
+    pub fn addp(&mut self, x:f32,y:f32,rotation:f32) -> &mut Self{
+        self.sys.sprite_buffer.push(sprite_program::Vertex([x, y,rotation]));
         self
     }
     pub fn save(&mut self) -> SpriteSave {
         SpriteSave {
             _ns: ns(),
-            buffer: vbo::StaticBuffer::new(self.sys.circle_buffer.get_verts()),
+            buffer: vbo::StaticBuffer::new(self.sys.sprite_buffer.get_verts()),
         }
     }
     pub fn send_and_draw(&mut self,texture:&mut Texture) {
-        self.sys.circle_buffer.update();
+        self.sys.sprite_buffer.update();
 
 
         self.sys.sprite_program.set_buffer_and_draw(
             texture.radius * GL_POINT_COMP * self.sys.point_mul.0,
             [1.0,1.0,1.0,1.0],
             0,
-            self.sys.circle_buffer.get_id(),
+            self.sys.sprite_buffer.get_id(),
             gl::POINTS,
-            self.sys.circle_buffer.len(),
+            self.sys.sprite_buffer.len(),
             texture.id
         );
     }
 }
 impl Drop for SpriteSession<'_> {
     fn drop(&mut self) {
-        self.sys.reset();
+        self.sys.sprite_buffer.clear();
     }
 }
 
@@ -82,7 +82,7 @@ impl Texture {
                 };
 
                 let id = build_opengl_mipmapped_texture(width, height, img);
-                Ok(Texture { id ,radius:(width.max(height) as f32)/2.0})
+                Ok(Texture { id ,radius:(width.max(height) as f32)*2.0/2.0})
             }
         }
     }
