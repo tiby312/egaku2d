@@ -101,7 +101,7 @@ fn main() {
             if timer.is_ready() {
                 let mut canvas = sys.canvas_mut();
 
-                canvas.clear_color([0.2, 0.2, 0.2]);
+                canvas.clear_color([1.0;3]);
 
 
               

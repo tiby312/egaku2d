@@ -34,18 +34,19 @@ out vec4 out_color;
 
 void main() 
 {
-    vec2 foo=(gl_PointCoord-vec2(0.5,0.5))*2.0;
+    vec2 foo=(gl_PointCoord-vec2(0.5,0.5))*1.5;
 
+    vec2 foo2=(rotation * foo);
     
-    if (foo.x<-0.5 || foo.x>0.5){
+    if (foo2.x<-0.5 || foo2.x>0.5){
         discard;
     }
-    if (foo.y<-0.5 || foo.y>0.5){
+    if (foo2.y<-0.5 || foo2.y>0.5){
         discard;
     }
     
     
-    vec2 texCoord = (rotation * foo)+vec2(0.5,0.5);
+    vec2 texCoord = foo2 + vec2(0.5,0.5);
     out_color = texture(tex0, texCoord) ;
 }
 ";

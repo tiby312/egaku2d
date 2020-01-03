@@ -82,7 +82,7 @@ impl Texture {
                 };
 
                 let id = build_opengl_mipmapped_texture(width, height, img);
-                Ok(Texture { id ,radius:(width.max(height) as f32)*2.0/2.0})
+                Ok(Texture { id ,radius:(width.max(height) as f32)*1.5/2.0})
             }
         }
     }
@@ -112,10 +112,15 @@ fn build_opengl_mipmapped_texture(width: u32, height: u32, image: image::RgbaIma
             raw.as_ptr() as *const _,
         );
         gl_ok!();
-
+        /*
         gl::TexParameteri(gl::TEXTURE_2D, gl::TEXTURE_MIN_FILTER, gl::NEAREST as i32);
         gl_ok!();
         gl::TexParameteri(gl::TEXTURE_2D, gl::TEXTURE_MAG_FILTER, gl::NEAREST as i32);
+        gl_ok!();
+        */
+        gl::TexParameteri(gl::TEXTURE_2D, gl::TEXTURE_MIN_FILTER, gl::LINEAR as i32);
+        gl_ok!();
+        gl::TexParameteri(gl::TEXTURE_2D, gl::TEXTURE_MAG_FILTER, gl::LINEAR as i32);
         gl_ok!();
 
         gl::BindTexture(gl::TEXTURE_2D, 0);
