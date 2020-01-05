@@ -11,6 +11,9 @@ use core::mem;
 use gl::types::*;
 
 mod shader;
+
+///Contains all the texture/sprite drawing code.
+///The api is described in the crate documentation.
 pub mod sprite;
 mod vbo;
 
@@ -130,6 +133,8 @@ impl SimpleCanvas {
     ///Creates a new texture from the specified file.
     ///The fact that we need a mutable reference to this object
     ///Ensures that we make the texture in the same thread.
+    ///The grid dimensions passed are the tile dimensions is
+    ///the texture is a tile set.
     pub fn texture(
         &mut self,
         file: &str,

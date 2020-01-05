@@ -2,7 +2,10 @@ use super::*;
 
 ///The index will be used when draw is called with a specific texture.
 ///The index will be split into a x and y coordinate.
-///Use can use a texture to create this index from a x and y coordinate.    
+///The texture object has functions to create this index from a x and y coordinate. 
+///If the index is larger than texture.dim.x*texture.dim.y then it will be modded so that
+///it can be mapped to a tile set. But obviously, the user should be picking an index
+///that maps to a valid tile in the tile set to begin with.
 pub struct TexIndex(pub u32);
 
 pub struct SpriteSave {
@@ -87,6 +90,9 @@ pub struct Texture {
 
 impl Texture {
     ///Create a texture index from a coordinate in the tile set.
+    ///The top left time maps to 0,0. 
+    ///The x component grows to the right.
+    ///The y component grows downwards.
     pub fn coord_to_index(&self, cell: Vec2<u32>) -> TexIndex {
         TexIndex(self.grid_dim.x * cell.x + cell.y)
     }

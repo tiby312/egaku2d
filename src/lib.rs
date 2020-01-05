@@ -55,6 +55,8 @@
 //! shapes. The user can manually set the scale either by x or y and the other axis is automaically inferred
 //! so that to keep a 1:1 ratio.
 //!
+//!  
+//!
 //! # Fullscreen
 //!
 //! Fullscreen is kept behind a feature gate since on certain platforms like wayland linux it does not work.
