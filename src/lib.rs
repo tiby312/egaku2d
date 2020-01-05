@@ -73,6 +73,9 @@
 //!
 //! let canvas = glsys.canvas_mut();
 //!
+//! //Make a tileset texture from a png that has 64 different tiles.
+//! let food_texture = canvas.texturep("food.png",8,8).unwrap();
+//!
 //! //Make the background dark gray.
 //! canvas.clear_color([0.2,0.2,0.2]);
 //!
@@ -104,6 +107,9 @@
 //!   .addp(7.,8.)
 //!   .addp(9.,5.)
 //!   .send_and_draw([0., 1., 1., 0.1],4.0);
+//!
+//! use very_simple_2d::sprite::TexIndex;
+//! canvas.sprites().addp(100.,100.,TexIndex(0)).send_and_draw(&food_texture,[1.0;4],4.0);
 //!
 //! //Swap buffers on the opengl context.
 //! glsys.swap_buffers();

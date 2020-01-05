@@ -143,6 +143,16 @@ impl SimpleCanvas {
         sprite::Texture::new(file, grid_dim)
     }
 
+    ///Primitive version of texture
+    pub fn texturep(
+        &mut self,
+        file: &str,
+        grid_dim_x:u32,
+        grid_dim_y:u32
+    ) -> image::ImageResult<sprite::Texture> {
+        sprite::Texture::new(file, vec2(grid_dim_x,grid_dim_y))
+    }
+
     pub fn clear_color(&mut self, back_color: [f32; 3]) {
         unsafe {
             gl::ClearColor(back_color[0], back_color[1], back_color[2], 1.0);
