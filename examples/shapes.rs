@@ -67,7 +67,7 @@ fn main() {
         }
         k.save()      
     };
-    
+
     
     let mut timer = very_simple_2d::RefreshTimer::new(16);
 
@@ -110,7 +110,7 @@ fn main() {
                 const WHITE:[f32;4]=[1.0,1.0,1.0,0.8];
               
                 //draw static VBOs already on the gpu.
-                sprite_save.draw(&mut canvas,&mut food_tex,COL1,32.0);
+                sprite_save.draw(&mut canvas,&mut food_tex,COL4,32.0);
                 arrow_save.draw(&mut canvas, COL1);
                 line_save.draw(&mut canvas, COL2);
                 square_save.draw(&mut canvas, COL3,10.0);
