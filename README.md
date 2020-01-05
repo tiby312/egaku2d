@@ -11,8 +11,6 @@ is calling opengl functions).
 
 ## Example
 
-# Example
-
 ```rust
 use axgeom::*;
 let events_loop = glutin::event_loop::EventLoop::new();
@@ -60,4 +58,5 @@ glsys.swap_buffers();
 ## Demo
 
 Demo sprites are provided courtesy of Henry Software:
+
 https://henrysoftware.itch.io/pixel-food

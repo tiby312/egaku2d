@@ -5,7 +5,7 @@ pub struct SquareSave {
     buffer: vbo::StaticBuffer<circle_program::Vertex>,
 }
 impl SquareSave {
-    pub fn draw(&self, session: &mut SimpleCanvas, col: [f32; 4],radius:f32) {
+    pub fn draw(&self, session: &mut SimpleCanvas, col: [f32; 4], radius: f32) {
         session.circle_program.set_buffer_and_draw(
             radius * GL_POINT_COMP * session.point_mul.0,
             col,
@@ -16,7 +16,6 @@ impl SquareSave {
         );
     }
 }
-
 
 pub struct SquareSession<'a> {
     pub(crate) sys: &'a mut SimpleCanvas,
@@ -41,7 +40,7 @@ impl<'a> SquareSession<'a> {
         }
     }
 
-    pub fn send_and_draw(&mut self, col: [f32; 4],radius:f32) {
+    pub fn send_and_draw(&mut self, col: [f32; 4], radius: f32) {
         //self.sys.circle_buffer.update();
         self.sys.circle_buffer.update();
         self.sys.circle_program.set_buffer_and_draw(
@@ -65,7 +64,7 @@ pub struct CircleSave {
     buffer: vbo::StaticBuffer<circle_program::Vertex>,
 }
 impl CircleSave {
-    pub fn draw(&self, session: &mut SimpleCanvas, col: [f32; 4],radius:f32) {
+    pub fn draw(&self, session: &mut SimpleCanvas, col: [f32; 4], radius: f32) {
         session.circle_program.set_buffer_and_draw(
             radius * GL_POINT_COMP * session.point_mul.0,
             col,
@@ -92,7 +91,7 @@ impl<'a> CircleSession<'a> {
         }
     }
 
-    pub fn send_and_draw(&mut self, col: [f32; 4],radius:f32) {
+    pub fn send_and_draw(&mut self, col: [f32; 4], radius: f32) {
         self.sys.circle_buffer.update();
 
         self.sys.circle_program.set_buffer_and_draw(

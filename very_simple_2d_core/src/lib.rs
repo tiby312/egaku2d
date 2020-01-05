@@ -59,13 +59,10 @@ pub struct SimpleCanvas {
 }
 
 impl SimpleCanvas {
-    
     pub fn set_viewport(&mut self, window_dim: axgeom::FixedAspectVec2, game_width: f32) {
         self.point_mul = self.circle_program.set_viewport(window_dim, game_width);
 
-        let _ = self
-            .sprite_program
-            .set_viewport(window_dim, game_width);
+        let _ = self.sprite_program.set_viewport(window_dim, game_width);
     }
 
     //Unsafe since user might create two instances, both of
@@ -91,17 +88,17 @@ impl SimpleCanvas {
             sprite_program,
             circle_program,
             circle_buffer,
-            sprite_buffer
+            sprite_buffer,
         }
     }
 
     pub fn sprites(&mut self) -> sprite::SpriteSession {
-        sprite::SpriteSession{sys:self}
+        sprite::SpriteSession { sys: self }
     }
 
     pub fn circles(&mut self) -> CircleSession {
         assert_eq!(self.circle_buffer.len(), 0);
-        CircleSession {sys: self }
+        CircleSession { sys: self }
     }
     pub fn squares(&mut self) -> SquareSession {
         assert_eq!(self.circle_buffer.len(), 0);
@@ -133,8 +130,12 @@ impl SimpleCanvas {
     ///Creates a new texture from the specified file.
     ///The fact that we need a mutable reference to this object
     ///Ensures that we make the texture in the same thread.
-    pub fn texture(&mut self, file:&str,grid_dim:Vec2<u32>) -> image::ImageResult<sprite::Texture> {
-        sprite::Texture::new(file,grid_dim)
+    pub fn texture(
+        &mut self,
+        file: &str,
+        grid_dim: Vec2<u32>,
+    ) -> image::ImageResult<sprite::Texture> {
+        sprite::Texture::new(file, grid_dim)
     }
 
     pub fn clear_color(&mut self, back_color: [f32; 3]) {

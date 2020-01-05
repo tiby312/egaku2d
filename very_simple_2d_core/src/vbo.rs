@@ -48,8 +48,6 @@ impl<V: core::fmt::Debug + Copy + Clone> StaticBuffer<V> {
     }
 }
 
-
-
 //TODO make this be composed of a static buffer!!!!!!!!!!
 #[derive(Clone, Debug)]
 pub struct GrowableBuffer<V> {
@@ -102,7 +100,6 @@ impl<V: Default> GrowableBuffer<V> {
     }
 
     pub fn update(&mut self) {
-        
         let vbo = self.vbo;
 
         match self.vbo_size {
@@ -130,7 +127,6 @@ impl<V: Default> GrowableBuffer<V> {
             gl_ok!();
         }
     }
-
 
     #[inline(always)]
     pub fn get_id(&self) -> u32 {

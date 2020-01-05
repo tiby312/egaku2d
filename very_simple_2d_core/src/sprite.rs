@@ -5,41 +5,50 @@ use super::*;
 ///Use can use a texture to create this index from a x and y coordinate.    
 pub struct TexIndex(pub u32);
 
-
-pub struct SpriteSave{
+pub struct SpriteSave {
     _ns: NotSend,
     buffer: vbo::StaticBuffer<sprite_program::Vertex>,
 }
 impl SpriteSave {
-    pub fn draw(&self, session: &mut SimpleCanvas, texture:&Texture,color:[f32;4],point_size:f32) {
+    pub fn draw(
+        &self,
+        session: &mut SimpleCanvas,
+        texture: &Texture,
+        color: [f32; 4],
+        point_size: f32,
+    ) {
         session.sprite_program.set_buffer_and_draw(
-            point_size* GL_POINT_COMP * session.point_mul.0,
+            point_size * GL_POINT_COMP * session.point_mul.0,
             color,
             self.buffer.get_id(),
             self.buffer.len(),
-            texture
+            texture,
         );
     }
 }
-
 
 pub struct SpriteSession<'a> {
     pub(crate) sys: &'a mut SimpleCanvas,
 }
 
 impl SpriteSession<'_> {
-
     ///Add a point sprite.
     #[inline(always)]
-    pub fn add(&mut self, point: Vec2<f32>,index:TexIndex) -> &mut Self {
-        self.sys.sprite_buffer.push(sprite_program::Vertex{pos:[point.x, point.y],index:index.0 as f32});
+    pub fn add(&mut self, point: Vec2<f32>, index: TexIndex) -> &mut Self {
+        self.sys.sprite_buffer.push(sprite_program::Vertex {
+            pos: [point.x, point.y],
+            index: index.0 as f32,
+        });
         self
     }
 
     ///Primitive version of add.
     #[inline(always)]
-    pub fn addp(&mut self, x:f32,y:f32,index:TexIndex) -> &mut Self{
-        self.sys.sprite_buffer.push(sprite_program::Vertex{pos:[x, y],index:index.0 as f32});
+    pub fn addp(&mut self, x: f32, y: f32, index: TexIndex) -> &mut Self {
+        self.sys.sprite_buffer.push(sprite_program::Vertex {
+            pos: [x, y],
+            index: index.0 as f32,
+        });
         self
     }
 
@@ -52,20 +61,18 @@ impl SpriteSession<'_> {
     }
 
     ///Draw the sprites using the specified texture.
-    pub fn send_and_draw(&mut self,texture:&Texture,color:[f32;4],point_size:f32) {
+    pub fn send_and_draw(&mut self, texture: &Texture, color: [f32; 4], point_size: f32) {
         self.sys.sprite_buffer.update();
 
-
         self.sys.sprite_program.set_buffer_and_draw(
-            point_size* GL_POINT_COMP * self.sys.point_mul.0,
+            point_size * GL_POINT_COMP * self.sys.point_mul.0,
             color,
             self.sys.sprite_buffer.get_id(),
             self.sys.sprite_buffer.len(),
-            texture
+            texture,
         );
     }
 }
-
 
 impl Drop for SpriteSession<'_> {
     fn drop(&mut self) {
@@ -74,28 +81,27 @@ impl Drop for SpriteSession<'_> {
 }
 
 pub struct Texture {
-    pub(crate) grid_dim:Vec2<u32>,
+    pub(crate) grid_dim: Vec2<u32>,
     pub(crate) id: GLuint,
 }
 
 impl Texture {
-
     ///Create a texture index from a coordinate in the tile set.
-    pub fn coord_to_index(&self,cell:Vec2<u32>)->TexIndex{
-        TexIndex(self.grid_dim.x*cell.x+cell.y)
+    pub fn coord_to_index(&self, cell: Vec2<u32>) -> TexIndex {
+        TexIndex(self.grid_dim.x * cell.x + cell.y)
     }
 
     ///Create a texture index from a coordinate in the tile set, using primitives
-    pub fn coord_to_indexp(&self,cellx:u32,celly:u32)->TexIndex{
-        self.coord_to_index(vec2(cellx,celly))
+    pub fn coord_to_indexp(&self, cellx: u32, celly: u32) -> TexIndex {
+        self.coord_to_index(vec2(cellx, celly))
     }
-    
-    pub fn new(file: &str,grid_dim:Vec2<u32>) -> image::ImageResult<Texture> {
+
+    pub fn new(file: &str, grid_dim: Vec2<u32>) -> image::ImageResult<Texture> {
         match image::open(&file.to_string()) {
             Err(err) => Err(err),
             Ok(img) => {
                 use image::GenericImageView;
-                
+
                 let (width, height) = img.dimensions();
 
                 let img = match img {
@@ -104,7 +110,7 @@ impl Texture {
                 };
 
                 let id = build_opengl_mipmapped_texture(width, height, img);
-                Ok(Texture { id , grid_dim})
+                Ok(Texture { id, grid_dim })
             }
         }
     }
@@ -133,7 +139,7 @@ fn build_opengl_mipmapped_texture(width: u32, height: u32, image: image::RgbaIma
             raw.as_ptr() as *const _,
         );
         gl_ok!();
-        
+
         gl::TexParameteri(gl::TEXTURE_2D, gl::TEXTURE_MIN_FILTER, gl::NEAREST as i32);
         gl_ok!();
         gl::TexParameteri(gl::TEXTURE_2D, gl::TEXTURE_MAG_FILTER, gl::NEAREST as i32);

@@ -128,7 +128,7 @@ impl CircleProgram {
         unsafe {
             gl::UseProgram(self.program);
             gl_ok!();
-            
+
             gl::Uniform1f(self.point_size_uniform, point_size);
             gl_ok!();
 
@@ -158,7 +158,7 @@ impl CircleProgram {
 
             gl_ok!();
 
-            gl::DisableVertexAttribArray(self.pos_attr as GLuint); 
+            gl::DisableVertexAttribArray(self.pos_attr as GLuint);
             gl_ok!();
 
             gl::BindBuffer(gl::ARRAY_BUFFER, 0);

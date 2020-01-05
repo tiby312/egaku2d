@@ -13,7 +13,6 @@ fn main() {
     let mut sys = WindowedSystem::newp(640, 480, &events_loop, "shapes example");
     //let mut sys=FullScreenSystem::new(&events_loop);
 
-
     let rect_save = {
         let mut k = sys.canvas_mut().rects();
         k.addp(400., 420., 300., 400.);
@@ -51,17 +50,19 @@ fn main() {
             .save()
     };
 
+    let mut food_tex = sys.canvas_mut().texture("food.png", vec2(8, 8)).unwrap();
 
-    let mut food_tex = sys.canvas_mut().texture("food.png",vec2(8,8)).unwrap();
-    
-    let sprite_save={
-        let mut k=sys.canvas_mut().sprites();    
-        for (i,x) in (032..200).step_by(32).enumerate(){
-            for (j,y) in (032..200).step_by(32).enumerate(){
-                k.add(vec2(x,y).inner_as(),food_tex.coord_to_indexp(i as u32,j as u32));
+    let sprite_save = {
+        let mut k = sys.canvas_mut().sprites();
+        for (i, x) in (032..200).step_by(32).enumerate() {
+            for (j, y) in (032..200).step_by(32).enumerate() {
+                k.add(
+                    vec2(x, y).inner_as(),
+                    food_tex.coord_to_indexp(i as u32, j as u32),
+                );
             }
         }
-        k.save()      
+        k.save()
     };
 
     //Draw 60 frames per second.
@@ -97,21 +98,21 @@ fn main() {
             if timer.is_ready() {
                 let mut canvas = sys.canvas_mut();
 
-                canvas.clear_color([0.2;3]);
+                canvas.clear_color([0.2; 3]);
 
-                const COL1:[f32;4]=[0.0,1.0,0.1,0.1];
-                const COL2:[f32;4]=[0.8,0.8,1.0,0.4];
-                const COL3:[f32;4]=[1.0,0.0,1.0,0.4];
-                const COL4:[f32;4]=[0.5,1.0,0.5,0.6];
-                const WHITE:[f32;4]=[1.0,1.0,1.0,0.8];
-              
+                const COL1: [f32; 4] = [0.0, 1.0, 0.1, 0.1];
+                const COL2: [f32; 4] = [0.8, 0.8, 1.0, 0.4];
+                const COL3: [f32; 4] = [1.0, 0.0, 1.0, 0.4];
+                const COL4: [f32; 4] = [0.5, 1.0, 0.5, 0.6];
+                const WHITE: [f32; 4] = [1.0, 1.0, 1.0, 0.8];
+
                 //draw static VBOs already on the gpu.
-                sprite_save.draw(&mut canvas,&food_tex,COL4,16.0);
+                sprite_save.draw(&mut canvas, &food_tex, COL4, 16.0);
                 arrow_save.draw(&mut canvas, COL1);
                 line_save.draw(&mut canvas, COL2);
-                square_save.draw(&mut canvas, COL3,10.0);
+                square_save.draw(&mut canvas, COL3, 10.0);
                 rect_save.draw(&mut canvas, COL4);
-                                
+
                 {
                     //draw some moving circles
                     let mut k = canvas.circles();
@@ -124,39 +125,34 @@ fn main() {
                             k.add(pos + vec2(c.sin() * y as f32 * 0.1, c.cos() * x as f32 * 0.1));
                         }
                     }
-                    k.send_and_draw(COL1,8.0);
+                    k.send_and_draw(COL1, 8.0);
                 }
-                  
+
                 {
                     //draw some moving sprites
-                    let mut k=canvas.sprites();
-                    
-                    for y in (100..500).step_by(40){
-                        
-                        for x in (100..500).step_by(40){
-                            let c=(counter+x+y) as f32*0.01;
+                    let mut k = canvas.sprites();
+
+                    for y in (100..500).step_by(40) {
+                        for x in (100..500).step_by(40) {
+                            let c = (counter + x + y) as f32 * 0.01;
                             let pos = vec2(x, y).inner_as();
 
-                            let cc=((counter+x+y) as f32*0.1 ) as u32;
-                            k.add(pos+vec2(c.sin()*20.0,c.cos()*20.0),sprite::TexIndex(cc % 64));
-                            
+                            let cc = ((counter + x + y) as f32 * 0.1) as u32;
+                            k.add(
+                                pos + vec2(c.sin() * 20.0, c.cos() * 20.0),
+                                sprite::TexIndex(cc % 64),
+                            );
                         }
                     }
-                    
-                    k.send_and_draw(&mut food_tex,WHITE,20.0);
-                }
-                
 
-                
+                    k.send_and_draw(&mut food_tex, WHITE, 20.0);
+                }
+
                 {
                     //draw a growing circle
                     let c = ((counter as f32 * 0.06).sin() * 40.0).abs();
-                    canvas
-                        .circles()
-                        .add(cursor)
-                        .send_and_draw(COL2,c);
+                    canvas.circles().add(cursor).send_and_draw(COL2, c);
                 }
-
 
                 {
                     //draw a moving line
@@ -167,7 +163,6 @@ fn main() {
                         .send_and_draw(COL3);
                 }
 
-                
                 {
                     //draw a rotating arrow
                     let c = counter as f32 * 0.04;
@@ -177,8 +172,7 @@ fn main() {
                         .add(center, center + vec2(c.cos() * 80., c.sin() * 80.))
                         .send_and_draw(COL4);
                 }
-                
-                
+
                 //display what we drew
                 sys.swap_buffers();
 
