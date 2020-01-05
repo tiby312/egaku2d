@@ -33,7 +33,7 @@ void main() {
     int cellindex = int(cellindex);
     
     //TODO optimize
-    ivec2 ce=ivec2(cellindex / grid_dim.x, cellindex % grid_dim.x);
+    ivec2 ce=ivec2(cellindex / (grid_dim.x), cellindex % (grid_dim.x));
 
     //texture_offset.x=float(ce.x)/float(grid_dim.x);
     //texture_offset.y=float(ce.y)/float(grid_dim.y);
@@ -53,6 +53,7 @@ out vec4 out_color;
 void main() 
 {
     vec2 k=vec2((gl_PointCoord.x+texture_offset.x)/float(grid_dim.x),(gl_PointCoord.y+texture_offset.y)/float(grid_dim.y));
+    
     vec2 foo=k;
     out_color=texture(tex0,foo)*bcol;
 }
