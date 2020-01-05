@@ -59,9 +59,9 @@ fn main() {
     let sprite_save={
         let mut k=sys.canvas_mut().sprites();
         let mut cc=0;
-        for y in (032..200).step_by(32){
-            for x in (032..200).step_by(32){
-                k.add(vec2(x,y).inner_as(),cc % 64);
+        for (i,y) in (032..200).step_by(32).enumerate(){
+            for (j,x) in (032..200).step_by(32).enumerate(){
+                k.add(vec2(x,y).inner_as(),food_tex.coord_to_indexp(i as u32,j as u32));
                 cc+=1;
             }
         }
@@ -110,7 +110,7 @@ fn main() {
                 const WHITE:[f32;4]=[1.0,1.0,1.0,0.8];
               
                 //draw static VBOs already on the gpu.
-                sprite_save.draw(&mut canvas,&mut food_tex,COL4,32.0);
+                sprite_save.draw(&mut canvas,&food_tex,COL4,16.0);
                 arrow_save.draw(&mut canvas, COL1);
                 line_save.draw(&mut canvas, COL2);
                 square_save.draw(&mut canvas, COL3,10.0);

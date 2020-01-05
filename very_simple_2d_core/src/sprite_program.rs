@@ -33,7 +33,7 @@ void main() {
     int cellindex = int(cellindex);
     
     //TODO optimize
-    ivec2 ce=ivec2(cellindex/ grid_dim.x,cellindex % grid_dim.x);
+    ivec2 ce=ivec2(cellindex / grid_dim.x, cellindex % grid_dim.x);
 
     texture_offset.x=float(ce.x)/float(grid_dim.x);
     texture_offset.y=float(ce.y)/float(grid_dim.y);

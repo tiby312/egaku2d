@@ -6,7 +6,7 @@ pub struct SpriteSave{
     buffer: vbo::StaticBuffer<sprite_program::Vertex>,
 }
 impl SpriteSave {
-    pub fn draw(&self, session: &mut SimpleCanvas, texture:&mut Texture,color:[f32;4],point_size:f32) {
+    pub fn draw(&self, session: &mut SimpleCanvas, texture:&Texture,color:[f32;4],point_size:f32) {
         session.sprite_program.set_buffer_and_draw(
             point_size* GL_POINT_COMP * session.point_mul.0,
             color,
@@ -38,7 +38,7 @@ impl SpriteSession<'_> {
             buffer: vbo::StaticBuffer::new(self.sys.sprite_buffer.get_verts()),
         }
     }
-    pub fn send_and_draw(&mut self,texture:&mut Texture,color:[f32;4],point_size:f32) {
+    pub fn send_and_draw(&mut self,texture:&Texture,color:[f32;4],point_size:f32) {
         self.sys.sprite_buffer.update();
 
 
@@ -63,7 +63,12 @@ pub struct Texture {
 }
 
 impl Texture {
-    
+    pub fn coord_to_index(&self,cell:Vec2<u32>)->u32{
+        self.grid_dim.x*cell.x+cell.y
+    }
+    pub fn coord_to_indexp(&self,cellx:u32,celly:u32)->u32{
+        self.coord_to_index(vec2(cellx,celly))
+    }
     pub fn new(file: &str,grid_dim:Vec2<u32>) -> image::ImageResult<Texture> {
         match image::open(&file.to_string()) {
             Err(err) => Err(err),
