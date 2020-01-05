@@ -94,7 +94,7 @@ impl SimpleCanvas {
         }
     }
 
-    pub fn sprites<'a>(&'a mut self) -> sprite::SpriteSession {
+    pub fn sprites(&mut self) -> sprite::SpriteSession {
         sprite::SpriteSession{sys:self}
     }
 

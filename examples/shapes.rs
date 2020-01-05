@@ -51,21 +51,7 @@ fn main() {
             .save()
     };
 
-    /*
-    let mut texture = sys.canvas_mut().texture("test1.png".to_string()).unwrap();
-    
-    let mut k=sys.canvas_mut().sprites();
-    for x in (0..600).step_by(60){
-        for y in (0..600).step_by(60){
-            let (x,y)=(x as f32,y as f32);
-            let l=0 as f32 * 0.06;
-            k.addp(x+l.cos()*5.,y+l.sin()*5.,(x+y) as f32);
-        }
-    }
 
-    let sprite_save=k.save();
-    drop(k);
-    */
     let mut food_tex = sys.canvas_mut().texture("food.png",vec2(8,8)).unwrap();
     let mut adventurer_tex = sys.canvas_mut().texture("adventurer-sheet.png",vec2(7,11)).unwrap();
 
