@@ -6,15 +6,13 @@ pub struct SpriteSave{
     buffer: vbo::StaticBuffer<sprite_program::Vertex>,
 }
 impl SpriteSave {
-    pub fn draw(&self, session: &mut SimpleCanvas, texture:&mut Texture) {
+    pub fn draw(&self, session: &mut SimpleCanvas, texture:&mut Texture,point_size:f32) {
         session.sprite_program.set_buffer_and_draw(
-            texture.radius * GL_POINT_COMP * session.point_mul.0,
+            point_size,
             [1.0,1.0,1.0,1.0],
-            0,
             self.buffer.get_id(),
-            gl::POINTS,
             self.buffer.len(),
-            texture.id
+            texture
         );
     }
 }
@@ -25,13 +23,13 @@ pub struct SpriteSession<'a> {
 }
 
 impl SpriteSession<'_> {
-    pub fn add(&mut self, point: Vec2<f32>,rotation:f32) -> &mut Self {
-        self.sys.sprite_buffer.push(sprite_program::Vertex([point.x, point.y,rotation]));
+    pub fn add(&mut self, point: Vec2<f32>,index:u32) -> &mut Self {
+        self.sys.sprite_buffer.push(sprite_program::Vertex{pos:[point.x, point.y],index:index as f32});
         self
     }
 
-    pub fn addp(&mut self, x:f32,y:f32,rotation:f32) -> &mut Self{
-        self.sys.sprite_buffer.push(sprite_program::Vertex([x, y,rotation]));
+    pub fn addp(&mut self, x:f32,y:f32,index:u32) -> &mut Self{
+        self.sys.sprite_buffer.push(sprite_program::Vertex{pos:[x, y],index:index as f32});
         self
     }
     pub fn save(&mut self) -> SpriteSave {
@@ -40,18 +38,16 @@ impl SpriteSession<'_> {
             buffer: vbo::StaticBuffer::new(self.sys.sprite_buffer.get_verts()),
         }
     }
-    pub fn send_and_draw(&mut self,texture:&mut Texture) {
+    pub fn send_and_draw(&mut self,texture:&mut Texture,point_size:f32) {
         self.sys.sprite_buffer.update();
 
 
         self.sys.sprite_program.set_buffer_and_draw(
-            texture.radius * GL_POINT_COMP * self.sys.point_mul.0,
+            point_size,
             [1.0,1.0,1.0,1.0],
-            0,
             self.sys.sprite_buffer.get_id(),
-            gl::POINTS,
             self.sys.sprite_buffer.len(),
-            texture.id
+            texture
         );
     }
 }
@@ -62,13 +58,13 @@ impl Drop for SpriteSession<'_> {
 }
 
 pub struct Texture {
-    radius:f32,
-    id: GLuint,
+    pub(crate) grid_dim:Vec2<u32>,
+    pub(crate) id: GLuint,
 }
 
 impl Texture {
     
-    pub fn new(file: String) -> image::ImageResult<Texture> {
+    pub fn new(file: String,grid_dim:Vec2<u32>) -> image::ImageResult<Texture> {
         match image::open(file.clone()) {
             Err(err) => Err(err),
             Ok(img) => {
@@ -81,8 +77,15 @@ impl Texture {
                     img => img.to_rgba(),
                 };
 
+
+                let xx=width/grid_dim.x;
+                let yy=height/grid_dim.y;
+
+                assert_eq!(xx,yy);
+
+
                 let id = build_opengl_mipmapped_texture(width, height, img);
-                Ok(Texture { id ,radius:(width.max(height) as f32)*1.5/2.0})
+                Ok(Texture { id , grid_dim})
             }
         }
     }
@@ -112,9 +115,9 @@ fn build_opengl_mipmapped_texture(width: u32, height: u32, image: image::RgbaIma
         );
         gl_ok!();
         
-        gl::TexParameteri(gl::TEXTURE_2D, gl::TEXTURE_MIN_FILTER, gl::LINEAR as i32);
+        gl::TexParameteri(gl::TEXTURE_2D, gl::TEXTURE_MIN_FILTER, gl::NEAREST as i32);
         gl_ok!();
-        gl::TexParameteri(gl::TEXTURE_2D, gl::TEXTURE_MAG_FILTER, gl::LINEAR as i32);
+        gl::TexParameteri(gl::TEXTURE_2D, gl::TEXTURE_MAG_FILTER, gl::NEAREST as i32);
         gl_ok!();
 
         gl::BindTexture(gl::TEXTURE_2D, 0);

@@ -8,52 +8,63 @@ use std::str;
 // Shader sources
 static VS_SRC: &'static str = "
 #version 300 es
-in vec3 position;
+in vec2 position;
+in float cellindex;
+
 out mat2 rotation;
+out vec2 texture_offset;
+
+uniform ivec2 grid_dim;
+uniform float cell_size;
+
 uniform mat3 mmatrix;
 uniform float point_size;
+
 void main() {
     gl_PointSize = point_size;
-    vec3 pp=vec3(position.xy,1.0);
+    vec3 pp = vec3(position.xy,1.0);
     gl_Position = vec4(mmatrix*pp.xyz, 1.0);
 
-    float c=cos(position.z);
-    float s=sin(position.z);
+    //float c=cos(position.z);
+    //float s=sin(position.z);
 
-    rotation[0]=vec2(c,-s);
-    rotation[1]=vec2(s,c);
+    //rotation[0]=vec2(c,-s);
+    //rotation[1]=vec2(s,c);
+
+    int cellindex = int(cellindex);
+    
+    //TODO optimize
+    ivec2 ce=ivec2(cellindex/ grid_dim.x,cellindex % grid_dim.x);
+
+    texture_offset.x=float(ce.x)/float(grid_dim.x);
+    texture_offset.y=float(ce.y)/float(grid_dim.y);
 }";
 
 static FS_SRC: &'static str = "
 #version 300 es
 precision mediump float;
-
+in vec2 texture_offset;
+uniform highp ivec2 grid_dim;
 uniform sampler2D tex0;
 in mat2 rotation;
 out vec4 out_color;
 
 void main() 
 {
-    vec2 foo=(gl_PointCoord-vec2(0.5,0.5))*1.5;
-
-    vec2 foo2=(rotation * foo);
-    
-    if (foo2.x<-0.5 || foo2.x>0.5){
-        discard;
-    }
-    if (foo2.y<-0.5 || foo2.y>0.5){
-        discard;
-    }
-    
-    
-    vec2 texCoord = foo2 + vec2(0.5,0.5);
-    out_color = texture(tex0, texCoord) ;
+    vec2 k=vec2(gl_PointCoord.x/float(grid_dim.x),gl_PointCoord.y/float(grid_dim.y));
+    vec2 foo=k+texture_offset;
+    out_color=texture(tex0,foo);
 }
 ";
 
-#[repr(transparent)]
+//#[repr(transparent)]
+#[repr(packed(4))]
 #[derive(Copy, Clone, Debug, Default)]
-pub struct Vertex(pub [f32; 3]);
+pub struct Vertex{
+    pub pos:[f32;2],
+    pub index:f32
+}
+//pub struct Vertex(pub ([f32; 3],u32));
 
 #[derive(Debug)]
 pub struct SpriteProgram {
@@ -61,8 +72,11 @@ pub struct SpriteProgram {
     pub matrix_uniform: GLint,
     pub square_uniform: GLint,
     pub point_size_uniform: GLint,
+    pub grid_dim_uniform: GLint,
+    pub cell_size_uniform: GLint,
     pub bcol_uniform: GLint,
     pub pos_attr: GLint,
+    pub index_attr: GLint,
     pub sample_location: GLint
 }
 
@@ -102,14 +116,16 @@ impl SpriteProgram {
 
     pub fn set_buffer_and_draw(
         &mut self,
-        point_size: f32,
+        point_size:f32,
         col: [f32; 4],
-        square: usize,
         buffer_id: u32,
-        mode: GLenum,
         length: usize,
-        texture_id:u32
+        texture:&crate::sprite::Texture
     ) {
+
+        let mode=gl::POINTS;
+
+        let texture_id=texture.id;
 
         //TODO NO IDEA WHY THIS IS NEEDED ON LINUX.
         //Without this function call, on linux not every shape gets drawn.
@@ -121,6 +137,15 @@ impl SpriteProgram {
             gl::UseProgram(self.program);
             gl_ok!();
 
+            gl::Uniform1f(self.point_size_uniform, 0.);
+            gl_ok!();
+
+            gl::EnableVertexAttribArray(self.pos_attr as GLuint);
+            gl_ok!();
+
+            gl::EnableVertexAttribArray(self.index_attr as GLuint);
+            gl_ok!();
+
             gl::BindBuffer(gl::ARRAY_BUFFER, buffer_id);
             gl_ok!();
 
@@ -128,8 +153,8 @@ impl SpriteProgram {
             gl::GetIntegerv(gl::ARRAY_BUFFER_BINDING,&mut data);
             assert_eq!(data as u32,buffer_id);
 
-            //gl::DrawArrays(mode, 0, length as i32);
-            //gl_ok!();
+            gl::DrawArrays(mode, 0, 1);
+            gl_ok!();
 
             gl::BindBuffer(gl::ARRAY_BUFFER, 0);
             gl_ok!();
@@ -143,9 +168,10 @@ impl SpriteProgram {
             gl::Uniform4fv(self.bcol_uniform, 1, col.as_ptr() as *const _);
             gl_ok!();
 
+            /*
             gl::Uniform1i(self.square_uniform, square as i32);
             gl_ok!();
-
+            */
             gl::BindBuffer(gl::ARRAY_BUFFER, buffer_id);
             gl_ok!();
 
@@ -156,13 +182,17 @@ impl SpriteProgram {
 
             gl::BindTexture(gl::TEXTURE_2D, texture_id);
             gl_ok!();            
+
             
 
             gl::Uniform1i(self.sample_location,0);   
             gl_ok!();
 
+            gl::Uniform2i(self.grid_dim_uniform,texture.grid_dim.x as i32,texture.grid_dim.y as i32);   
+            gl_ok!();
 
         
+
 
 
 
@@ -171,16 +201,38 @@ impl SpriteProgram {
 
             gl::VertexAttribPointer(
                 self.pos_attr as GLuint,
-                3,
+                2,
                 gl::FLOAT,
                 gl::FALSE as GLboolean,
-                0 as i32,
-                core::ptr::null(),
+                3*4 as i32,
+                0 as *const _,
             );
             gl_ok!();
 
+
+            
+            gl::EnableVertexAttribArray(self.index_attr as GLuint);
+            gl_ok!();
+
+            gl::VertexAttribPointer(
+                self.index_attr as GLuint,
+                1,
+                gl::FLOAT,
+                gl::FALSE as GLboolean,
+                (3*4) as i32,
+                (4*2) as *const _,
+            );
+            gl_ok!();
+
+
             gl::DrawArrays(mode, 0 as i32, length as i32);
 
+            gl_ok!();
+
+            gl::DisableVertexAttribArray(self.pos_attr as GLuint); 
+            gl_ok!();
+
+            gl::DisableVertexAttribArray(self.index_attr as GLuint); 
             gl_ok!();
 
             gl::BindBuffer(gl::ARRAY_BUFFER, 0);
@@ -213,6 +265,15 @@ impl SpriteProgram {
             gl::UseProgram(program);
             gl_ok!();
 
+            let grid_dim_uniform: GLint =
+                gl::GetUniformLocation(program, CString::new("grid_dim").unwrap().as_ptr());
+            gl_ok!();
+
+            let cell_size_uniform: GLint =
+                gl::GetUniformLocation(program, CString::new("cell_size").unwrap().as_ptr());
+            gl_ok!();
+
+
             let square_uniform: GLint =
                 gl::GetUniformLocation(program, CString::new("square").unwrap().as_ptr());
             gl_ok!();
@@ -233,6 +294,11 @@ impl SpriteProgram {
                 gl::GetAttribLocation(program, CString::new("position").unwrap().as_ptr());
             gl_ok!();
 
+            let index_attr =
+                gl::GetAttribLocation(program, CString::new("cellindex").unwrap().as_ptr());
+            gl_ok!();
+
+            
             let sample_location = 
                 gl::GetAttribLocation(program, CString::new("tex0").unwrap().as_ptr());
             gl_ok!();
@@ -242,9 +308,12 @@ impl SpriteProgram {
                 program,
                 square_uniform,
                 point_size_uniform,
+                grid_dim_uniform,
+                cell_size_uniform,
                 matrix_uniform,
                 bcol_uniform,
                 pos_attr,
+                index_attr
             }
         }
     }

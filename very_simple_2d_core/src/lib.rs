@@ -98,13 +98,13 @@ impl SimpleCanvas {
         sprite::SpriteSession{sys:self}
     }
 
-    pub fn circles(&mut self, radius: f32) -> CircleSession {
+    pub fn circles(&mut self) -> CircleSession {
         assert_eq!(self.circle_buffer.len(), 0);
-        CircleSession { radius, sys: self }
+        CircleSession {sys: self }
     }
-    pub fn squares(&mut self, radius: f32) -> SquareSession {
+    pub fn squares(&mut self) -> SquareSession {
         assert_eq!(self.circle_buffer.len(), 0);
-        SquareSession { radius, sys: self }
+        SquareSession { sys: self }
     }
     pub fn rects(&mut self) -> RectSession {
         assert_eq!(self.circle_buffer.len(), 0);
@@ -128,8 +128,8 @@ impl SimpleCanvas {
             radius: radius * kk,
         }
     }
-    pub fn texture(&mut self, file: String) -> image::ImageResult<sprite::Texture> {
-        sprite::Texture::new(file)
+    pub fn texture(&mut self, file: String,grid_dim:Vec2<u32>) -> image::ImageResult<sprite::Texture> {
+        sprite::Texture::new(file,grid_dim)
     }
 
     pub fn clear_color(&mut self, back_color: [f32; 3]) {

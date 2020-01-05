@@ -2,13 +2,12 @@ use super::*;
 
 pub struct SquareSave {
     _ns: NotSend,
-    radius: f32,
     buffer: vbo::StaticBuffer<circle_program::Vertex>,
 }
 impl SquareSave {
-    pub fn draw(&self, session: &mut SimpleCanvas, col: [f32; 4]) {
+    pub fn draw(&self, session: &mut SimpleCanvas, col: [f32; 4],radius:f32) {
         session.circle_program.set_buffer_and_draw(
-            self.radius * GL_POINT_COMP * session.point_mul.0,
+            radius * GL_POINT_COMP * session.point_mul.0,
             col,
             0,
             self.buffer.get_id(),
@@ -20,7 +19,6 @@ impl SquareSave {
 
 
 pub struct SquareSession<'a> {
-    pub(crate) radius: f32,
     pub(crate) sys: &'a mut SimpleCanvas,
 }
 impl<'a> SquareSession<'a> {
@@ -39,16 +37,15 @@ impl<'a> SquareSession<'a> {
     pub fn save(&mut self) -> SquareSave {
         SquareSave {
             _ns: ns(),
-            radius: self.radius,
             buffer: vbo::StaticBuffer::new(self.sys.circle_buffer.get_verts()),
         }
     }
 
-    pub fn send_and_draw(&mut self, col: [f32; 4]) {
+    pub fn send_and_draw(&mut self, col: [f32; 4],radius:f32) {
         //self.sys.circle_buffer.update();
         self.sys.circle_buffer.update();
         self.sys.circle_program.set_buffer_and_draw(
-            self.radius * GL_POINT_COMP * self.sys.point_mul.0,
+            radius * GL_POINT_COMP * self.sys.point_mul.0,
             col,
             0,
             self.sys.circle_buffer.get_id(),
@@ -65,13 +62,12 @@ impl<'a> Drop for SquareSession<'a> {
 
 pub struct CircleSave {
     _ns: NotSend,
-    radius: f32,
     buffer: vbo::StaticBuffer<circle_program::Vertex>,
 }
 impl CircleSave {
-    pub fn draw(&self, session: &mut SimpleCanvas, col: [f32; 4]) {
+    pub fn draw(&self, session: &mut SimpleCanvas, col: [f32; 4],radius:f32) {
         session.circle_program.set_buffer_and_draw(
-            self.radius * GL_POINT_COMP * session.point_mul.0,
+            radius * GL_POINT_COMP * session.point_mul.0,
             col,
             1,
             self.buffer.get_id(),
@@ -81,7 +77,6 @@ impl CircleSave {
     }
 }
 pub struct CircleSession<'a> {
-    pub(crate) radius: f32,
     pub(crate) sys: &'a mut SimpleCanvas,
 }
 impl<'a> Drop for CircleSession<'a> {
@@ -93,16 +88,15 @@ impl<'a> CircleSession<'a> {
     pub fn save(&mut self) -> CircleSave {
         CircleSave {
             _ns: ns(),
-            radius: self.radius,
             buffer: vbo::StaticBuffer::new(self.sys.circle_buffer.get_verts()),
         }
     }
 
-    pub fn send_and_draw(&mut self, col: [f32; 4]) {
+    pub fn send_and_draw(&mut self, col: [f32; 4],radius:f32) {
         self.sys.circle_buffer.update();
 
         self.sys.circle_program.set_buffer_and_draw(
-            self.radius * GL_POINT_COMP * self.sys.point_mul.0,
+            radius * GL_POINT_COMP * self.sys.point_mul.0,
             col,
             1,
             self.sys.circle_buffer.get_id(),
