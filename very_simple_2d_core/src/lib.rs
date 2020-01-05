@@ -128,6 +128,10 @@ impl SimpleCanvas {
             radius: radius * kk,
         }
     }
+
+    ///Creates a new texture from the specified file.
+    ///The fact that we need a mutable reference to this object
+    ///Ensures that we make the texture in the same thread.
     pub fn texture(&mut self, file:&str,grid_dim:Vec2<u32>) -> image::ImageResult<sprite::Texture> {
         sprite::Texture::new(file,grid_dim)
     }
