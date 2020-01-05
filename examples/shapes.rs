@@ -117,25 +117,19 @@ fn main() {
 
                 canvas.clear_color([0.2;3]);
 
-
+                const COL1:[f32;4]=[0.0,1.0,0.1,0.1];
+                const COL2:[f32;4]=[0.8,0.8,1.0,0.4];
+                const COL3:[f32;4]=[1.0,0.0,1.0,0.4];
+                const COL4:[f32;4]=[0.5,1.0,0.5,0.6];
+                const WHITE:[f32;4]=[1.0,1.0,1.0,0.8];
               
-                //Use this instead of clear_color for an interesting fade effect.
-                //canvas.rects().addp(0.0,640.0,0.0,480.0).send_and_draw([0.2,0.2,0.2,0.3]);
-
                 //draw static VBOs already on the gpu.
-                sprite_save.draw(&mut canvas,&mut food_tex,32.0);
-                            
-                arrow_save.draw(&mut canvas, [0.0, 1.0, 0.1, 0.5]);
-                
-                line_save.draw(&mut canvas, [0., 1.0, 1., 0.3]);
-                square_save.draw(&mut canvas, [1., 0., 1., 0.1],10.0);
-                
-                
-                rect_save.draw(&mut canvas, [0.8, 0.8, 1.0, 0.2]);
-                
-
-
-                
+                sprite_save.draw(&mut canvas,&mut food_tex,COL1,32.0);
+                arrow_save.draw(&mut canvas, COL1);
+                line_save.draw(&mut canvas, COL2);
+                square_save.draw(&mut canvas, COL3,10.0);
+                rect_save.draw(&mut canvas, COL4);
+                                
                 {
                     //Draw some moving circles
                     let mut k = canvas.circles();
@@ -148,11 +142,11 @@ fn main() {
                             k.add(pos + vec2(c.sin() * y as f32 * 0.1, c.cos() * x as f32 * 0.1));
                         }
                     }
-                    k.send_and_draw([1., 1., 1., 0.1],8.0);
+                    k.send_and_draw(COL1,8.0);
                 }
                 
                 
-                canvas.sprites().addp(550.0,200.0,(counter as f32*0.05) as u32 % 40).send_and_draw(&mut adventurer_tex,200.0);
+                canvas.sprites().addp(550.0,200.0,(counter as f32*0.05) as u32 % 40).send_and_draw(&mut adventurer_tex,WHITE,200.0);
                 
                 
                 let mut k=canvas.sprites();
@@ -169,8 +163,7 @@ fn main() {
                     }
                 }
                 
-                //k.addp(600.,400.,0.,0);
-                k.send_and_draw(&mut food_tex   ,20.0);
+                k.send_and_draw(&mut food_tex,WHITE,20.0);
                 
                 drop(k);
                 
@@ -182,7 +175,7 @@ fn main() {
                     canvas
                         .circles()
                         .add(cursor)
-                        .send_and_draw([1.0, 1.0, 1.0, 1.0],c);
+                        .send_and_draw(COL2,c);
                 }
 
 
@@ -192,7 +185,7 @@ fn main() {
                     canvas
                         .lines(10.)
                         .add(vec2(50., 500.), vec2(500., 50. + c.sin() * 50.))
-                        .send_and_draw([1., 1., 0.2, 0.2]);
+                        .send_and_draw(COL3);
                 }
 
                 
@@ -203,7 +196,7 @@ fn main() {
                     canvas
                         .arrows(10.0)
                         .add(center, center + vec2(c.cos() * 80., c.sin() * 80.))
-                        .send_and_draw([1.0, 0.1, 0.5, 0.5]);
+                        .send_and_draw(COL4);
                 }
                 
                 

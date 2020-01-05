@@ -11,7 +11,6 @@ static VS_SRC: &'static str = "
 in vec2 position;
 in float cellindex;
 
-out mat2 rotation;
 out vec2 texture_offset;
 
 uniform ivec2 grid_dim;
@@ -46,14 +45,15 @@ precision mediump float;
 in vec2 texture_offset;
 uniform highp ivec2 grid_dim;
 uniform sampler2D tex0;
-in mat2 rotation;
+uniform vec4 bcol;
 out vec4 out_color;
 
 void main() 
 {
     vec2 k=vec2(gl_PointCoord.x/float(grid_dim.x),gl_PointCoord.y/float(grid_dim.y));
     vec2 foo=k+texture_offset;
-    out_color=texture(tex0,foo);
+
+    out_color=texture(tex0,foo)*bcol;
 }
 ";
 
@@ -77,7 +77,7 @@ pub struct SpriteProgram {
     pub bcol_uniform: GLint,
     pub pos_attr: GLint,
     pub index_attr: GLint,
-    pub sample_location: GLint
+    pub sample_location: GLint,
 }
 
 #[derive(Debug)]

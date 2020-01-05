@@ -158,8 +158,5 @@ impl<V: Default> GrowableBuffer<V> {
 
         //TODO first confirm the vbo resized??
         self.vbo_size = Some(self.buffer.capacity());
-
-
-        dbg!(self.vbo_size);
     }
 }

@@ -6,10 +6,10 @@ pub struct SpriteSave{
     buffer: vbo::StaticBuffer<sprite_program::Vertex>,
 }
 impl SpriteSave {
-    pub fn draw(&self, session: &mut SimpleCanvas, texture:&mut Texture,point_size:f32) {
+    pub fn draw(&self, session: &mut SimpleCanvas, texture:&mut Texture,color:[f32;4],point_size:f32) {
         session.sprite_program.set_buffer_and_draw(
             point_size,
-            [1.0,1.0,1.0,1.0],
+            color,
             self.buffer.get_id(),
             self.buffer.len(),
             texture
@@ -38,13 +38,13 @@ impl SpriteSession<'_> {
             buffer: vbo::StaticBuffer::new(self.sys.sprite_buffer.get_verts()),
         }
     }
-    pub fn send_and_draw(&mut self,texture:&mut Texture,point_size:f32) {
+    pub fn send_and_draw(&mut self,texture:&mut Texture,color:[f32;4],point_size:f32) {
         self.sys.sprite_buffer.update();
 
 
         self.sys.sprite_program.set_buffer_and_draw(
             point_size,
-            [1.0,1.0,1.0,1.0],
+            color,
             self.sys.sprite_buffer.get_id(),
             self.sys.sprite_buffer.len(),
             texture
