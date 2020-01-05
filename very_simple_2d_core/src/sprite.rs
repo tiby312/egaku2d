@@ -84,6 +84,7 @@ impl Drop for SpriteSession<'_> {
 }
 
 pub struct Texture {
+    _ns: NotSend,
     pub(crate) grid_dim: Vec2<u32>,
     pub(crate) id: GLuint,
 }
@@ -116,7 +117,7 @@ impl Texture {
                 };
 
                 let id = build_opengl_mipmapped_texture(width, height, img);
-                Ok(Texture { id, grid_dim })
+                Ok(Texture {_ns: ns(), id, grid_dim })
             }
         }
     }
