@@ -37,10 +37,12 @@ impl<V: core::fmt::Debug + Copy + Clone> StaticBuffer<V> {
         }
     }
 
+    #[inline(always)]
     pub fn len(&self) -> usize {
         self.length
     }
 
+    #[inline(always)]
     pub fn get_id(&self) -> u32 {
         self.vbo
     }
@@ -65,9 +67,11 @@ impl<V> Drop for GrowableBuffer<V> {
 }
 
 impl<V: Default> GrowableBuffer<V> {
+    #[inline(always)]
     pub fn get_verts(&self) -> &[V] {
         &self.buffer
     }
+
     pub fn new() -> GrowableBuffer<V> {
         let mut vbo = 0;
 
@@ -127,18 +131,23 @@ impl<V: Default> GrowableBuffer<V> {
         }
     }
 
+
+    #[inline(always)]
     pub fn get_id(&self) -> u32 {
         self.vbo
     }
 
+    #[inline(always)]
     pub fn push(&mut self, a: V) {
         self.buffer.push(a);
     }
 
+    #[inline(always)]
     pub fn len(&self) -> usize {
         self.buffer.len()
     }
 
+    #[inline(always)]
     pub fn clear(&mut self) {
         self.buffer.clear();
     }

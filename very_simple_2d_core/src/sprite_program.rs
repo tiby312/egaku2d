@@ -31,9 +31,14 @@ void main() {
     //rotation[1]=vec2(s,c);
 
     int cellindex = int(cellindex);
+
+    //Force cellindex to be in a valid range
+    cellindex = cellindex % (grid_dim.x * grid_dim.y);
+
     
     //TODO optimize
     ivec2 ce=ivec2(cellindex / (grid_dim.x), cellindex % (grid_dim.x));
+
 
     //texture_offset.x=float(ce.x)/float(grid_dim.x);
     //texture_offset.y=float(ce.y)/float(grid_dim.y);

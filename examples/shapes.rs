@@ -46,29 +46,25 @@ fn main() {
         //Draw some lines
         sys.canvas_mut()
             .lines(3.0)
-            .add(vec2(400., 0.), vec2(300., 10.))
+            .add(vec2(400., 0.), vec2(600., 400.))
             .add(vec2(10., 300.), vec2(300., 400.))
             .save()
     };
 
 
     let mut food_tex = sys.canvas_mut().texture("food.png",vec2(8,8)).unwrap();
-    let mut adventurer_tex = sys.canvas_mut().texture("adventurer-sheet.png",vec2(7,11)).unwrap();
-
-
+    
     let sprite_save={
-        let mut k=sys.canvas_mut().sprites();
-        let mut cc=0;
-        for (i,y) in (032..200).step_by(32).enumerate(){
-            for (j,x) in (032..200).step_by(32).enumerate(){
+        let mut k=sys.canvas_mut().sprites();    
+        for (i,x) in (032..200).step_by(32).enumerate(){
+            for (j,y) in (032..200).step_by(32).enumerate(){
                 k.add(vec2(x,y).inner_as(),food_tex.coord_to_indexp(i as u32,j as u32));
-                cc+=1;
             }
         }
         k.save()      
     };
 
-    
+    //Draw 60 frames per second.
     let mut timer = very_simple_2d::RefreshTimer::new(16);
 
     let mut counter = 0;
@@ -82,9 +78,9 @@ fn main() {
                 _ => {}
             },
             WindowEvent::CursorMoved {
-                modifiers: _,
                 device_id: _,
                 position: logical_position,
+                ..
             } => {
                 let dpi = sys.get_hidpi_factor();
                 let p = logical_position.to_physical(dpi);
@@ -130,12 +126,7 @@ fn main() {
                     }
                     k.send_and_draw(COL1,8.0);
                 }
-                
-                
-                //draw an adventurer
-                canvas.sprites().addp(550.0,200.0,(counter as f32*0.05) as u32 % 40).send_and_draw(&mut adventurer_tex,WHITE,200.0);
-                
-                
+                  
                 {
                     //draw some moving sprites
                     let mut k=canvas.sprites();
@@ -147,7 +138,7 @@ fn main() {
                             let pos = vec2(x, y).inner_as();
 
                             let cc=((counter+x+y) as f32*0.1 ) as u32;
-                            k.add(pos+vec2(c.sin()*20.0,c.cos()*20.0),cc % 64);
+                            k.add(pos+vec2(c.sin()*20.0,c.cos()*20.0),sprite::TexIndex(cc % 64));
                             
                         }
                     }

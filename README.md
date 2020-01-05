@@ -55,3 +55,9 @@ canvas.circles(4.0)
 //Swap buffers on the opengl context.
 glsys.swap_buffers();
 ```
+
+
+## Demo
+
+Demo sprites are provided courtesy of Henry Software:
+https://henrysoftware.itch.io/pixel-food

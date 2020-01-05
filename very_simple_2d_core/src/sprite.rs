@@ -1,5 +1,10 @@
 use super::*;
 
+///The index will be used when draw is called with a specific texture.
+///The index will be split into a x and y coordinate.
+///Use can use a texture to create this index from a x and y coordinate.    
+pub struct TexIndex(pub u32);
+
 
 pub struct SpriteSave{
     _ns: NotSend,
@@ -23,21 +28,30 @@ pub struct SpriteSession<'a> {
 }
 
 impl SpriteSession<'_> {
-    pub fn add(&mut self, point: Vec2<f32>,index:u32) -> &mut Self {
-        self.sys.sprite_buffer.push(sprite_program::Vertex{pos:[point.x, point.y],index:index as f32});
+
+    ///Add a point sprite.
+    #[inline(always)]
+    pub fn add(&mut self, point: Vec2<f32>,index:TexIndex) -> &mut Self {
+        self.sys.sprite_buffer.push(sprite_program::Vertex{pos:[point.x, point.y],index:index.0 as f32});
         self
     }
 
-    pub fn addp(&mut self, x:f32,y:f32,index:u32) -> &mut Self{
-        self.sys.sprite_buffer.push(sprite_program::Vertex{pos:[x, y],index:index as f32});
+    ///Primitive version of add.
+    #[inline(always)]
+    pub fn addp(&mut self, x:f32,y:f32,index:TexIndex) -> &mut Self{
+        self.sys.sprite_buffer.push(sprite_program::Vertex{pos:[x, y],index:index.0 as f32});
         self
     }
+
+    ///Save this sprite session to into its own static buffer to be drawn later.
     pub fn save(&mut self) -> SpriteSave {
         SpriteSave {
             _ns: ns(),
             buffer: vbo::StaticBuffer::new(self.sys.sprite_buffer.get_verts()),
         }
     }
+
+    ///Draw the sprites using the specified texture.
     pub fn send_and_draw(&mut self,texture:&Texture,color:[f32;4],point_size:f32) {
         self.sys.sprite_buffer.update();
 
@@ -51,6 +65,8 @@ impl SpriteSession<'_> {
         );
     }
 }
+
+
 impl Drop for SpriteSession<'_> {
     fn drop(&mut self) {
         self.sys.sprite_buffer.clear();
@@ -63,12 +79,17 @@ pub struct Texture {
 }
 
 impl Texture {
-    pub fn coord_to_index(&self,cell:Vec2<u32>)->u32{
-        self.grid_dim.x*cell.x+cell.y
+
+    ///Create a texture index from a coordinate in the tile set.
+    pub fn coord_to_index(&self,cell:Vec2<u32>)->TexIndex{
+        TexIndex(self.grid_dim.x*cell.x+cell.y)
     }
-    pub fn coord_to_indexp(&self,cellx:u32,celly:u32)->u32{
+
+    ///Create a texture index from a coordinate in the tile set, using primitives
+    pub fn coord_to_indexp(&self,cellx:u32,celly:u32)->TexIndex{
         self.coord_to_index(vec2(cellx,celly))
     }
+    
     pub fn new(file: &str,grid_dim:Vec2<u32>) -> image::ImageResult<Texture> {
         match image::open(&file.to_string()) {
             Err(err) => Err(err),
