@@ -66,8 +66,9 @@ fn main() {
     let sprite_save=k.save();
     drop(k);
     */
-    let mut texture = sys.canvas_mut().texture("food.png".to_string(),vec2(8,8)).unwrap();
-    
+    let mut food_tex = sys.canvas_mut().texture("food.png",vec2(8,8)).unwrap();
+    let mut adventurer_tex = sys.canvas_mut().texture("adventurer-sheet.png",vec2(7,11)).unwrap();
+
 
     let mut k=sys.canvas_mut().sprites();
     let mut cc=0;
@@ -122,7 +123,7 @@ fn main() {
                 //canvas.rects().addp(0.0,640.0,0.0,480.0).send_and_draw([0.2,0.2,0.2,0.3]);
 
                 //draw static VBOs already on the gpu.
-                sprite_save.draw(&mut canvas,&mut texture,32.0);
+                sprite_save.draw(&mut canvas,&mut food_tex,32.0);
                             
                 arrow_save.draw(&mut canvas, [0.0, 1.0, 0.1, 0.5]);
                 
@@ -132,6 +133,7 @@ fn main() {
                 
                 rect_save.draw(&mut canvas, [0.8, 0.8, 1.0, 0.2]);
                 
+
 
                 
                 {
@@ -150,6 +152,7 @@ fn main() {
                 }
                 
                 
+                canvas.sprites().addp(550.0,200.0,(counter as f32*0.05) as u32 % 40).send_and_draw(&mut adventurer_tex,200.0);
                 
                 
                 let mut k=canvas.sprites();
@@ -167,7 +170,7 @@ fn main() {
                 }
                 
                 //k.addp(600.,400.,0.,0);
-                k.send_and_draw(&mut texture,20.0);
+                k.send_and_draw(&mut food_tex   ,20.0);
                 
                 drop(k);
                 

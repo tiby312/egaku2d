@@ -128,7 +128,7 @@ impl SimpleCanvas {
             radius: radius * kk,
         }
     }
-    pub fn texture(&mut self, file: String,grid_dim:Vec2<u32>) -> image::ImageResult<sprite::Texture> {
+    pub fn texture(&mut self, file:&str,grid_dim:Vec2<u32>) -> image::ImageResult<sprite::Texture> {
         sprite::Texture::new(file,grid_dim)
     }
 

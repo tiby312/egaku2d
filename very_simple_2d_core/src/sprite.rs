@@ -64,8 +64,8 @@ pub struct Texture {
 
 impl Texture {
     
-    pub fn new(file: String,grid_dim:Vec2<u32>) -> image::ImageResult<Texture> {
-        match image::open(file.clone()) {
+    pub fn new(file: &str,grid_dim:Vec2<u32>) -> image::ImageResult<Texture> {
+        match image::open(&file.to_string()) {
             Err(err) => Err(err),
             Ok(img) => {
                 use image::GenericImageView;
@@ -81,7 +81,7 @@ impl Texture {
                 let xx=width/grid_dim.x;
                 let yy=height/grid_dim.y;
 
-                assert_eq!(xx,yy);
+                //assert_eq!(xx,yy);
 
 
                 let id = build_opengl_mipmapped_texture(width, height, img);
