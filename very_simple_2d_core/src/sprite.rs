@@ -8,7 +8,7 @@ pub struct SpriteSave{
 impl SpriteSave {
     pub fn draw(&self, session: &mut SimpleCanvas, texture:&mut Texture,color:[f32;4],point_size:f32) {
         session.sprite_program.set_buffer_and_draw(
-            point_size,
+            point_size* GL_POINT_COMP * session.point_mul.0,
             color,
             self.buffer.get_id(),
             self.buffer.len(),
@@ -43,7 +43,7 @@ impl SpriteSession<'_> {
 
 
         self.sys.sprite_program.set_buffer_and_draw(
-            point_size,
+            point_size* GL_POINT_COMP * self.sys.point_mul.0,
             color,
             self.sys.sprite_buffer.get_id(),
             self.sys.sprite_buffer.len(),

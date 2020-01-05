@@ -62,9 +62,10 @@ impl SimpleCanvas {
     
     pub fn set_viewport(&mut self, window_dim: axgeom::FixedAspectVec2, game_width: f32) {
         self.point_mul = self.circle_program.set_viewport(window_dim, game_width);
+
         let _ = self
             .sprite_program
-            .set_viewport(window_dim, window_dim.width as f32);
+            .set_viewport(window_dim, game_width);
     }
 
     //Unsafe since user might create two instances, both of
