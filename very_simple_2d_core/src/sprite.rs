@@ -77,13 +77,6 @@ impl Texture {
                     img => img.to_rgba(),
                 };
 
-
-                let xx=width/grid_dim.x;
-                let yy=height/grid_dim.y;
-
-                //assert_eq!(xx,yy);
-
-
                 let id = build_opengl_mipmapped_texture(width, height, img);
                 Ok(Texture { id , grid_dim})
             }

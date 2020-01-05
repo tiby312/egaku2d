@@ -56,19 +56,19 @@ fn main() {
     let mut adventurer_tex = sys.canvas_mut().texture("adventurer-sheet.png",vec2(7,11)).unwrap();
 
 
-    let mut k=sys.canvas_mut().sprites();
-    let mut cc=0;
-    for y in (032..200).step_by(32){
-        for x in (032..200).step_by(32){
-            k.add(vec2(x,y).inner_as(),cc % 64);
-            cc+=1;
+    let sprite_save={
+        let mut k=sys.canvas_mut().sprites();
+        let mut cc=0;
+        for y in (032..200).step_by(32){
+            for x in (032..200).step_by(32){
+                k.add(vec2(x,y).inner_as(),cc % 64);
+                cc+=1;
+            }
         }
-    }
+        k.save()      
+    };
     
-    let sprite_save=k.save();
     
-    drop(k);
-
     let mut timer = very_simple_2d::RefreshTimer::new(16);
 
     let mut counter = 0;
@@ -117,7 +117,7 @@ fn main() {
                 rect_save.draw(&mut canvas, COL4);
                                 
                 {
-                    //Draw some moving circles
+                    //draw some moving circles
                     let mut k = canvas.circles();
                     for x in (0..1000).step_by(12) {
                         for y in (0..1000).step_by(12) {
@@ -132,31 +132,33 @@ fn main() {
                 }
                 
                 
+                //draw an adventurer
                 canvas.sprites().addp(550.0,200.0,(counter as f32*0.05) as u32 % 40).send_and_draw(&mut adventurer_tex,WHITE,200.0);
                 
                 
-                let mut k=canvas.sprites();
-                
-                for y in (100..500).step_by(40){
+                {
+                    //draw some moving sprites
+                    let mut k=canvas.sprites();
                     
-                    for x in (100..500).step_by(40){
-                        let c=(counter+x+y) as f32*0.01;
-                        let pos = vec2(x, y).inner_as();
-
-                        let cc=((counter+x+y) as f32*0.1 ) as u32;
-                        k.add(pos+vec2(c.sin()*20.0,c.cos()*20.0),cc % 64);
+                    for y in (100..500).step_by(40){
                         
+                        for x in (100..500).step_by(40){
+                            let c=(counter+x+y) as f32*0.01;
+                            let pos = vec2(x, y).inner_as();
+
+                            let cc=((counter+x+y) as f32*0.1 ) as u32;
+                            k.add(pos+vec2(c.sin()*20.0,c.cos()*20.0),cc % 64);
+                            
+                        }
                     }
+                    
+                    k.send_and_draw(&mut food_tex,WHITE,20.0);
                 }
-                
-                k.send_and_draw(&mut food_tex,WHITE,20.0);
-                
-                drop(k);
                 
 
                 
                 {
-                    //Draw a growing circle
+                    //draw a growing circle
                     let c = ((counter as f32 * 0.06).sin() * 40.0).abs();
                     canvas
                         .circles()
@@ -166,7 +168,7 @@ fn main() {
 
 
                 {
-                    //Draw a moving line
+                    //draw a moving line
                     let c = counter as f32 * 0.07;
                     canvas
                         .lines(10.)
@@ -176,7 +178,7 @@ fn main() {
 
                 
                 {
-                    //Draw a rotating arrow
+                    //draw a rotating arrow
                     let c = counter as f32 * 0.04;
                     let center = vec2(400., 400.);
                     canvas
@@ -186,14 +188,7 @@ fn main() {
                 }
                 
                 
-                
-                //sprite_save.draw(canvas,&mut texture);
-                
-                //let sprite_save=k.save();
-                //drop(k);
-
-
-                //Display what we drew
+                //display what we drew
                 sys.swap_buffers();
 
                 counter += 1;
