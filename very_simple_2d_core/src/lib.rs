@@ -54,6 +54,7 @@ const GL_POINT_COMP: f32 = 2.0;
 ///y grows as you go down.
 ///x grows as you go right.
 pub struct SimpleCanvas {
+    _ns: NotSend,
     circle_program: CircleProgram,
     sprite_program: SpriteProgram,
     point_mul: PointMul,
@@ -87,6 +88,7 @@ impl SimpleCanvas {
         gl_ok!();
 
         SimpleCanvas {
+            _ns: ns(),
             point_mul,
             sprite_program,
             circle_program,
