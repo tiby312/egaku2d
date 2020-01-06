@@ -1,7 +1,7 @@
 //! # Overview
 //!
-//! A library that lets you draw various simple 2d geometry primitives fast using a single
-//! shader program and a single vertex buffer object with a safe api (provided no other libray
+//! A library that lets you draw various simple 2d geometry primitives and sprites fast using 
+//! vertex buffer objects with a safe api (provided no other libray
 //! is calling opengl functions). Uses the builder pattern for a convinient api.
 //! The main design goal is to be able to draw thousands of shapes efficiently.
 //! Uses glutin and opengl es 3.0.
@@ -40,6 +40,20 @@
 //! These functions allow the user to efficiently draw thousands of static objects by uploading all
 //! of their shape data just once to the gpu. For dynamic shapes that move every step,
 //! the user should use send_and_draw() every step.
+//!
+//! # Sprites
+//!
+//! You can also draw sprites! You can upload a tileset texture to the gpu and then draw thousands of sprites
+//! using a similar api to the shape drawing api. 
+//! The sprites are point sprites drawn using the opengl POINTS primitive in order to cut down on the data
+//! that needs to be sent to the gpu. The only information that is sent to the gpu on a sprite by sprite basis
+//! is its position, and its tile index.
+//!
+//! While the user can pick different tile
+//! coorinates to draw different sprints within the texture they upload to the gpu, they cannot rotate the sprite.
+//! The sprite is drawn centered at the position the user specifies. They can change the size of all sprites in the 
+//! draw session by changing its radius. See the example below.
+//!
 //!
 //! # View
 //!
@@ -108,8 +122,8 @@
 //!   .addp(9.,5.)
 //!   .send_and_draw([0., 1., 1., 0.1],4.0);
 //!
-//! use very_simple_2d::sprite::TexIndex;
-//! canvas.sprites().addp(100.,100.,TexIndex(0)).send_and_draw(&food_texture,[1.0;4],4.0);
+//! //Draw the first tile in the top left corder of the texture.
+//! canvas.sprites().addp(100.,100.,food_texture.coord_to_indexp(0,0)).send_and_draw(&food_texture,[1.0;4],4.0);
 //!
 //! //Swap buffers on the opengl context.
 //! glsys.swap_buffers();

@@ -1,8 +1,9 @@
 use super::*;
 
-///The index will be used when draw is called with a specific texture.
-///The index will be split into a x and y coordinate.
-///The texture object has functions to create this index from a x and y coordinate. 
+///The texture index is the other piece of data every sprite has besides
+///its position. It tells the gpu which part of a texture to draw.
+///Each texture object has functions to create this index from a x and y coordinate. 
+///On the gpu, the index will be split into a x and y coordinate.
 ///If the index is larger than texture.dim.x*texture.dim.y then it will be modded so that
 ///it can be mapped to a tile set. But obviously, the user should be picking an index
 ///that maps to a valid tile in the tile set to begin with.
