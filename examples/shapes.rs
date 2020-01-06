@@ -94,7 +94,7 @@ fn main() {
             _ => {}
         },
 
-        Event::MainEventsCleared => {
+        Event::EventsCleared => {
             if timer.is_ready() {
                 let mut canvas = sys.canvas_mut();
 
