@@ -113,6 +113,23 @@ fn main() {
                 square_save.draw(&mut canvas, COL3, 10.0);
                 rect_save.draw(&mut canvas, COL4);
 
+
+
+                /*
+                either a or b happens:
+
+                case A:
+                    1   : build up verticies 
+                    1.5 : *optional*  save verticies
+                case B:
+                    1   : invoke saved off verticies
+                
+                2   :  set uniforms
+                3   :  draw
+                */
+
+                sprite_save.uniforms(canvas,&food_tex,16.0).with_color(COL1).with_offset(vec2(5.,4.)).draw();
+
                 {
                     //draw some moving circles
                     let mut k = canvas.circles();
@@ -125,7 +142,7 @@ fn main() {
                             k.add(pos + vec2(c.sin() * y as f32 * 0.1, c.cos() * x as f32 * 0.1));
                         }
                     }
-                    k.send_and_draw(COL1, 8.0);
+                    k.uniforms(8.0).with_color(COL1).send_and_draw();
                 }
 
                 {
