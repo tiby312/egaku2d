@@ -48,7 +48,7 @@ fn main() {
             .save()
     };
 
-    let food_tex = sys.canvas_mut().texture("food.png", [8, 8]).unwrap();
+    let food_tex = sys.texture("food.png", [8, 8]).unwrap();
 
     let sprite_save = {
         let mut k = sys.canvas_mut().sprites();

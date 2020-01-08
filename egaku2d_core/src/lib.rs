@@ -233,18 +233,7 @@ impl SimpleCanvas {
         }
     }
 
-    ///Creates a new texture from the specified file.
-    ///The fact that we need a mutable reference to this object
-    ///Ensures that we make the texture in the same thread.
-    ///The grid dimensions passed are the tile dimensions is
-    ///the texture is a tile set.
-    pub fn texture(
-        &mut self,
-        file: &str,
-        grid_dim: [u32;2],
-    ) -> image::ImageResult<sprite::Texture> {
-        sprite::Texture::new(file, grid_dim)
-    }
+
 
     pub fn clear_color(&mut self, back_color: [f32; 3]) {
         unsafe {

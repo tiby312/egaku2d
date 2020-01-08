@@ -129,12 +129,16 @@
 //! glsys.swap_buffers();
 //! ```
 
+
+
+
 use axgeom::*;
 pub use glutin;
 use glutin::PossiblyCurrent;
 
 use egaku2d_core;
 use egaku2d_core::gl;
+
 
 pub use egaku2d_core::shapes;
 pub use egaku2d_core::sprite;
@@ -286,6 +290,19 @@ pub mod fullscreen {
             self.inner.set_viewport(self.window_dim, width);
         }
 
+        ///Creates a new texture from the specified file.
+        ///The fact that we need a mutable reference to this object
+        ///Ensures that we make the texture in the same thread.
+        ///The grid dimensions passed are the tile dimensions is
+        ///the texture is a tile set.
+        pub fn texture(
+            &mut self,
+            file: &str,
+            grid_dim: [u32;2],
+        ) -> image::ImageResult<sprite::Texture> {
+            crate::texture(file,grid_dim)
+        }
+        
         pub fn canvas(&self) -> &SimpleCanvas {
             &self.inner
         }
@@ -306,6 +323,9 @@ pub mod fullscreen {
         }
     }
 }
+
+
+
 
 ///A version where the user can control the size of the window.
 pub struct WindowedSystem {
@@ -399,6 +419,19 @@ impl WindowedSystem {
         [v.x,v.y]
     }
 
+    ///Creates a new texture from the specified file.
+    ///The fact that we need a mutable reference to this object
+    ///Ensures that we make the texture in the same thread.
+    ///The grid dimensions passed are the tile dimensions is
+    ///the texture is a tile set.
+    pub fn texture(
+        &mut self,
+        file: &str,
+        grid_dim: [u32;2],
+    ) -> image::ImageResult<sprite::Texture> {
+        crate::texture(file,grid_dim)
+    }
+
     pub fn canvas(&self) -> &SimpleCanvas {
         &self.inner
     }
@@ -423,4 +456,75 @@ fn prompt_for_monitor(el: &EventLoop<()>) -> MonitorHandle {
         .expect("Please enter a valid ID");
 
     monitor
+}
+
+
+
+
+use egaku2d_core::gl_ok;
+use egaku2d_core::sprite::*;
+use egaku2d_core::gl::types::GLuint;
+
+///Creates a new texture from the specified file.
+///The fact that we need a mutable reference to this object
+///Ensures that we make the texture in the same thread.
+///The grid dimensions passed are the tile dimensions is
+///the texture is a tile set.
+pub fn texture(
+    file: &str,
+    grid_dim: [u32;2],
+) -> image::ImageResult<sprite::Texture> {
+
+    match image::open(&file.to_string()) {
+        Err(err) => Err(err),
+        Ok(img) => {
+            use image::GenericImageView;
+
+            let (width, height) = img.dimensions();
+
+            let img = match img {
+                image::DynamicImage::ImageRgba8(img) => img,
+                img => img.to_rgba(),
+            };
+
+            let id = build_opengl_mipmapped_texture(width, height, img);
+            Ok(unsafe{Texture::new(id,grid_dim)})
+        }
+    }
+}
+
+fn build_opengl_mipmapped_texture(width: u32, height: u32, image: image::RgbaImage) -> GLuint {
+    unsafe {
+        let mut texture_id: GLuint = 0;
+        gl::GenTextures(1, &mut texture_id);
+        gl_ok!();
+
+        gl::BindTexture(gl::TEXTURE_2D, texture_id);
+        gl_ok!();
+
+        let raw = image.into_raw();
+
+        gl::TexImage2D(
+            gl::TEXTURE_2D,
+            0,
+            gl::RGBA as i32,
+            width as i32,
+            height as i32,
+            0,
+            gl::RGBA,
+            gl::UNSIGNED_BYTE,
+            raw.as_ptr() as *const _,
+        );
+        gl_ok!();
+
+        gl::TexParameteri(gl::TEXTURE_2D, gl::TEXTURE_MIN_FILTER, gl::NEAREST as i32);
+        gl_ok!();
+        gl::TexParameteri(gl::TEXTURE_2D, gl::TEXTURE_MAG_FILTER, gl::NEAREST as i32);
+        gl_ok!();
+
+        gl::BindTexture(gl::TEXTURE_2D, 0);
+        gl_ok!();
+
+        texture_id
+    }
 }
