@@ -13,9 +13,9 @@ fn main() {
 
     let rect_save = {
         let mut k = sys.canvas_mut().rects();
-        k.add([400., 420.], [300., 400.]);
-        k.add([50., 100.], [300., 350.]);
-        k.add([5., 100.], [30., 350.]);
+        k.add([400., 420.], [410., 450.]);
+        k.add([50., 100.], [60., 250.]);
+        k.add([5., 100.], [30., 150.]);
         k.save()
     };
 
@@ -107,7 +107,7 @@ fn main() {
                 arrow_save.uniforms(canvas).with_color(COL1).draw();
                 line_save.uniforms(canvas).with_color(COL2).draw();
                 square_save.uniforms(canvas,10.0).with_color(COL3).draw();
-                rect_save.uniforms(canvas).with_color(COL4);
+                rect_save.uniforms(canvas).with_color(COL4).draw();
 
 
 
