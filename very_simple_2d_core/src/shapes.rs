@@ -17,17 +17,13 @@ pub struct SquareSession<'a> {
 }
 impl<'a> SquareSession<'a> {
     #[inline(always)]
-    pub fn add(&mut self, point: Vec2<f32>) -> &mut Self {
+    pub fn add(&mut self, point: [f32;2]) -> &mut Self {
         self.sys
             .circle_buffer
-            .push(circle_program::Vertex([point.x, point.y]));
+            .push(circle_program::Vertex(point));
         self
     }
 
-    #[inline(always)]
-    pub fn addp(&mut self, x: f32, y: f32) -> &mut Self {
-        self.add(vec2(x, y))
-    }
     pub fn save(&mut self) -> SquareSave {
         SquareSave {
             _ns: ns(),
@@ -78,14 +74,10 @@ impl<'a> CircleSession<'a> {
     }
 
     #[inline(always)]
-    pub fn addp(&mut self, x: f32, y: f32) -> &mut Self {
-        self.add(vec2(x, y))
-    }
-    #[inline(always)]
-    pub fn add(&mut self, point: Vec2<f32>) -> &mut Self {
+    pub fn add(&mut self, point: [f32;2]) -> &mut Self {
         self.sys
             .circle_buffer
-            .push(circle_program::Vertex([point.x, point.y]));
+            .push(circle_program::Vertex(point));
         self
     }
 }
@@ -127,7 +119,8 @@ impl RectSession<'_> {
     }
 
     #[inline(always)]
-    pub fn add(&mut self, rect: Rect<f32>) -> &mut Self {
+    pub fn add(&mut self, top_left: [f32;2], bottom_right:[f32;2]) -> &mut Self {
+        let rect=rect(top_left[0],bottom_right[0],top_left[1],bottom_right[1]);
         let [tl, tr, br, bl] = rect.get_corners();
         //let arr = [a, b, c, c, d, a];
         let arr = [tr, tl, bl, bl, br, tr];
@@ -175,11 +168,9 @@ impl ArrowSession<'_> {
     }
 
     #[inline(always)]
-    pub fn addp(&mut self, x1: f32, y1: f32, x2: f32, y2: f32) -> &mut Self {
-        self.add(vec2(x1, y1), vec2(x2, y2))
-    }
-    #[inline(always)]
-    pub fn add(&mut self, start: Vec2<f32>, end: Vec2<f32>) -> &mut Self {
+    pub fn add(&mut self, start: PointType, end: PointType) -> &mut Self {
+        let start=vec2(start[0],start[1]);
+        let end=vec2(end[0],end[1]);
         let radius = self.radius;
         let offset = end - start;
 
