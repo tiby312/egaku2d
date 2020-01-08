@@ -136,13 +136,6 @@ impl SpriteProgram {
         &mut self,
         un:&SpriteProgramUniformValues,
         buffer_info:BufferInfo,
-        /*
-        point_size: f32,
-        col: [f32; 4],
-        buffer_id: u32,
-        length: usize,
-        texture: &crate::sprite::Texture,
-        */
     ) {
         let col=un.color;
         let buffer_id=buffer_info.id;

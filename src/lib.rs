@@ -8,7 +8,24 @@
 //!
 //! ![](https://raw.githubusercontent.com/tiby312/very_simple_2d/master/assets/screenshot.gif)
 //!
-//! # User Guide
+//! # Pipeline 
+//!
+//! The egaku2d drawing pipeline works as follows:
+//!
+//! * 1. Pick a drawing type (a particular shape or a sprite) and set mandatory values for the particular shape or sprite.
+//! * 2. Build up a large group of verticies
+//!     * 2.1 Optionally save off verticies to a static vbo on the gpu for fast drawing at a later time.
+//! * 3. Set mandatory shader uniform values.
+//!     * 3.1 Set optional uniform values
+//! * 4. Send the vertex data to the gpu and draw
+//!
+//! Additionally, there is a way to draw the vertices we saved off to the gpu.
+//! To do that, instead of steps 1 and 2, we use the saved off verticies,
+//! and then set the uniform values and then draw. Drawing in this case is faster
+//! since the vertex data already exists on the gpu.
+//!
+//!
+//! # Using Shapes
 //!
 //! The user can draw the following:
 //!
@@ -41,7 +58,7 @@
 //! of their shape data just once to the gpu. For dynamic shapes that move every step,
 //! the user should use send_and_draw() every step.
 //!
-//! # Sprites
+//! # Using Sprites
 //!
 //! You can also draw sprites! You can upload a tileset texture to the gpu and then draw thousands of sprites
 //! using a similar api to the shape drawing api. 
@@ -83,47 +100,47 @@
 //! ```rust,no_run
 //! use axgeom::*;
 //! let events_loop = glutin::event_loop::EventLoop::new();
-//! let mut glsys = very_simple_2d::WindowedSystem::newp(600, 480, &events_loop,"test window");
-//!
-//! let canvas = glsys.canvas_mut();
+//! let mut glsys = egaku2d::WindowedSystem::new([600, 480], &events_loop,"test window");
 //!
 //! //Make a tileset texture from a png that has 64 different tiles.
-//! let food_texture = canvas.texturep("food.png",8,8).unwrap();
+//! let food_texture = glsys.texture("food.png",[8,8]).unwrap();
+//!
+//! let canvas = glsys.canvas_mut();
 //!
 //! //Make the background dark gray.
 //! canvas.clear_color([0.2,0.2,0.2]);
 //!
 //! //Push some squares to a static vertex buffer object on the gpu.
 //! let rect_save = canvas.squares()
-//!   .addp(40., 40.)
-//!   .addp(40., 40.)
+//!   .add([40., 40.])
+//!   .add([40., 40.])
 //!   .save();
 //!
 //! //Draw the squares we saved.
-//! rect_save.draw(canvas,[0.0, 1.0, 0.1, 0.5],5.0);
+//! rect_save.uniforms(canvas,5.0).with_color([0.0, 1.0, 0.1, 0.5]).draw();
 //!
 //! //Draw some arrows.
 //! canvas.arrows(5.0)
-//!   .add(vec2(40., 40.), vec2(40., 200.))
-//!   .add(vec2(40., 40.), vec2(200., 40.))
-//!   .send_and_draw([0.0, 1.0, 0.1, 0.5]);
+//!   .add([40., 40.], [40., 200.])
+//!   .add([40., 40.], [200., 40.])
+//!   .uniforms().send_and_draw();
 //!
 //! //Draw some circles.
 //! canvas.circles()
-//!   .add(vec2(5.,6.))
-//!   .add(vec2(7.,8.))
-//!   .add(vec2(9.,5.))
-//!   .send_and_draw([0., 1., 1., 0.1],4.0);
+//!   .add([5.,6.])
+//!   .add([7.,8.])
+//!   .add([9.,5.])
+//!   .uniforms(4.0).with_color([0., 1., 1., 0.1]).send_and_draw();
 //!
 //! //Draw some circles from f32 primitives.
 //! canvas.circles()
-//!   .addp(5.,6.)
-//!   .addp(7.,8.)
-//!   .addp(9.,5.)
-//!   .send_and_draw([0., 1., 1., 0.1],4.0);
+//!   .add([5.,6.])
+//!   .add([7.,8.])
+//!   .add([9.,5.])
+//!   .uniforms(4.0).with_color([0., 1., 1., 0.1]).send_and_draw();
 //!
 //! //Draw the first tile in the top left corder of the texture.
-//! canvas.sprites().addp(100.,100.,food_texture.coord_to_indexp(0,0)).send_and_draw(&food_texture,[1.0;4],4.0);
+//! canvas.sprites().add([100.,100.],food_texture.coord_to_index([0,0])).uniforms(&food_texture,4.0).send_and_draw();
 //!
 //! //Swap buffers on the opengl context.
 //! glsys.swap_buffers();

@@ -34,13 +34,10 @@ impl<'a> SquareSession<'a> {
     pub fn uniforms(&mut self,radius:f32)->Uniforms{
         let un=ProgramUniformValues{radius,color:self.sys.color,mode:gl::POINTS,rect:false,offset:vec2same(0.0)};
         Uniforms{sys:self.sys,un}
+ 
     }
 }
-impl<'a> Drop for SquareSession<'a> {
-    fn drop(&mut self) {
-        self.sys.circle_buffer.clear();
-    }
-}
+
 
 pub struct CircleSave {
     _ns: NotSend,
@@ -55,11 +52,8 @@ impl CircleSave {
 pub struct CircleSession<'a> {
     pub(crate) sys: &'a mut SimpleCanvas,
 }
-impl<'a> Drop for CircleSession<'a> {
-    fn drop(&mut self) {
-        self.sys.circle_buffer.clear();
-    }
-}
+
+
 impl<'a> CircleSession<'a> {
     pub fn save(&mut self) -> CircleSave {
         CircleSave {
@@ -84,11 +78,6 @@ impl<'a> CircleSession<'a> {
 
 pub struct RectSession<'a> {
     pub(crate) sys: &'a mut SimpleCanvas,
-}
-impl Drop for RectSession<'_> {
-    fn drop(&mut self) {
-        self.sys.circle_buffer.clear();
-    }
 }
 
 
@@ -147,11 +136,6 @@ impl ArrowSave {
 pub struct ArrowSession<'a> {
     pub(crate) sys: &'a mut SimpleCanvas,
     pub(crate) radius: f32,
-}
-impl Drop for ArrowSession<'_> {
-    fn drop(&mut self) {
-        self.sys.circle_buffer.clear();
-    }
 }
 
 impl ArrowSession<'_> {
@@ -213,11 +197,7 @@ pub struct LineSession<'a> {
     pub(crate) sys: &'a mut SimpleCanvas,
     pub(crate) radius: f32,
 }
-impl Drop for LineSession<'_> {
-    fn drop(&mut self) {
-        self.sys.circle_buffer.clear();
-    }
-}
+
 impl LineSession<'_> {
     pub fn save(&mut self) -> LineSave {
         LineSave {

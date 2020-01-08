@@ -139,10 +139,6 @@ impl<V: Default> GrowableBuffer<V> {
         self.buffer.push(a);
     }
 
-    #[inline(always)]
-    pub fn len(&self) -> usize {
-        self.buffer.len()
-    }
 
     #[inline(always)]
     pub fn clear(&mut self) {

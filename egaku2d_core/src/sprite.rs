@@ -52,11 +52,6 @@ impl SpriteSession<'_> {
     }
 }
 
-impl Drop for SpriteSession<'_> {
-    fn drop(&mut self) {
-        self.sys.sprite_buffer.clear();
-    }
-}
 
 pub struct Texture {
     _ns: NotSend,

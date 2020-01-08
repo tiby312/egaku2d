@@ -153,6 +153,12 @@ pub struct SimpleCanvas {
     circle_program: CircleProgram,
     sprite_program: SpriteProgram,
     point_mul: PointMul,
+
+
+    //It is important to note that this buffers might not be empty when a session object is dropped.
+    //the buffers are cleared on creation of a session.
+    //this allows us to not have to implement Drop for the session to make sure that the buffer is cleared.
+    //if they were to implement drop, they would be slightly less egronomic to use.
     circle_buffer: vbo::GrowableBuffer<circle_program::Vertex>,
     sprite_buffer: vbo::GrowableBuffer<sprite_program::Vertex>,
     color:[f32;4] //Default color used
@@ -199,23 +205,24 @@ impl SimpleCanvas {
     }
 
     pub fn sprites(&mut self) -> sprite::SpriteSession {
+        self.sprite_buffer.clear();
         sprite::SpriteSession { sys: self }
     }
 
     pub fn circles(&mut self) -> CircleSession {
-        assert_eq!(self.circle_buffer.len(), 0);
+        self.circle_buffer.clear();
         CircleSession { sys: self }
     }
     pub fn squares(&mut self) -> SquareSession {
-        assert_eq!(self.circle_buffer.len(), 0);
+        self.circle_buffer.clear();
         SquareSession { sys: self }
     }
     pub fn rects(&mut self) -> RectSession {
-        assert_eq!(self.circle_buffer.len(), 0);
+        self.circle_buffer.clear();
         RectSession { sys: self }
     }
     pub fn arrows(&mut self, radius: f32) -> ArrowSession {
-        assert_eq!(self.circle_buffer.len(), 0);
+        self.circle_buffer.clear();
         let kk = self.point_mul.0;
 
         ArrowSession {
@@ -225,7 +232,7 @@ impl SimpleCanvas {
     }
 
     pub fn lines(&mut self, radius: f32) -> LineSession {
-        assert_eq!(self.circle_buffer.len(), 0);
+        self.circle_buffer.clear();
         let kk = self.point_mul.0;
         LineSession {
             sys: self,
