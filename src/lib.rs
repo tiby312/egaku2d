@@ -13,16 +13,24 @@
 //! The egaku2d drawing pipeline works as follows:
 //!
 //! * 1. Pick a drawing type (a particular shape or a sprite) and set mandatory values for the particular shape or sprite.
-//! * 2. Build up a large group of verticies
-//!     * 2.1 Optionally save off verticies to a static vbo on the gpu for fast drawing at a later time.
-//! * 3. Set mandatory shader uniform values.
-//!     * 3.1 Set optional uniform values
-//! * 4. Send the vertex data to the gpu and draw
+//! * 2. Build up a large group of verticies by calling **`add()`**
+//!     * 2.1 Optionally save off verticies to a static vbo on the gpu for fast drawing at a later time by calling **`save()`**.
+//! * 3. Set mandatory shader uniform values bt calling **`uniforms()`**
+//!     * 3.1 Set optional uniform values e.g. **`with_color()`**.
+//! * 4. Send the vertex data to the gpu and draw by calling **`send_and_draw()`**
 //!
 //! Additionally, there is a way to draw the vertices we saved off to the gpu.
 //! To do that, instead of steps 1 and 2, we use the saved off verticies,
-//! and then set the uniform values and then draw. Drawing in this case is faster
+//! and then set the uniform values and then draw by calling **`draw()`**. Drawing in this case is faster
 //! since the vertex data already exists on the gpu.
+//!
+//!
+//! Using this pipeline, the user can efficiently draw thousands of circles, for example, with the caveat that
+//! they all will be the same radius and color/transparency values. This api does not allow the user
+//! to efficiently draw thousands of circles where each circle has a different color or radius.
+//! This was a design decision to make each vertex as lightweight as possible (just a x and y position),
+//! making it more efficient to set and send to the gpu.
+//!
 //!
 //!
 //! # Using Shapes
@@ -37,27 +45,6 @@
 //! Lines                     | `(point,point,thickness)`               
 //! Arrows                    | `(point_start,point_end,thickness)`               
 //!   
-//!
-//! Each one of these follows the same simple api for drawing:
-//!
-//! * `add()` - **Fast** function that adds one shape to a Vec.
-//! * `send_and_draw()` - **Slow** function that sends the Vec to the one vertex buffer object on the gpu and then draws them using DrawArrays.
-//!
-//! Using this api, the user can efficiently draw thousands of circles, for example, with the caveat that
-//! they all will be the same radius and color/transparency values. This api does not allow the user
-//! to efficiently draw thousands of circles where each circle has a different color or radius.
-//! This was a design decision to make each vertex as lightweight as possible (just a x and y position),
-//! making it more efficient to set and send to the gpu.
-//!
-//! Additionally there are the following functions to optionally save off verticies onto the gpu:
-//!
-//! * `save()` - **Slow** function that creates a new static VBO containing the shapes added from `add()`.
-//! * `draw()` - **Fast** function that draws a static VBO. This is fast since the data already exists on the gpu.
-//!
-//! These functions allow the user to efficiently draw thousands of static objects by uploading all
-//! of their shape data just once to the gpu. For dynamic shapes that move every step,
-//! the user should use send_and_draw() every step.
-//!
 //! # Using Sprites
 //!
 //! You can also draw sprites! You can upload a tileset texture to the gpu and then draw thousands of sprites
