@@ -13,9 +13,9 @@ fn main() {
 
     let rect_save = {
         let mut k = sys.canvas_mut().rects();
-        k.add([400., 420., 410., 450.]);
-        k.add([50., 100., 60., 250.]);
-        k.add([5., 100., 30., 150.]);
+        k.add([400., 420., 410., 420.]);
+        k.add([50., 100., 60., 80.]);
+        k.add([300., 500., 30., 50.]);
         k.save()
     };
 
@@ -103,27 +103,11 @@ fn main() {
                 const WHITE: [f32; 4] = [1.0, 1.0, 1.0, 0.8];
 
                 //draw static VBOs already on the gpu.
-                sprite_save.uniforms(canvas, &food_tex,16.0).with_color(COL4).draw();
-                arrow_save.uniforms(canvas).with_color(COL1).draw();
+                sprite_save.uniforms(canvas, &food_tex,32.0).with_color(COL4).draw();
+                arrow_save.uniforms(canvas).draw();
                 line_save.uniforms(canvas).with_color(COL2).draw();
                 square_save.uniforms(canvas,10.0).with_color(COL3).draw();
                 rect_save.uniforms(canvas).with_color(COL4).draw();
-
-
-
-                /*
-                either a or b happens:
-
-                case A:
-                    1   : build up verticies 
-                    1.5 : *optional*  save verticies
-                case B:
-                    1   : invoke saved off verticies
-                
-                2   :  set mandatory uniforms and set optional uniforms if desired
-                3   :  draw
-                */
-
                 
                 //draw some moving circles
                 let mut k = canvas.circles();

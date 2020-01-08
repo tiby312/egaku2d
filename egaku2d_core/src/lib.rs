@@ -52,95 +52,97 @@ pub mod gl {
 ///They all follow the same api outlined in the crate documentation.
 pub mod shapes;
 
-//const GL_POINT_COMP: f32 = 2.0;
 
+use self::uniforms::*;
+///Contains the objects used for the uniform setting stage of the egaku2d drawing pipeline.
+pub mod uniforms{
+    use super::*;
+    use vbo::BufferInfo;
 
+    pub struct StaticUniforms<'a>{
+        pub(crate) sys:&'a mut SimpleCanvas,
+        pub(crate) un:ProgramUniformValues,
+        pub(crate) buffer:BufferInfo
+    }
+    impl StaticUniforms<'_>{
+        pub fn with_color(&mut self,color:[f32;4])->&mut Self{
+            self.un.color=color;
+            self
+        }
 
-use vbo::BufferInfo;
-
-pub struct StaticUniforms<'a>{
-    sys:&'a mut SimpleCanvas,
-    un:ProgramUniformValues,
-    buffer:BufferInfo
-}
-impl StaticUniforms<'_>{
-    pub fn with_color(&mut self,color:[f32;4])->&mut Self{
-        self.un.color=color;
-        self
+        pub fn draw(&mut self){
+            self.sys.circle_program.set_buffer_and_draw(
+                &self.un,
+                self.buffer
+            );
+        }
+        //TOO add offset
     }
 
-    pub fn draw(&mut self){
-        self.sys.circle_program.set_buffer_and_draw(
-            &self.un,
-            self.buffer
-        );
-    }
-    //TOO add offset
-}
 
-
-pub struct StaticSpriteUniforms<'a>{
-    sys:&'a mut SimpleCanvas,
-    un:SpriteProgramUniformValues<'a>,
-    buffer:BufferInfo
-}
-
-impl StaticSpriteUniforms<'_>{
-    pub fn with_color(&mut self,color:[f32;4])->&mut Self{
-        self.un.color=color;
-        self
+    pub struct StaticSpriteUniforms<'a>{
+        pub(crate) sys:&'a mut SimpleCanvas,
+        pub(crate) un:SpriteProgramUniformValues<'a>,
+        pub(crate) buffer:BufferInfo
     }
 
-    pub fn draw(&mut self){
-        self.sys.sprite_program.set_buffer_and_draw(
-            &self.un,
-            self.buffer,
-        );
-    }
-}
+    impl StaticSpriteUniforms<'_>{
+        pub fn with_color(&mut self,color:[f32;4])->&mut Self{
+            self.un.color=color;
+            self
+        }
 
-pub struct SpriteUniforms<'a>{
-    sys:&'a mut SimpleCanvas,
-    un:SpriteProgramUniformValues<'a>,
-}
-impl SpriteUniforms<'_>{
-    pub fn with_color(&mut self,color:[f32;4])->&mut Self{
-        self.un.color=color;
-        self
-    }
-    pub fn send_and_draw(&mut self){
-        self.sys.sprite_buffer.update();
-
-        self.sys.sprite_program.set_buffer_and_draw(
-            &self.un,
-            self.sys.sprite_buffer.get_info()
-        );
-    }
-}
-
-
-pub struct Uniforms<'a>{
-    sys:&'a mut SimpleCanvas,
-    un:ProgramUniformValues,
-}
-
-impl Uniforms<'_>{
-    pub fn with_color(&mut self,color:[f32;4])->&mut Self{
-        self.un.color=color;
-        self
+        pub fn draw(&mut self){
+            self.sys.sprite_program.set_buffer_and_draw(
+                &self.un,
+                self.buffer,
+            );
+        }
     }
 
-    pub fn send_and_draw(&mut self){
-        self.sys.circle_buffer.update();
-
-        self.sys.circle_program.set_buffer_and_draw(
-            &self.un,
-            self.sys.circle_buffer.get_info()
-        );
+    pub struct SpriteUniforms<'a>{
+        pub(crate) sys:&'a mut SimpleCanvas,
+        pub(crate) un:SpriteProgramUniformValues<'a>,
     }
-    //TODO add offset
-}
+    impl SpriteUniforms<'_>{
+        pub fn with_color(&mut self,color:[f32;4])->&mut Self{
+            self.un.color=color;
+            self
+        }
+        pub fn send_and_draw(&mut self){
+            self.sys.sprite_buffer.update();
 
+            self.sys.sprite_program.set_buffer_and_draw(
+                &self.un,
+                self.sys.sprite_buffer.get_info()
+            );
+        }
+    }
+
+
+    pub struct Uniforms<'a>{
+        pub(crate) sys:&'a mut SimpleCanvas,
+        pub(crate) un:ProgramUniformValues,
+    }
+
+    impl Uniforms<'_>{
+        pub fn with_color(&mut self,color:[f32;4])->&mut Self{
+            self.un.color=color;
+            self
+        }
+
+        pub fn send_and_draw(&mut self){
+            self.sys.circle_buffer.update();
+
+            self.sys.circle_program.set_buffer_and_draw(
+                &self.un,
+                self.sys.circle_buffer.get_info()
+            );
+        }
+        //TODO add offset
+    }
+
+}
 
 
 

@@ -4,9 +4,9 @@
 //! vertex buffer objects with a safe api (provided no other libray
 //! is calling opengl functions). Uses the builder pattern for a convinient api.
 //! The main design goal is to be able to draw thousands of shapes efficiently.
-//! Uses glutin and opengl es 3.0.
+//! Uses glutin and opengl es 2.0.
 //!
-//! ![](https://raw.githubusercontent.com/tiby312/very_simple_2d/master/assets/screenshot.gif)
+//! ![](https://raw.githubusercontent.com/tiby312/egaku2d/master/assets/screenshot.gif)
 //!
 //! # Pipeline 
 //!
@@ -144,6 +144,7 @@ use egaku2d_core;
 use egaku2d_core::gl;
 
 
+pub use egaku2d_core::uniforms;
 pub use egaku2d_core::shapes;
 pub use egaku2d_core::sprite;
 pub use egaku2d_core::SimpleCanvas;
@@ -198,7 +199,7 @@ pub mod fullscreen {
             //we are targeting only opengl 3.0 es. and glsl 300 es.
 
             let windowed_context = glutin::ContextBuilder::new()
-                .with_gl(glutin::GlRequest::Specific(glutin::Api::OpenGlEs, (3, 0)))
+                .with_gl(glutin::GlRequest::Specific(glutin::Api::OpenGlEs, (2, 0)))
                 .with_vsync(true)
                 .build_windowed(gl_window, &events_loop)
                 .unwrap();
@@ -364,7 +365,7 @@ impl WindowedSystem {
         //we are targeting only opengl 3.0 es. and glsl 300 es.
 
         let windowed_context = glutin::ContextBuilder::new()
-            .with_gl(glutin::GlRequest::Specific(glutin::Api::OpenGlEs, (3, 0)))
+            .with_gl(glutin::GlRequest::Specific(glutin::Api::OpenGlEs, (2, 0)))
             .with_vsync(true)
             .build_windowed(gl_window, &events_loop)
             .unwrap();
@@ -467,7 +468,7 @@ use egaku2d_core::gl::types::GLuint;
 ///Ensures that we make the texture in the same thread.
 ///The grid dimensions passed are the tile dimensions is
 ///the texture is a tile set.
-pub fn texture(
+fn texture(
     file: &str,
     grid_dim: [u32;2],
 ) -> image::ImageResult<sprite::Texture> {
