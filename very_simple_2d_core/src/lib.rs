@@ -10,6 +10,10 @@ use axgeom::*;
 use core::mem;
 use gl::types::*;
 
+use crate::sprite_program::*;
+use crate::circle_program::*;
+
+
 mod shader;
 
 ///Contains all the texture/sprite drawing code.
@@ -23,6 +27,13 @@ macro_rules! gl_ok {
     () => {
         assert_eq!(gl::GetError(), gl::NO_ERROR);
     };
+}
+
+//TODO get rid of this and just a read-only reference to the buffer instead
+#[derive(Copy,Clone,Debug)]
+pub(crate) struct BufferInfo{
+    pub id:u32,
+    pub length:usize
 }
 
 struct NotSend(*mut usize);
@@ -46,8 +57,97 @@ pub mod gl {
 ///They all follow the same api outlined in the crate documentation.
 pub mod shapes;
 
-const GL_POINT_COMP: f32 = 2.0;
-//const GL_POINT_COMP:f32=2.0;
+//const GL_POINT_COMP: f32 = 2.0;
+
+
+
+
+
+pub struct StaticUniforms<'a>{
+    sys:&'a mut SimpleCanvas,
+    un:ProgramUniformValues,
+    buffer:BufferInfo
+}
+impl StaticUniforms<'_>{
+    pub fn with_color(&mut self,color:[f32;4])->&mut Self{
+        self.un.color=color;
+        self
+    }
+
+    pub fn draw(&mut self){
+        self.sys.circle_program.set_buffer_and_draw(
+            &self.un,
+            self.buffer
+        );
+    }
+    //TOO add offset
+}
+
+
+pub struct StaticSpriteUniforms<'a>{
+    sys:&'a mut SimpleCanvas,
+    un:SpriteProgramUniformValues<'a>,
+    buffer:BufferInfo
+}
+
+impl StaticSpriteUniforms<'_>{
+    pub fn with_color(&mut self,color:[f32;4])->&mut Self{
+        self.un.color=color;
+        self
+    }
+
+    pub fn draw(&mut self){
+        self.sys.sprite_program.set_buffer_and_draw(
+            &self.un,
+            self.buffer,
+        );
+    }
+}
+
+pub struct SpriteUniforms<'a>{
+    sys:&'a mut SimpleCanvas,
+    un:SpriteProgramUniformValues<'a>,
+}
+impl SpriteUniforms<'_>{
+    pub fn with_color(&mut self,color:[f32;4])->&mut Self{
+        self.un.color=color;
+        self
+    }
+    pub fn send_and_draw(&mut self){
+        self.sys.sprite_buffer.update();
+
+        self.sys.sprite_program.set_buffer_and_draw(
+            &self.un,
+            self.sys.sprite_buffer.get_info()
+        );
+    }
+}
+
+
+pub struct Uniforms<'a>{
+    sys:&'a mut SimpleCanvas,
+    un:ProgramUniformValues,
+}
+
+impl Uniforms<'_>{
+    pub fn with_color(&mut self,color:[f32;4])->&mut Self{
+        self.un.color=color;
+        self
+    }
+
+    pub fn send_and_draw(&mut self){
+        self.sys.circle_buffer.update();
+
+        self.sys.circle_program.set_buffer_and_draw(
+            &self.un,
+            self.sys.circle_buffer.get_info()
+        );
+    }
+    //TODO add offset
+}
+
+
+
 
 ///Allows the user to start drawing shapes.
 ///The top left corner is the origin.
@@ -60,6 +160,7 @@ pub struct SimpleCanvas {
     point_mul: PointMul,
     circle_buffer: vbo::GrowableBuffer<circle_program::Vertex>,
     sprite_buffer: vbo::GrowableBuffer<sprite_program::Vertex>,
+    color:[f32;4] //Default color used
 }
 
 impl SimpleCanvas {
@@ -94,6 +195,7 @@ impl SimpleCanvas {
             circle_program,
             circle_buffer,
             sprite_buffer,
+            color:[1.0;4]
         }
     }
 

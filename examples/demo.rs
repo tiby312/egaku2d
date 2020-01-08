@@ -107,11 +107,11 @@ fn main() {
                 const WHITE: [f32; 4] = [1.0, 1.0, 1.0, 0.8];
 
                 //draw static VBOs already on the gpu.
-                sprite_save.draw(&mut canvas, &food_tex, COL4, 16.0);
-                arrow_save.draw(&mut canvas, COL1);
-                line_save.draw(&mut canvas, COL2);
-                square_save.draw(&mut canvas, COL3, 10.0);
-                rect_save.draw(&mut canvas, COL4);
+                sprite_save.uniforms(canvas, &food_tex,16.0).with_color(COL4).draw();
+                arrow_save.uniforms(canvas).with_color(COL1).draw();
+                line_save.uniforms(canvas).with_color(COL2).draw();
+                square_save.uniforms(canvas,10.0).with_color(COL3).draw();
+                rect_save.uniforms(canvas).with_color(COL4);
 
 
 
@@ -124,11 +124,11 @@ fn main() {
                 case B:
                     1   : invoke saved off verticies
                 
-                2   :  set uniforms
+                2   :  set mandatory uniforms and set optional uniforms if desired
                 3   :  draw
                 */
 
-                sprite_save.uniforms(canvas,&food_tex,16.0).with_color(COL1).with_offset(vec2(5.,4.)).draw();
+                //sprite_save.uniforms(canvas,&food_tex,16.0).with_color(COL1).with_offset(vec2(5.,4.)).draw();
 
                 {
                     //draw some moving circles
@@ -162,13 +162,13 @@ fn main() {
                         }
                     }
 
-                    k.send_and_draw(&mut food_tex, WHITE, 20.0);
+                    k.uniforms(&food_tex,20.0).with_color(WHITE).send_and_draw();
                 }
 
                 {
                     //draw a growing circle
                     let c = ((counter as f32 * 0.06).sin() * 40.0).abs();
-                    canvas.circles().add(cursor).send_and_draw(COL2, c);
+                    canvas.circles().add(cursor).uniforms(c).with_color(COL2).send_and_draw();
                 }
 
                 {
@@ -177,7 +177,9 @@ fn main() {
                     canvas
                         .lines(10.)
                         .add(vec2(50., 500.), vec2(500., 50. + c.sin() * 50.))
-                        .send_and_draw(COL3);
+                        .uniforms()
+                        .with_color(COL3)
+                        .send_and_draw();
                 }
 
                 {
@@ -187,7 +189,9 @@ fn main() {
                     canvas
                         .arrows(10.0)
                         .add(center, center + vec2(c.cos() * 80., c.sin() * 80.))
-                        .send_and_draw(COL4);
+                        .uniforms()
+                        .with_color(COL4)
+                        .send_and_draw();
                 }
 
                 //display what we drew

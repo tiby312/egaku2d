@@ -5,6 +5,7 @@ pub struct SquareSave {
     buffer: vbo::StaticBuffer<circle_program::Vertex>,
 }
 impl SquareSave {
+    /*
     pub fn draw(&self, session: &mut SimpleCanvas, col: [f32; 4], radius: f32) {
         session.circle_program.set_buffer_and_draw(
             radius * GL_POINT_COMP * session.point_mul.0,
@@ -14,6 +15,10 @@ impl SquareSave {
             gl::POINTS,
             self.buffer.len(),
         );
+    }*/
+    pub fn uniforms<'a>(&'a self,sys:&'a mut SimpleCanvas,radius:f32)->StaticUniforms<'a>{
+        let un=ProgramUniformValues{radius,color:sys.color,mode:gl::POINTS,rect:false,offset:vec2same(0.0)};
+        StaticUniforms{sys,un,buffer:self.buffer.get_info()}
     }
 }
 
@@ -40,6 +45,7 @@ impl<'a> SquareSession<'a> {
         }
     }
 
+    /*
     pub fn send_and_draw(&mut self, col: [f32; 4], radius: f32) {
         //self.sys.circle_buffer.update();
         self.sys.circle_buffer.update();
@@ -51,6 +57,12 @@ impl<'a> SquareSession<'a> {
             gl::POINTS,
             self.sys.circle_buffer.len(),
         );
+    }
+    */
+
+    pub fn uniforms(&mut self,radius:f32)->Uniforms{
+        let un=ProgramUniformValues{radius,color:self.sys.color,mode:gl::POINTS,rect:false,offset:vec2same(0.0)};
+        Uniforms{sys:self.sys,un}
     }
 }
 impl<'a> Drop for SquareSession<'a> {
@@ -64,6 +76,7 @@ pub struct CircleSave {
     buffer: vbo::StaticBuffer<circle_program::Vertex>,
 }
 impl CircleSave {
+    /*
     pub fn draw(&self, session: &mut SimpleCanvas, col: [f32; 4], radius: f32) {
         session.circle_program.set_buffer_and_draw(
             radius * GL_POINT_COMP * session.point_mul.0,
@@ -73,6 +86,11 @@ impl CircleSave {
             gl::POINTS,
             self.buffer.len(),
         );
+    }
+    */
+    pub fn uniforms<'a>(&'a self,sys:&'a mut SimpleCanvas,radius:f32)->StaticUniforms<'a>{
+        let un=ProgramUniformValues{radius,color:sys.color,mode:gl::POINTS,rect:true,offset:vec2same(0.0)};
+        StaticUniforms{sys,un,buffer:self.buffer.get_info()}
     }
 }
 pub struct CircleSession<'a> {
@@ -91,6 +109,12 @@ impl<'a> CircleSession<'a> {
         }
     }
 
+    pub fn uniforms(&mut self,radius:f32)->Uniforms{
+        let un=ProgramUniformValues{radius,color:self.sys.color,mode:gl::POINTS,rect:true,offset:vec2same(0.0)};
+        Uniforms{sys:self.sys,un}
+    }
+
+    /*
     pub fn send_and_draw(&mut self, col: [f32; 4], radius: f32) {
         self.sys.circle_buffer.update();
 
@@ -103,6 +127,7 @@ impl<'a> CircleSession<'a> {
             self.sys.circle_buffer.len(),
         );
     }
+    */
 
     #[inline(always)]
     pub fn addp(&mut self, x: f32, y: f32) -> &mut Self {
@@ -126,12 +151,19 @@ impl Drop for RectSession<'_> {
     }
 }
 
+
+
 pub struct RectSave {
     _ns: NotSend,
     buffer: vbo::StaticBuffer<circle_program::Vertex>,
 }
 
 impl RectSave {
+    pub fn uniforms<'a>(&'a self,sys:&'a mut SimpleCanvas)->StaticUniforms<'a>{
+        let un=ProgramUniformValues{radius:0.0,color:sys.color,mode:gl::TRIANGLES,rect:false,offset:vec2same(0.0)};
+        StaticUniforms{sys,un,buffer:self.buffer.get_info()}
+    }
+    /*
     pub fn draw(&self, session: &mut SimpleCanvas, col: [f32; 4]) {
         assert_eq!(self.buffer.len() % 3, 0);
         session.circle_program.set_buffer_and_draw(
@@ -143,6 +175,7 @@ impl RectSave {
             self.buffer.len(),
         );
     }
+    */
 }
 
 impl RectSession<'_> {
@@ -153,6 +186,12 @@ impl RectSession<'_> {
         }
     }
 
+    pub fn uniforms(&mut self)->Uniforms{
+        let un=ProgramUniformValues{radius:0.0,color:self.sys.color,mode:gl::TRIANGLES,rect:false,offset:vec2same(0.0)};
+        Uniforms{sys:self.sys,un}
+    }
+
+    /*
     pub fn send_and_draw(&mut self, col: [f32; 4]) {
         assert_eq!(self.sys.circle_buffer.len() % 3, 0);
         self.sys.circle_buffer.update();
@@ -164,7 +203,7 @@ impl RectSession<'_> {
             gl::TRIANGLES,
             self.sys.circle_buffer.len(),
         );
-    }
+    }*/
 
     ///NOTE The argument positions
     ///It is x1,x2,y1,y2  not  x1,y1,x2,y2.
@@ -192,6 +231,7 @@ pub struct ArrowSave {
     buffer: vbo::StaticBuffer<circle_program::Vertex>,
 }
 impl ArrowSave {
+    /*
     pub fn draw(&self, session: &mut SimpleCanvas, col: [f32; 4]) {
         session.circle_program.set_buffer_and_draw(
             0.0,
@@ -201,6 +241,10 @@ impl ArrowSave {
             gl::TRIANGLES,
             self.buffer.len(),
         );
+    }*/
+    pub fn uniforms<'a>(&'a self,sys:&'a mut SimpleCanvas)->StaticUniforms<'a>{
+        let un=ProgramUniformValues{radius:0.0,color:sys.color,mode:gl::TRIANGLES,rect:false,offset:vec2same(0.0)};
+        StaticUniforms{sys,un,buffer:self.buffer.get_info()}
     }
 }
 pub struct ArrowSession<'a> {
@@ -221,6 +265,7 @@ impl ArrowSession<'_> {
         }
     }
 
+    /*
     pub fn send_and_draw(&mut self, col: [f32; 4]) {
         self.sys.circle_buffer.update();
         self.sys.circle_program.set_buffer_and_draw(
@@ -231,6 +276,11 @@ impl ArrowSession<'_> {
             gl::TRIANGLES,
             self.sys.circle_buffer.len(),
         );
+    }
+    */
+    pub fn uniforms(&mut self)->Uniforms{
+        let un=ProgramUniformValues{radius:0.0,color:self.sys.color,mode:gl::TRIANGLES,rect:false,offset:vec2same(0.0)};
+        Uniforms{sys:self.sys,un}
     }
 
     #[inline(always)]
@@ -270,6 +320,7 @@ pub struct LineSave {
 }
 
 impl LineSave {
+    /*
     pub fn draw(&self, session: &mut SimpleCanvas, col: [f32; 4]) {
         let _kk = session.point_mul.0;
         session.circle_program.set_buffer_and_draw(
@@ -280,6 +331,11 @@ impl LineSave {
             gl::TRIANGLES,
             self.buffer.len(),
         );
+    }
+    */
+    pub fn uniforms<'a>(&'a self,sys:&'a mut SimpleCanvas)->StaticUniforms<'a>{
+        let un=ProgramUniformValues{radius:0.0,color:sys.color,mode:gl::TRIANGLES,rect:false,offset:vec2same(0.0)};
+        StaticUniforms{sys,un,buffer:self.buffer.get_info()}
     }
 }
 
@@ -300,6 +356,7 @@ impl LineSession<'_> {
         }
     }
 
+    /*
     pub fn send_and_draw(&mut self, col: [f32; 4]) {
         self.sys.circle_buffer.update();
         self.sys.circle_program.set_buffer_and_draw(
@@ -310,6 +367,11 @@ impl LineSession<'_> {
             gl::TRIANGLES,
             self.sys.circle_buffer.len(),
         );
+    }
+    */
+    pub fn uniforms(&mut self)->Uniforms{
+        let un=ProgramUniformValues{radius:0.0,color:self.sys.color,mode:gl::TRIANGLES,rect:false,offset:vec2same(0.0)};
+        Uniforms{sys:self.sys,un}
     }
 
     #[inline(always)]

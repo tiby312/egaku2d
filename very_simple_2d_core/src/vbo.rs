@@ -1,20 +1,24 @@
 use super::*;
 use core::marker::PhantomData;
 
+
+
 #[derive(Debug)]
 pub struct StaticBuffer<V> {
-    vbo: u32,
-    length: usize,
+    info:BufferInfo,
     _p: PhantomData<V>,
 }
 impl<V> Drop for StaticBuffer<V> {
     fn drop(&mut self) {
         unsafe {
-            gl::DeleteBuffers(1, &self.vbo);
+            gl::DeleteBuffers(1, &self.info.id);
         }
     }
 }
 impl<V: core::fmt::Debug + Copy + Clone> StaticBuffer<V> {
+    pub(crate) fn get_info(&self)->BufferInfo{
+        self.info
+    }
     pub fn new(data: &[V]) -> StaticBuffer<V> {
         let mut vbo = 0;
         unsafe {
@@ -31,20 +35,12 @@ impl<V: core::fmt::Debug + Copy + Clone> StaticBuffer<V> {
             );
         }
         StaticBuffer {
-            vbo,
+            info : BufferInfo{
+                id:vbo,
+                length:data.len()
+            },
             _p: PhantomData,
-            length: data.len(),
         }
-    }
-
-    #[inline(always)]
-    pub fn len(&self) -> usize {
-        self.length
-    }
-
-    #[inline(always)]
-    pub fn get_id(&self) -> u32 {
-        self.vbo
     }
 }
 
@@ -65,6 +61,9 @@ impl<V> Drop for GrowableBuffer<V> {
 }
 
 impl<V: Default> GrowableBuffer<V> {
+    pub(crate) fn get_info(&self)->BufferInfo{
+        BufferInfo{id:self.vbo,length:self.buffer.len()}
+    }
     #[inline(always)]
     pub fn get_verts(&self) -> &[V] {
         &self.buffer

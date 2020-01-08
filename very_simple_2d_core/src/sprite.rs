@@ -1,5 +1,8 @@
 use super::*;
 
+
+use crate::sprite_program::*;
+
 ///The texture index is the other piece of data every sprite has besides
 ///its position. It tells the gpu which part of a texture to draw.
 ///Each texture object has functions to create this index from a x and y coordinate. 
@@ -14,6 +17,8 @@ pub struct SpriteSave {
     buffer: vbo::StaticBuffer<sprite_program::Vertex>,
 }
 impl SpriteSave {
+
+    /*
     pub fn draw(
         &self,
         session: &mut SimpleCanvas,
@@ -28,6 +33,11 @@ impl SpriteSave {
             self.buffer.len(),
             texture,
         );
+    }
+    */
+    pub fn uniforms<'a>(&'a self,sys:&'a mut SimpleCanvas,texture:&'a Texture,radius:f32)->StaticSpriteUniforms<'a>{
+        let un=SpriteProgramUniformValues{radius,color:sys.color,texture,offset:vec2same(0.0)};
+        StaticSpriteUniforms{sys,un,buffer:self.buffer.get_info()}
     }
 }
 
@@ -65,6 +75,7 @@ impl SpriteSession<'_> {
     }
 
     ///Draw the sprites using the specified texture.
+    /*
     pub fn send_and_draw(&mut self, texture: &Texture, color: [f32; 4], point_size: f32) {
         self.sys.sprite_buffer.update();
 
@@ -75,6 +86,12 @@ impl SpriteSession<'_> {
             self.sys.sprite_buffer.len(),
             texture,
         );
+    }
+    */
+
+    pub fn uniforms<'a>(&'a mut self,texture: &'a Texture,radius:f32)->SpriteUniforms<'a>{
+        let un=SpriteProgramUniformValues{radius,color:self.sys.color,texture,offset:vec2same(0.0)};
+        SpriteUniforms{sys:self.sys,un}
     }
 }
 

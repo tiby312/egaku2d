@@ -4,6 +4,18 @@ use crate::shader::*;
 use axgeom;
 use std::ffi::CString;
 use std::str;
+use axgeom::Vec2;
+use crate::BufferInfo;
+
+pub struct ProgramUniformValues{
+    pub rect:bool,
+    pub mode:u32,
+    pub radius:f32,
+    pub color:[f32;4],
+    pub offset:Vec2<f32>
+}
+
+
 
 // Shader sources
 static VS_SRC: &'static str = "
@@ -90,15 +102,26 @@ impl CircleProgram {
         PointMul(window_dim.width as f32 / game_width)
     }
 
-    pub fn set_buffer_and_draw(
+    pub(crate) fn set_buffer_and_draw(
         &mut self,
+        un:&ProgramUniformValues,
+        buffer_info:BufferInfo,
+        /*
         point_size: f32,
         col: [f32; 4],
         square: usize,
         buffer_id: u32,
         mode: GLenum,
         length: usize,
+        */
     ) {
+        let mode=un.mode;
+        let point_size=un.radius;
+        let col=un.color;
+        let square=un.rect;
+        let buffer_id=buffer_info.id;
+        let length=buffer_info.length;
+
         //TODO NO IDEA WHY THIS IS NEEDED ON LINUX.
         //Without this function call, on linux not every shape gets drawn.
         //gl_PointCoord will always return zero if you you try

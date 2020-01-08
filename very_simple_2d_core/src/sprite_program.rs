@@ -4,6 +4,8 @@ use crate::shader::*;
 use axgeom;
 use std::ffi::CString;
 use std::str;
+use axgeom::Vec2;
+use crate::BufferInfo;
 
 // Shader sources
 static VS_SRC: &'static str = "
@@ -90,6 +92,15 @@ pub struct SpriteProgram {
 #[derive(Debug)]
 pub struct PointMul(pub f32);
 
+
+pub struct SpriteProgramUniformValues<'a>{
+    pub texture:&'a crate::sprite::Texture,
+    pub radius:f32,
+    pub color:[f32;4],
+    pub offset:Vec2<f32>
+}
+
+
 impl SpriteProgram {
     pub fn set_viewport(
         &mut self,
@@ -121,17 +132,25 @@ impl SpriteProgram {
         PointMul(window_dim.width as f32 / game_width)
     }
 
-    pub fn set_buffer_and_draw(
+    pub(crate) fn set_buffer_and_draw(
         &mut self,
+        un:&SpriteProgramUniformValues,
+        buffer_info:BufferInfo,
+        /*
         point_size: f32,
         col: [f32; 4],
         buffer_id: u32,
         length: usize,
         texture: &crate::sprite::Texture,
+        */
     ) {
+        let col=un.color;
+        let buffer_id=buffer_info.id;
+        let length=buffer_info.length;
+        let point_size=un.radius;
         let mode = gl::POINTS;
-
-        let texture_id = texture.id;
+        let texture=un.texture;
+        let texture_id = un.texture.id;
 
         //TODO NO IDEA WHY THIS IS NEEDED ON LINUX.
         //Without this function call, on linux not every shape gets drawn.
