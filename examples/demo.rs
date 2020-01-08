@@ -1,15 +1,15 @@
-extern crate very_simple_2d;
+extern crate egaku2d;
 
 use glutin::event::Event;
 use glutin::event::VirtualKeyCode;
 use glutin::event::WindowEvent;
 use glutin::event_loop::ControlFlow;
-use very_simple_2d::*;
+
 
 fn main() {
     let events_loop = glutin::event_loop::EventLoop::new();
-    let mut sys = WindowedSystem::newp(640, 480, &events_loop, "shapes example");
-    //let mut sys=FullScreenSystem::new(&events_loop);
+    let mut sys = egaku2d::WindowedSystem::newp(640, 480, &events_loop, "shapes example");
+    //let mut sys=egaku2d::FullScreenSystem::new(&events_loop);
 
     let rect_save = {
         let mut k = sys.canvas_mut().rects();
@@ -64,7 +64,7 @@ fn main() {
     };
 
     //Draw 60 frames per second.
-    let mut timer = very_simple_2d::RefreshTimer::new(16);
+    let mut timer = egaku2d::RefreshTimer::new(16);
 
     let mut counter = 0;
     let mut cursor = [0.0;2];
@@ -86,7 +86,7 @@ fn main() {
             WindowEvent::CloseRequested => {
                 *control_flow = ControlFlow::Exit;
             }
-            WindowEvent::Resized(_logical_size) => {}
+            WindowEvent::Resized(_dim) => {}
             _ => {}
         },
 
@@ -157,7 +157,7 @@ fn main() {
 
                             k.add(
                                 [x,y],
-                                sprite::TexIndex(cc % 64),
+                                egaku2d::sprite::TexIndex(cc % 64),
                             );
                         }
                     }

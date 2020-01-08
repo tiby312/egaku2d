@@ -133,12 +133,12 @@ use axgeom::*;
 pub use glutin;
 use glutin::PossiblyCurrent;
 
-use very_simple_2d_core;
-use very_simple_2d_core::gl;
+use egaku2d_core;
+use egaku2d_core::gl;
 
-pub use very_simple_2d_core::shapes;
-pub use very_simple_2d_core::sprite;
-pub use very_simple_2d_core::SimpleCanvas;
+pub use egaku2d_core::shapes;
+pub use egaku2d_core::sprite;
+pub use egaku2d_core::SimpleCanvas;
 
 ///A timer to determine how often to refresh the screen.
 ///You pass it the desired refresh rate, then you can poll
@@ -172,6 +172,7 @@ impl RefreshTimer {
 pub use self::fullscreen::FullScreenSystem;
 #[cfg(feature = "fullscreen")]
 pub mod fullscreen {
+    use super::*;
     pub struct FullScreenSystem {
         inner: SimpleCanvas,
         window_dim: FixedAspectVec2,
@@ -196,9 +197,9 @@ pub mod fullscreen {
 
             let windowed_context = unsafe { windowed_context.make_current().unwrap() };
 
-            let dpi = windowed_context.window().hidpi_factor();
+            //let dpi = windowed_context.window().scale_factor();
             let glutin::dpi::PhysicalSize { width, height } =
-                windowed_context.window().inner_size().to_physical(dpi);
+                windowed_context.window().inner_size();
 
             dbg!(width, height);
 
@@ -207,8 +208,8 @@ pub mod fullscreen {
             assert_eq!(unsafe { gl::GetError() }, gl::NO_ERROR);
 
             let window_dim = axgeom::FixedAspectVec2 {
-                ratio: AspectRatio(vec2(width, height)),
-                width,
+                ratio: AspectRatio(vec2(width as f64, height as f64)),
+                width:width as f64,
             };
 
             let windowed_context = Some(windowed_context);
@@ -232,22 +233,21 @@ pub mod fullscreen {
                 .as_ref()
                 .unwrap()
                 .window()
-                .hidpi_factor();
+                .scale_factor();
 
             let size = self
                 .windowed_context
                 .as_ref()
                 .unwrap()
                 .window()
-                .inner_size()
-                .to_physical(dpi);
+                .inner_size();
 
             println!("resizing context!!! {:?}", (dpi, size));
 
             self.windowed_context.as_mut().unwrap().resize(size);
             self.window_dim = axgeom::FixedAspectVec2 {
-                ratio: AspectRatio(vec2(size.width, size.height)),
-                width: size.width,
+                ratio: AspectRatio(vec2(size.width as f64, size.height as f64)),
+                width: size.width as f64,
             };
 
             let ctx = unsafe {

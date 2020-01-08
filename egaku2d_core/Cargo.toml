@@ -1,12 +1,12 @@
 [package]
-name = "very_simple_2d_core"
-version = "0.6.0"
+name = "egaku2d_core"
+version = "0.1.0"
 authors = ["Ken <kenakioreed@gmail.com>"]
 build = "build.rs"
 edition = "2018"
 description = "Simple 2D graphics library without context creation code"
 license = "MIT/Apache-2.0"
-repository = "https://github.com/tiby312/very_simple_2d"
+repository = "https://github.com/tiby312/egaku2d"
 
 
 
