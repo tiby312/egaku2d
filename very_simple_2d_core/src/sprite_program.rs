@@ -5,7 +5,7 @@ use axgeom;
 use std::ffi::CString;
 use std::str;
 use axgeom::Vec2;
-use crate::BufferInfo;
+use crate::vbo::BufferInfo;
 
 // Shader sources
 static VS_SRC: &'static str = "
@@ -210,8 +210,8 @@ impl SpriteProgram {
 
             gl::Uniform2i(
                 self.grid_dim_uniform,
-                texture.grid_dim.x as i32,
-                texture.grid_dim.y as i32,
+                texture.grid_dim[0] as i32,
+                texture.grid_dim[1] as i32,
             );
             gl_ok!();
 

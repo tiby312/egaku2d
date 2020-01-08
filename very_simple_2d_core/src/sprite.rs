@@ -1,7 +1,6 @@
 use super::*;
 
 
-use crate::sprite_program::*;
 
 ///The texture index is the other piece of data every sprite has besides
 ///its position. It tells the gpu which part of a texture to draw.
@@ -48,19 +47,9 @@ pub struct SpriteSession<'a> {
 impl SpriteSession<'_> {
     ///Add a point sprite.
     #[inline(always)]
-    pub fn add(&mut self, point: Vec2<f32>, index: TexIndex) -> &mut Self {
+    pub fn add(&mut self, point: PointType, index: TexIndex) -> &mut Self {
         self.sys.sprite_buffer.push(sprite_program::Vertex {
-            pos: [point.x, point.y],
-            index: index.0 as f32,
-        });
-        self
-    }
-
-    ///Primitive version of add.
-    #[inline(always)]
-    pub fn addp(&mut self, x: f32, y: f32, index: TexIndex) -> &mut Self {
-        self.sys.sprite_buffer.push(sprite_program::Vertex {
-            pos: [x, y],
+            pos: point,
             index: index.0 as f32,
         });
         self
@@ -73,21 +62,6 @@ impl SpriteSession<'_> {
             buffer: vbo::StaticBuffer::new(self.sys.sprite_buffer.get_verts()),
         }
     }
-
-    ///Draw the sprites using the specified texture.
-    /*
-    pub fn send_and_draw(&mut self, texture: &Texture, color: [f32; 4], point_size: f32) {
-        self.sys.sprite_buffer.update();
-
-        self.sys.sprite_program.set_buffer_and_draw(
-            point_size * GL_POINT_COMP * self.sys.point_mul.0,
-            color,
-            self.sys.sprite_buffer.get_id(),
-            self.sys.sprite_buffer.len(),
-            texture,
-        );
-    }
-    */
 
     pub fn uniforms<'a>(&'a mut self,texture: &'a Texture,radius:f32)->SpriteUniforms<'a>{
         let un=SpriteProgramUniformValues{radius,color:self.sys.color,texture,offset:vec2same(0.0)};
@@ -103,7 +77,7 @@ impl Drop for SpriteSession<'_> {
 
 pub struct Texture {
     _ns: NotSend,
-    pub(crate) grid_dim: Vec2<u32>,
+    pub(crate) grid_dim: [u32;2],
     pub(crate) id: GLuint,
 }
 
@@ -112,16 +86,11 @@ impl Texture {
     ///The top left time maps to 0,0. 
     ///The x component grows to the right.
     ///The y component grows downwards.
-    pub fn coord_to_index(&self, cell: Vec2<u32>) -> TexIndex {
-        TexIndex(self.grid_dim.x * cell.x + cell.y)
+    pub fn coord_to_index(&self, cell: [u32;2]) -> TexIndex {
+        TexIndex(self.grid_dim[0] * cell[0] + cell[1])
     }
 
-    ///Create a texture index from a coordinate in the tile set, using primitives
-    pub fn coord_to_indexp(&self, cellx: u32, celly: u32) -> TexIndex {
-        self.coord_to_index(vec2(cellx, celly))
-    }
-
-    pub fn new(file: &str, grid_dim: Vec2<u32>) -> image::ImageResult<Texture> {
+    pub fn new(file: &str, grid_dim: [u32;2]) -> image::ImageResult<Texture> {
         match image::open(&file.to_string()) {
             Err(err) => Err(err),
             Ok(img) => {

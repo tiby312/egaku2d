@@ -14,6 +14,9 @@ use crate::sprite_program::*;
 use crate::circle_program::*;
 
 
+
+type PointType=[f32;2];
+
 mod shader;
 
 ///Contains all the texture/sprite drawing code.
@@ -28,14 +31,6 @@ macro_rules! gl_ok {
         assert_eq!(gl::GetError(), gl::NO_ERROR);
     };
 }
-
-//TODO get rid of this and just a read-only reference to the buffer instead
-#[derive(Copy,Clone,Debug)]
-pub(crate) struct BufferInfo{
-    pub id:u32,
-    pub length:usize
-}
-
 struct NotSend(*mut usize);
 
 fn ns() -> NotSend {
@@ -61,7 +56,7 @@ pub mod shapes;
 
 
 
-
+use vbo::BufferInfo;
 
 pub struct StaticUniforms<'a>{
     sys:&'a mut SimpleCanvas,
@@ -164,6 +159,10 @@ pub struct SimpleCanvas {
 }
 
 impl SimpleCanvas {
+    pub fn set_default_color(&mut self,color:[f32;4]){
+        self.color=color;
+    }
+
     pub fn set_viewport(&mut self, window_dim: axgeom::FixedAspectVec2, game_width: f32) {
         self.point_mul = self.circle_program.set_viewport(window_dim, game_width);
 
@@ -242,19 +241,9 @@ impl SimpleCanvas {
     pub fn texture(
         &mut self,
         file: &str,
-        grid_dim: Vec2<u32>,
+        grid_dim: [u32;2],
     ) -> image::ImageResult<sprite::Texture> {
         sprite::Texture::new(file, grid_dim)
-    }
-
-    ///Primitive version of texture
-    pub fn texturep(
-        &mut self,
-        file: &str,
-        grid_dim_x:u32,
-        grid_dim_y:u32
-    ) -> image::ImageResult<sprite::Texture> {
-        sprite::Texture::new(file, vec2(grid_dim_x,grid_dim_y))
     }
 
     pub fn clear_color(&mut self, back_color: [f32; 3]) {

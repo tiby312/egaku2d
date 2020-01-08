@@ -5,7 +5,7 @@ use axgeom;
 use std::ffi::CString;
 use std::str;
 use axgeom::Vec2;
-use crate::BufferInfo;
+use crate::vbo::BufferInfo;
 
 pub struct ProgramUniformValues{
     pub rect:bool,

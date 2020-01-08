@@ -3,6 +3,13 @@ use core::marker::PhantomData;
 
 
 
+#[derive(Copy,Clone,Debug)]
+pub(crate) struct BufferInfo{
+    pub id:u32,
+    pub length:usize
+}
+
+
 #[derive(Debug)]
 pub struct StaticBuffer<V> {
     info:BufferInfo,
@@ -125,11 +132,6 @@ impl<V: Default> GrowableBuffer<V> {
             );
             gl_ok!();
         }
-    }
-
-    #[inline(always)]
-    pub fn get_id(&self) -> u32 {
-        self.vbo
     }
 
     #[inline(always)]

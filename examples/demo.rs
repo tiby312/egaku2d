@@ -50,7 +50,7 @@ fn main() {
             .save()
     };
 
-    let mut food_tex = sys.canvas_mut().texture("food.png", vec2(8, 8)).unwrap();
+    let food_tex = sys.canvas_mut().texture("food.png", vec2(8, 8)).unwrap();
 
     let sprite_save = {
         let mut k = sys.canvas_mut().sprites();
@@ -96,7 +96,7 @@ fn main() {
 
         Event::EventsCleared => {
             if timer.is_ready() {
-                let mut canvas = sys.canvas_mut();
+                let canvas = sys.canvas_mut();
 
                 canvas.clear_color([0.2; 3]);
 
