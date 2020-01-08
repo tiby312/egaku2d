@@ -108,8 +108,8 @@ impl RectSession<'_> {
     }
 
     #[inline(always)]
-    pub fn add(&mut self, top_left: [f32;2], bottom_right:[f32;2]) -> &mut Self {
-        let rect=rect(top_left[0],bottom_right[0],top_left[1],bottom_right[1]);
+    pub fn add(&mut self, rect:[f32;4]) -> &mut Self {
+        let rect=axgeom::Rect::from_arr(rect);
         let [tl, tr, br, bl] = rect.get_corners();
         //let arr = [a, b, c, c, d, a];
         let arr = [tr, tl, bl, bl, br, tr];
