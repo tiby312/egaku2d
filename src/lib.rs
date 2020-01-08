@@ -302,7 +302,7 @@ pub mod fullscreen {
         ) -> image::ImageResult<sprite::Texture> {
             crate::texture(file,grid_dim)
         }
-        
+
         pub fn canvas(&self) -> &SimpleCanvas {
             &self.inner
         }
@@ -335,19 +335,12 @@ pub struct WindowedSystem {
 }
 
 impl WindowedSystem {
-    pub fn newp(
-        dimx: usize,
-        dimy: usize,
-        events_loop: &glutin::event_loop::EventLoop<()>,
-        title: &str,
-    ) -> WindowedSystem {
-        Self::new(vec2(dimx, dimy), events_loop, title)
-    }
     pub fn new(
-        dim: Vec2<usize>,
+        dim: [usize;2],
         events_loop: &glutin::event_loop::EventLoop<()>,
         title: &str,
     ) -> WindowedSystem {
+        let dim=vec2(dim[0],dim[1]);
         let dim = dim.inner_as::<f32>();
 
         let game_world = Rect::new(0.0, dim.x, 0.0, dim.y);

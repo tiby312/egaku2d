@@ -8,7 +8,7 @@ use glutin::event_loop::ControlFlow;
 
 fn main() {
     let events_loop = glutin::event_loop::EventLoop::new();
-    let mut sys = egaku2d::WindowedSystem::newp(640, 480, &events_loop, "shapes example");
+    let mut sys = egaku2d::WindowedSystem::new([640, 480], &events_loop, "shapes example");
     //let mut sys=egaku2d::FullScreenSystem::new(&events_loop);
 
     let rect_save = {
