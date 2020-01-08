@@ -336,8 +336,8 @@ impl WindowedSystem {
         let height = game_world.y.distance() as f64;
 
         let monitor = prompt_for_monitor(events_loop);
-        let dpi = monitor.hidpi_factor();
-        let p = glutin::dpi::PhysicalSize { width, height }.to_logical(dpi);
+        let dpi = monitor.scale_factor();
+        let p : glutin::dpi::LogicalSize<f64>= glutin::dpi::PhysicalSize { width, height }.to_logical(dpi);
 
         let gl_window = glutin::window::WindowBuilder::new()
             .with_inner_size(p)
@@ -358,15 +358,15 @@ impl WindowedSystem {
         gl::load_with(|symbol| windowed_context.get_proc_address(symbol) as *const _);
         assert_eq!(unsafe { gl::GetError() }, gl::NO_ERROR);
 
-        let dpi = windowed_context.window().hidpi_factor();
+        //let dpi = windowed_context.window().scale_factor();
         let glutin::dpi::PhysicalSize { width, height } =
-            windowed_context.window().inner_size().to_physical(dpi);
+            windowed_context.window().inner_size();
         assert_eq!(width as usize, dim.x as usize);
         assert_eq!(height as usize, dim.y as usize);
 
         let window_dim = axgeom::FixedAspectVec2 {
-            ratio: AspectRatio(vec2(width, height)),
-            width,
+            ratio: AspectRatio(vec2(width as f64, height as f64)),
+            width:width as f64,
         };
 
         WindowedSystem {
@@ -376,16 +376,13 @@ impl WindowedSystem {
         }
     }
 
-    pub fn get_hidpi_factor(&self) -> f64 {
-        self.windowed_context.window().hidpi_factor()
-    }
 
     pub fn set_viewport_from_width(&mut self, width: f32) {
         self.inner.set_viewport(self.window_dim, width);
     }
 
     pub fn set_viewport_min(&mut self, d: f32) {
-        if self.get_dim().x < self.get_dim().y {
+        if self.get_dim()[0] < self.get_dim()[1] {
             self.set_viewport_from_width(d);
         } else {
             self.set_viewport_from_height(d);
@@ -397,12 +394,9 @@ impl WindowedSystem {
         self.inner.set_viewport(self.window_dim, width);
     }
 
-    pub fn get_dimp(&self) -> [usize; 2] {
-        let k = self.window_dim.as_vec().inner_as();
-        [k.x, k.y]
-    }
-    pub fn get_dim(&self) -> Vec2<usize> {
-        self.window_dim.as_vec().inner_as()
+    pub fn get_dim(&self) -> [usize;2] {
+        let v=self.window_dim.as_vec().inner_as();
+        [v.x,v.y]
     }
 
     pub fn canvas(&self) -> &SimpleCanvas {

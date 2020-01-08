@@ -17,7 +17,7 @@ members = [ "very_simple_2d_core"]
 [dependencies]
 axgeom = "1.5"
 very_simple_2d_core = {version="0.6.0", path="./very_simple_2d_core"}
-glutin = "0.22.0-alpha5"
+glutin = "0.22"
 
 [features]
 fullscreen = []

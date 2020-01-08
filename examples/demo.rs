@@ -1,7 +1,5 @@
-extern crate axgeom;
 extern crate very_simple_2d;
 
-use axgeom::*;
 use glutin::event::Event;
 use glutin::event::VirtualKeyCode;
 use glutin::event::WindowEvent;
@@ -80,11 +78,9 @@ fn main() {
             },
             WindowEvent::CursorMoved {
                 device_id: _,
-                position: logical_position,
+                position: p,
                 ..
             } => {
-                let dpi = sys.get_hidpi_factor();
-                let p = logical_position.to_physical(dpi);
                 cursor = [p.x as f32, p.y as f32];
             }
             WindowEvent::CloseRequested => {
@@ -94,7 +90,7 @@ fn main() {
             _ => {}
         },
 
-        Event::EventsCleared => {
+        Event::MainEventsCleared => {
             if timer.is_ready() {
                 let canvas = sys.canvas_mut();
 
