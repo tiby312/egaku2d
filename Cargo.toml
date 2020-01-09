@@ -24,7 +24,4 @@ image = "0.22.3"
 fullscreen = []
 
 
-[patch.crates-io]
-axgeom = {path="../axgeom"}
-
 
