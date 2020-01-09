@@ -96,6 +96,7 @@ fn main() {
             if timer.is_ready() {
                 let canvas = sys.canvas_mut();
 
+                
                 let cc=counter as f32*0.1;
                 let wobble=[cc.cos()*10.0,cc.sin()*10.0];
 
