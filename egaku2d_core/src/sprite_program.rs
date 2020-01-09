@@ -14,7 +14,7 @@ in vec2 position;
 in float cellindex;
 
 out vec2 texture_offset;
-
+uniform vec2 offset;
 uniform ivec2 grid_dim;
 uniform float cell_size;
 
@@ -23,7 +23,7 @@ uniform float point_size;
 
 void main() {
     gl_PointSize = point_size;
-    vec3 pp = vec3(position.xy,1.0);
+    vec3 pp = vec3(position.xy+offset,1.0);
     gl_Position = vec4(mmatrix*pp.xyz, 1.0);
 
     //float c=cos(position.z);
@@ -80,6 +80,7 @@ pub struct SpriteProgram {
     pub program: GLuint,
     pub matrix_uniform: GLint,
     pub square_uniform: GLint,
+    pub offset_uniform: GLint,
     pub point_size_uniform: GLint,
     pub grid_dim_uniform: GLint,
     pub cell_size_uniform: GLint,
@@ -144,6 +145,8 @@ impl SpriteProgram {
         let mode = gl::POINTS;
         let texture=un.texture;
         let texture_id = un.texture.id;
+        let offset=un.offset;
+
         //TODO NO IDEA WHY THIS IS NEEDED ON LINUX.
         //Without this function call, on linux not every shape gets drawn.
         //gl_PointCoord will always return zero if you you try
@@ -184,6 +187,9 @@ impl SpriteProgram {
             gl_ok!();
 
             gl::Uniform1f(self.point_size_uniform, point_size);
+            gl_ok!();
+            
+            gl::Uniform2f(self.offset_uniform, offset.x,offset.y);
             gl_ok!();
 
             gl::Uniform4fv(self.bcol_uniform, 1, col.as_ptr() as *const _);
@@ -301,6 +307,10 @@ impl SpriteProgram {
                 gl::GetUniformLocation(program, CString::new("bcol").unwrap().as_ptr());
             gl_ok!();
 
+            let offset_uniform: GLint =
+                gl::GetUniformLocation(program, CString::new("offset").unwrap().as_ptr());
+            gl_ok!();
+
             let pos_attr =
                 gl::GetAttribLocation(program, CString::new("position").unwrap().as_ptr());
             gl_ok!();
@@ -317,6 +327,7 @@ impl SpriteProgram {
                 sample_location,
                 program,
                 square_uniform,
+                offset_uniform,
                 point_size_uniform,
                 grid_dim_uniform,
                 cell_size_uniform,

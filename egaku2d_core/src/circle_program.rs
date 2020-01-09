@@ -23,11 +23,12 @@ pub struct ProgramUniformValues{
 static VS_SRC: &'static str = "
 #version 300 es
 in vec2 position;
+uniform vec2 offset;
 uniform mat3 mmatrix;
 uniform float point_size;
 void main() {
     gl_PointSize = point_size;
-    vec3 pp=vec3(position,1.0);
+    vec3 pp=vec3(position+offset,1.0);
     gl_Position = vec4(mmatrix*pp.xyz, 1.0);
 }";
 
@@ -65,6 +66,7 @@ pub struct CircleProgram {
     pub program: GLuint,
     pub matrix_uniform: GLint,
     pub square_uniform: GLint,
+    pub offset_uniform: GLint,
     pub point_size_uniform: GLint,
     pub bcol_uniform: GLint,
     pub pos_attr: GLint,
@@ -108,20 +110,13 @@ impl CircleProgram {
         &mut self,
         un:&ProgramUniformValues,
         buffer_info:BufferInfo,
-        /*
-        point_size: f32,
-        col: [f32; 4],
-        square: usize,
-        buffer_id: u32,
-        mode: GLenum,
-        length: usize,
-        */
     ) {
         let mode=un.mode;
         let point_size=un.radius;
         let col=un.color;
         let square=un.rect;
         let buffer_id=buffer_info.id;
+        let offset=un.offset;
         let length=buffer_info.length;
 
         //TODO NO IDEA WHY THIS IS NEEDED ON LINUX.
@@ -153,6 +148,10 @@ impl CircleProgram {
         unsafe {
             gl::UseProgram(self.program);
             gl_ok!();
+
+            gl::Uniform2f(self.offset_uniform, offset.x,offset.y);
+            gl_ok!();
+
 
             gl::Uniform1f(self.point_size_uniform, point_size);
             gl_ok!();
@@ -228,12 +227,17 @@ impl CircleProgram {
                 gl::GetUniformLocation(program, CString::new("bcol").unwrap().as_ptr());
             gl_ok!();
 
+            let offset_uniform: GLint =
+                gl::GetUniformLocation(program, CString::new("offset").unwrap().as_ptr());
+            gl_ok!();
+
             let pos_attr =
                 gl::GetAttribLocation(program, CString::new("position").unwrap().as_ptr());
             gl_ok!();
 
             CircleProgram {
                 program,
+                offset_uniform,
                 square_uniform,
                 point_size_uniform,
                 matrix_uniform,

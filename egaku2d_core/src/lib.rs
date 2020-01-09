@@ -73,6 +73,11 @@ pub mod uniforms{
             self
         }
 
+        pub fn with_offset(&mut self,offset:[f32;2])->&mut Self{
+            self.un.offset=vec2(offset[0],offset[1]);
+            self
+        }
+
         pub fn draw(&mut self){
             self.sys.circle_program.set_buffer_and_draw(
                 &self.un,
@@ -90,6 +95,12 @@ pub mod uniforms{
     }
 
     impl StaticSpriteUniforms<'_>{
+
+        pub fn with_offset(&mut self,offset:[f32;2])->&mut Self{
+            self.un.offset=vec2(offset[0],offset[1]);
+            self
+        }
+
         pub fn with_color(&mut self,color:[f32;4])->&mut Self{
             self.un.color=color;
             self
@@ -108,6 +119,11 @@ pub mod uniforms{
         pub(crate) un:SpriteProgramUniformValues<'a>,
     }
     impl SpriteUniforms<'_>{
+        
+        pub fn with_offset(&mut self,offset:[f32;2])->&mut Self{
+            self.un.offset=vec2(offset[0],offset[1]);
+            self
+        }
         pub fn with_color(&mut self,color:[f32;4])->&mut Self{
             self.un.color=color;
             self
@@ -129,6 +145,11 @@ pub mod uniforms{
     }
 
     impl Uniforms<'_>{
+
+        pub fn with_offset(&mut self,offset:[f32;2])->&mut Self{
+            self.un.offset=vec2(offset[0],offset[1]);
+            self
+        }
         pub fn with_color(&mut self,color:[f32;4])->&mut Self{
             self.un.color=color;
             self

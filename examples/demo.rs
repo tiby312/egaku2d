@@ -96,6 +96,9 @@ fn main() {
             if timer.is_ready() {
                 let canvas = sys.canvas_mut();
 
+                let cc=counter as f32*0.1;
+                let wobble=[cc.cos()*10.0,cc.sin()*10.0];
+
                 canvas.clear_color([0.2; 3]);
 
                 const COL1: [f32; 4] = [0.0, 1.0, 0.1, 0.1];
@@ -107,13 +110,13 @@ fn main() {
                 //draw static VBOs already on the gpu.
                 /*
                 */
-                sprite_save.uniforms(canvas, &food_tex,32.0).with_color(COL4).draw();
+                sprite_save.uniforms(canvas, &food_tex,32.0).with_color(COL4).with_offset(wobble).draw();
                 
                 arrow_save.uniforms(canvas).draw();
                 
                 line_save.uniforms(canvas).with_color(COL2).draw();
                 
-                square_save.uniforms(canvas,10.0).with_color(COL3).draw();
+                square_save.uniforms(canvas,10.0).with_color(COL3).with_offset(wobble).draw();
                 
                 rect_save.uniforms(canvas).with_color(COL4).draw();
                 
@@ -131,7 +134,7 @@ fn main() {
                         k.add([x,y]);
                     }
                 }
-                k.uniforms(8.0).with_color(COL1).send_and_draw();
+                k.uniforms(8.0).with_color(COL1).with_offset(wobble).send_and_draw();
                 
 
             
@@ -154,7 +157,7 @@ fn main() {
                     }
                 }
 
-                k.uniforms(&food_tex,20.0).with_color(WHITE).send_and_draw();
+                k.uniforms(&food_tex,20.0).with_color(WHITE).with_offset(wobble).send_and_draw();
                 
 
                 
