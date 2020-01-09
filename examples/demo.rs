@@ -10,6 +10,8 @@ fn main() {
     let events_loop = glutin::event_loop::EventLoop::new();
     let mut sys = egaku2d::WindowedSystem::new([640, 480], &events_loop, "shapes example");
     //let mut sys=egaku2d::FullScreenSystem::new(&events_loop);
+    let food_tex = sys.texture("food.png", [8, 8]).unwrap();
+
 
     let rect_save = {
         let mut k = sys.canvas_mut().rects();
@@ -48,8 +50,7 @@ fn main() {
             .save()
     };
 
-    let food_tex = sys.texture("food.png", [8, 8]).unwrap();
-
+    
     let sprite_save = {
         let mut k = sys.canvas_mut().sprites();
         for (i, x) in (032..200).step_by(32).enumerate().map(|(a,b)|(a as u32,b as f32)) {
@@ -62,6 +63,7 @@ fn main() {
         }
         k.save()
     };
+    
 
     //Draw 60 frames per second.
     let mut timer = egaku2d::RefreshTimer::new(16);
@@ -103,11 +105,19 @@ fn main() {
                 const WHITE: [f32; 4] = [1.0, 1.0, 1.0, 0.8];
 
                 //draw static VBOs already on the gpu.
+                /*
+                */
                 sprite_save.uniforms(canvas, &food_tex,32.0).with_color(COL4).draw();
+                
                 arrow_save.uniforms(canvas).draw();
+                
                 line_save.uniforms(canvas).with_color(COL2).draw();
+                
                 square_save.uniforms(canvas,10.0).with_color(COL3).draw();
+                
                 rect_save.uniforms(canvas).with_color(COL4).draw();
+                
+
                 
                 //draw some moving circles
                 let mut k = canvas.circles();
@@ -122,7 +132,7 @@ fn main() {
                     }
                 }
                 k.uniforms(8.0).with_color(COL1).send_and_draw();
-            
+                
 
             
                 //draw some moving sprites
@@ -145,7 +155,7 @@ fn main() {
                 }
 
                 k.uniforms(&food_tex,20.0).with_color(WHITE).send_and_draw();
-            
+                
 
                 
                 //draw a growing circle
@@ -176,7 +186,7 @@ fn main() {
                     .uniforms()
                     .with_color(COL4)
                     .send_and_draw();
-            
+                
 
                 //display what we drew
                 sys.swap_buffers();

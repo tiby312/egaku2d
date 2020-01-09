@@ -1,6 +1,6 @@
 [package]
 name = "egaku2d_core"
-version = "0.1.0"
+version = "0.1.1"
 authors = ["Ken <kenakioreed@gmail.com>"]
 build = "build.rs"
 edition = "2018"

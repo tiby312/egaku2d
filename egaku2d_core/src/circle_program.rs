@@ -7,6 +7,8 @@ use std::str;
 use axgeom::Vec2;
 use crate::vbo::BufferInfo;
 
+
+#[derive(Copy,Clone,Debug)]
 pub struct ProgramUniformValues{
     pub rect:bool,
     pub mode:u32,

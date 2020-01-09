@@ -4,7 +4,7 @@
 //! vertex buffer objects with a safe api (provided no other libray
 //! is calling opengl functions). Uses the builder pattern for a convinient api.
 //! The main design goal is to be able to draw thousands of shapes efficiently.
-//! Uses glutin and opengl es 2.0.
+//! Uses glutin and opengl es 3.0.
 //!
 //! ![](https://raw.githubusercontent.com/tiby312/egaku2d/master/assets/screenshot.gif)
 //!
@@ -199,7 +199,7 @@ pub mod fullscreen {
             //we are targeting only opengl 3.0 es. and glsl 300 es.
 
             let windowed_context = glutin::ContextBuilder::new()
-                .with_gl(glutin::GlRequest::Specific(glutin::Api::OpenGlEs, (2, 0)))
+                .with_gl(glutin::GlRequest::Specific(glutin::Api::OpenGlEs, (3, 0)))
                 .with_vsync(true)
                 .build_windowed(gl_window, &events_loop)
                 .unwrap();
@@ -365,7 +365,7 @@ impl WindowedSystem {
         //we are targeting only opengl 3.0 es. and glsl 300 es.
 
         let windowed_context = glutin::ContextBuilder::new()
-            .with_gl(glutin::GlRequest::Specific(glutin::Api::OpenGlEs, (2, 0)))
+            .with_gl(glutin::GlRequest::Specific(glutin::Api::OpenGlEs, (3, 0)))
             .with_vsync(true)
             .build_windowed(gl_window, &events_loop)
             .unwrap();

@@ -92,7 +92,7 @@ pub struct SpriteProgram {
 #[derive(Debug)]
 pub struct PointMul(pub f32);
 
-
+#[derive(Copy,Clone,Debug)]
 pub struct SpriteProgramUniformValues<'a>{
     pub texture:&'a crate::sprite::Texture,
     pub radius:f32,
@@ -144,29 +144,30 @@ impl SpriteProgram {
         let mode = gl::POINTS;
         let texture=un.texture;
         let texture_id = un.texture.id;
-
         //TODO NO IDEA WHY THIS IS NEEDED ON LINUX.
         //Without this function call, on linux not every shape gets drawn.
         //gl_PointCoord will always return zero if you you try
         //and draw some circles after drawing a rect save.
         //It is something to do with changing between gl::TRIANGLES to gl::POINTS.
         //but this shouldnt be a problem since they are seperate vbos.
+        
         unsafe {
             gl::UseProgram(self.program);
             gl_ok!();
-
+        
             gl::Uniform1f(self.point_size_uniform, 0.);
             gl_ok!();
-
+        
             gl::EnableVertexAttribArray(self.pos_attr as GLuint);
             gl_ok!();
 
+        
             gl::EnableVertexAttribArray(self.index_attr as GLuint);
             gl_ok!();
-
+        
             gl::BindBuffer(gl::ARRAY_BUFFER, buffer_id);
             gl_ok!();
-
+        
             let mut data = 0i32;
             gl::GetIntegerv(gl::ARRAY_BUFFER_BINDING, &mut data);
             assert_eq!(data as u32, buffer_id);
@@ -177,14 +178,17 @@ impl SpriteProgram {
             gl::BindBuffer(gl::ARRAY_BUFFER, 0);
             gl_ok!();
         }
-
+        
         unsafe {
+            gl::UseProgram(self.program);
+            gl_ok!();
+
             gl::Uniform1f(self.point_size_uniform, point_size);
             gl_ok!();
 
             gl::Uniform4fv(self.bcol_uniform, 1, col.as_ptr() as *const _);
             gl_ok!();
-
+        
             /*
             gl::Uniform1i(self.square_uniform, square as i32);
             gl_ok!();

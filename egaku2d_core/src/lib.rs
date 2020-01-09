@@ -31,6 +31,9 @@ macro_rules! gl_ok {
         assert_eq!(gl::GetError(), gl::NO_ERROR);
     };
 }
+
+
+#[derive(Debug)]
 struct NotSend(*mut usize);
 
 fn ns() -> NotSend {

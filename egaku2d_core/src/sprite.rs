@@ -53,6 +53,8 @@ impl SpriteSession<'_> {
 }
 
 
+
+#[derive(Debug)]
 pub struct Texture {
     _ns: NotSend,
     pub(crate) grid_dim: [u32;2],
