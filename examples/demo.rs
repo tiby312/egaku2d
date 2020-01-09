@@ -109,16 +109,10 @@ fn main() {
                 const WHITE: [f32; 4] = [1.0, 1.0, 1.0, 0.8];
 
                 //draw static VBOs already on the gpu.
-                /*
-                */
-                sprite_save.uniforms(canvas, &food_tex,32.0).with_color(COL4).with_offset(wobble).draw();
-                
+                sprite_save.uniforms(canvas, &food_tex,32.0).with_color(COL4).with_offset([-wobble[0],-wobble[1]]).draw();
                 arrow_save.uniforms(canvas).draw();
-                
                 line_save.uniforms(canvas).with_color(COL2).draw();
-                
                 square_save.uniforms(canvas,10.0).with_color(COL3).with_offset(wobble).draw();
-                
                 rect_save.uniforms(canvas).with_color(COL4).draw();
                 
 
@@ -163,7 +157,7 @@ fn main() {
 
                 
                 //draw a growing circle
-                let c = ((counter as f32 * 0.06).sin() * 40.0).abs();
+                let c = ((counter as f32 * 0.06).sin() * 100.0).abs();
                 canvas.circles().add(cursor).uniforms(c).with_color(COL2).send_and_draw();
             
 
