@@ -53,8 +53,8 @@ fn main() {
     
     let sprite_save = {
         let mut k = sys.canvas_mut().sprites();
-        for (i, x) in (032..200).step_by(32).enumerate().map(|(a,b)|(a as u32,b as f32)) {
-            for (j, y) in (032..200).step_by(32).enumerate().map(|(a,b)|(a as u32,b as f32)) {
+        for (i, x) in (032..200).step_by(32).enumerate().map(|(a,b)|(a as u8,b as f32)) {
+            for (j, y) in (032..200).step_by(32).enumerate().map(|(a,b)|(a as u8,b as f32)) {
                 k.add(
                     [x, y],
                     food_tex.coord_to_index([i, j]),
@@ -147,7 +147,7 @@ fn main() {
 
                         k.add(
                             [x,y],
-                            egaku2d::sprite::TexIndex(cc % 64),
+                            (cc % 64) as u16,
                         );
                     }
                 }

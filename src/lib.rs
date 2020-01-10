@@ -47,6 +47,22 @@
 //!   
 //! # Using Sprites
 //!
+//! Each sprite vertex has the following format:
+//! 
+//! position:[f32;2],
+//! index:u16,
+//! rotation:u16
+//!
+//!The texture index is the other piece of data every sprite has besides
+//!its position. It tells the gpu which part of a texture to draw.
+//!Each texture object has functions to create this index from a x and y coordinate. 
+//!On the gpu, the index will be split into a x and y coordinate.
+//!If the index is larger than texture.dim.x*texture.dim.y then it will be modded so that
+//!it can be mapped to a tile set. But obviously, the user should be picking an index
+//!that maps to a valid tile in the tile set to begin with.
+//! The rotation is normalized to a float on the gpu. The fact that the tile index has size u16,
+//! means you can have a texture with a mamimum of 256x256 tiles. 
+//! 
 //! You can also draw sprites! You can upload a tileset texture to the gpu and then draw thousands of sprites
 //! using a similar api to the shape drawing api. 
 //! The sprites are point sprites drawn using the opengl POINTS primitive in order to cut down on the data
@@ -425,7 +441,7 @@ impl WindowedSystem {
     pub fn texture(
         &mut self,
         file: &str,
-        grid_dim: [u32;2],
+        grid_dim: [u8;2],
     ) -> image::ImageResult<sprite::Texture> {
         crate::texture(file,grid_dim)
     }
@@ -470,7 +486,7 @@ use egaku2d_core::gl::types::GLuint;
 ///the texture is a tile set.
 fn texture(
     file: &str,
-    grid_dim: [u32;2],
+    grid_dim: [u8;2],
 ) -> image::ImageResult<sprite::Texture> {
 
     match image::open(&file.to_string()) {

@@ -1,10 +1,10 @@
 use crate::gl;
-use crate::gl::types::*;
+
 use crate::shader::*;
 use axgeom;
 use std::ffi::CString;
 use std::str;
-use axgeom::Vec2;
+
 use crate::vbo::BufferInfo;
 use super::*;
 
@@ -12,7 +12,7 @@ use super::*;
 static VS_SRC: &'static str = "
 #version 300 es
 in vec2 position;
-in int cellindex;
+in uint cellindex;
 
 out vec2 texture_offset;
 uniform vec2 offset;
@@ -71,8 +71,9 @@ void main()
 #[repr(packed(4))]
 #[derive(Copy, Clone, Debug, Default)]
 pub struct Vertex {
-    pub pos: [f32; 2],
-    pub index: i32,
+    pub pos: [f32; 2], //TODO use half floats??
+    pub index: u16,
+    pub rotation: u16
 }
 //pub struct Vertex(pub ([f32; 3],u32));
 
@@ -237,7 +238,7 @@ impl SpriteProgram {
             gl::VertexAttribIPointer(
                 self.index_attr as GLuint,
                 1,
-                gl::INT,
+                gl::UNSIGNED_SHORT,
                 (3 * 4) as i32,
                 (4 * 2) as *const _,
             );

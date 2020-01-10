@@ -2,15 +2,6 @@ use super::*;
 
 
 
-///The texture index is the other piece of data every sprite has besides
-///its position. It tells the gpu which part of a texture to draw.
-///Each texture object has functions to create this index from a x and y coordinate. 
-///On the gpu, the index will be split into a x and y coordinate.
-///If the index is larger than texture.dim.x*texture.dim.y then it will be modded so that
-///it can be mapped to a tile set. But obviously, the user should be picking an index
-///that maps to a valid tile in the tile set to begin with.
-pub struct TexIndex(pub u32);
-
 pub struct SpriteSave {
     _ns: NotSend,
     buffer: vbo::StaticBuffer<sprite_program::Vertex>,
@@ -31,10 +22,11 @@ pub struct SpriteSession<'a> {
 impl SpriteSession<'_> {
     ///Add a point sprite.
     #[inline(always)]
-    pub fn add(&mut self, point: PointType, index: TexIndex) -> &mut Self {
+    pub fn add(&mut self, point: PointType, index: u16) -> &mut Self {
         self.sys.sprite_buffer.push(sprite_program::Vertex {
             pos: point,
-            index: index.0 as i32,
+            index: index as u16,
+            rotation:0
         });
         self
     }
@@ -59,7 +51,7 @@ impl SpriteSession<'_> {
 #[derive(Debug)]
 pub struct Texture {
     _ns: NotSend,
-    pub(crate) grid_dim: [u32;2],
+    pub(crate) grid_dim: [u8;2],
     pub(crate) id: GLuint,
 }
 
@@ -68,11 +60,12 @@ impl Texture {
     ///The top left time maps to 0,0. 
     ///The x component grows to the right.
     ///The y component grows downwards.
-    pub fn coord_to_index(&self, cell: [u32;2]) -> TexIndex {
-        TexIndex(self.grid_dim[0] * cell[0] + cell[1])
+    pub fn coord_to_index(&self, cell: [u8;2]) -> u16 {
+        let cell=[cell[0] as u16,cell[1] as u16];
+        self.grid_dim[0] as u16 * cell[0] + cell[1]
     }
 
-    pub unsafe fn new(textureid:GLuint,grid_dim:[u32;2])->Texture{
+    pub unsafe fn new(textureid:GLuint,grid_dim:[u8;2])->Texture{
         Texture{id:textureid,grid_dim,_ns:ns()}
     }
 
