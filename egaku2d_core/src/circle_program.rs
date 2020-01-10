@@ -126,6 +126,7 @@ impl CircleProgram {
         //and draw some circles after drawing a rect save.
         //It is something to do with changing between gl::TRIANGLES to gl::POINTS.
         //but this shouldnt be a problem since they are seperate vbos.
+        
         unsafe {
             gl::UseProgram(self.program);
             gl_ok!();

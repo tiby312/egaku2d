@@ -62,34 +62,6 @@ use self::uniforms::*;
 pub mod uniforms{
     use super::*;
     use vbo::BufferInfo;
-/*
-    pub struct StaticUniforms<'a>{
-        pub(crate) sys:&'a mut SimpleCanvas,
-        pub(crate) un:UniformVals<'a>,
-        pub(crate) common:UniformCommon,
-        pub(crate) buffer:BufferInfo
-    }
-
-    impl StaticUniforms<'_>{
-        pub fn with_color(&mut self,color:[f32;4])->&mut Self{
-            self.common.color=color;
-            self
-        }
-
-        pub fn with_offset(&mut self,offset:[f32;2])->&mut Self{
-            self.common.offset=vec2(offset[0],offset[1]);
-            self
-        }
-
-        pub fn draw(&mut self){
-            self.sys.circle_program.set_buffer_and_draw(
-                &self.un,
-                self.buffer
-            );
-        }
-        //TOO add offset
-    }
-*/
 
     pub struct StaticUniforms<'a>{
         pub(crate) sys:&'a mut SimpleCanvas,
@@ -189,7 +161,7 @@ pub mod uniforms{
                 UniformVals::Circle(a)=>{
                     self.sys.circle_buffer.update();
 
-                    self.sys.regular_program.set_buffer_and_draw(
+                    self.sys.circle_program.set_buffer_and_draw(
                         &self.common,
                         a,
                         self.sys.circle_buffer.get_info()
@@ -232,7 +204,7 @@ impl SimpleCanvas {
 
     pub fn set_viewport(&mut self, window_dim: axgeom::FixedAspectVec2, game_width: f32) {
         self.point_mul = self.circle_program.set_viewport(window_dim, game_width);
-
+        let _ = self.regular_program.set_viewport(window_dim, game_width);
         let _ = self.sprite_program.set_viewport(window_dim, game_width);
     }
 
@@ -242,7 +214,7 @@ impl SimpleCanvas {
         let circle_buffer = vbo::GrowableBuffer::new();
         let sprite_buffer = vbo::GrowableBuffer::new();
 
-        let mut circle_program = CircleProgram::new(circle_program::REGULAR_FS_SRC);
+        let mut circle_program = CircleProgram::new(circle_program::CIRCLE_FS_SRC);
 
         let mut regular_program = CircleProgram::new(circle_program::REGULAR_FS_SRC);
 
@@ -250,6 +222,7 @@ impl SimpleCanvas {
         let mut sprite_program = SpriteProgram::new();
 
         let point_mul = circle_program.set_viewport(window_dim, window_dim.width as f32);
+        let _ = regular_program.set_viewport(window_dim,window_dim.width as f32);
         let _ = sprite_program.set_viewport(window_dim, window_dim.width as f32);
 
         gl::Enable(gl::BLEND);
