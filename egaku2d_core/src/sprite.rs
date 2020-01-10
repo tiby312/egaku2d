@@ -34,7 +34,7 @@ impl SpriteSession<'_> {
     pub fn add(&mut self, point: PointType, index: TexIndex) -> &mut Self {
         self.sys.sprite_buffer.push(sprite_program::Vertex {
             pos: point,
-            index: index.0 as f32,
+            index: index.0 as i32,
         });
         self
     }

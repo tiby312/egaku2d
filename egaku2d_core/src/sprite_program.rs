@@ -12,7 +12,7 @@ use super::*;
 static VS_SRC: &'static str = "
 #version 300 es
 in vec2 position;
-in float cellindex;
+in int cellindex;
 
 out vec2 texture_offset;
 uniform vec2 offset;
@@ -72,7 +72,7 @@ void main()
 #[derive(Copy, Clone, Debug, Default)]
 pub struct Vertex {
     pub pos: [f32; 2],
-    pub index: f32,
+    pub index: i32,
 }
 //pub struct Vertex(pub ([f32; 3],u32));
 
@@ -234,11 +234,10 @@ impl SpriteProgram {
             gl::EnableVertexAttribArray(self.index_attr as GLuint);
             gl_ok!();
 
-            gl::VertexAttribPointer(
+            gl::VertexAttribIPointer(
                 self.index_attr as GLuint,
                 1,
-                gl::FLOAT,
-                gl::FALSE as GLboolean,
+                gl::INT,
                 (3 * 4) as i32,
                 (4 * 2) as *const _,
             );
