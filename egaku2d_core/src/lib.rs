@@ -56,25 +56,28 @@ pub mod gl {
 pub mod shapes;
 
 
+use self::uniforms::UniformCommon;
 use self::uniforms::*;
 ///Contains the objects used for the uniform setting stage of the egaku2d drawing pipeline.
 pub mod uniforms{
     use super::*;
     use vbo::BufferInfo;
-
+/*
     pub struct StaticUniforms<'a>{
         pub(crate) sys:&'a mut SimpleCanvas,
-        pub(crate) un:ProgramUniformValues,
+        pub(crate) un:UniformVals<'a>,
+        pub(crate) common:UniformCommon,
         pub(crate) buffer:BufferInfo
     }
+
     impl StaticUniforms<'_>{
         pub fn with_color(&mut self,color:[f32;4])->&mut Self{
-            self.un.color=color;
+            self.common.color=color;
             self
         }
 
         pub fn with_offset(&mut self,offset:[f32;2])->&mut Self{
-            self.un.offset=vec2(offset[0],offset[1]);
+            self.common.offset=vec2(offset[0],offset[1]);
             self
         }
 
@@ -86,84 +89,115 @@ pub mod uniforms{
         }
         //TOO add offset
     }
+*/
 
-
-    pub struct StaticSpriteUniforms<'a>{
+    pub struct StaticUniforms<'a>{
         pub(crate) sys:&'a mut SimpleCanvas,
-        pub(crate) un:SpriteProgramUniformValues<'a>,
+        pub(crate) un:UniformVals<'a>,
+        pub(crate) common:UniformCommon,
         pub(crate) buffer:BufferInfo
     }
 
-    impl StaticSpriteUniforms<'_>{
+    impl StaticUniforms<'_>{
 
         pub fn with_offset(&mut self,offset:[f32;2])->&mut Self{
-            self.un.offset=vec2(offset[0],offset[1]);
+            self.common.offset=vec2(offset[0],offset[1]);
             self
         }
 
         pub fn with_color(&mut self,color:[f32;4])->&mut Self{
-            self.un.color=color;
+            self.common.color=color;
             self
         }
-
         pub fn draw(&mut self){
-            self.sys.sprite_program.set_buffer_and_draw(
-                &self.un,
-                self.buffer,
-            );
+            match &self.un{
+                UniformVals::Sprite(a)=>{
+                    self.sys.sprite_program.set_buffer_and_draw(
+                        &self.common,
+                        a,
+                        self.buffer
+                    );
+                },
+                UniformVals::Regular(a)=>{
+                    self.sys.regular_program.set_buffer_and_draw(
+                        &self.common,
+                        a,
+                        self.buffer
+                    );
+
+                },
+                UniformVals::Circle(a)=>{
+                    self.sys.circle_program.set_buffer_and_draw(
+                        &self.common,
+                        a,
+                        self.buffer
+                    );
+                }
+            }   
         }
     }
 
-    pub struct SpriteUniforms<'a>{
-        pub(crate) sys:&'a mut SimpleCanvas,
-        pub(crate) un:SpriteProgramUniformValues<'a>,
-    }
-    impl SpriteUniforms<'_>{
-        
-        pub fn with_offset(&mut self,offset:[f32;2])->&mut Self{
-            self.un.offset=vec2(offset[0],offset[1]);
-            self
-        }
-        pub fn with_color(&mut self,color:[f32;4])->&mut Self{
-            self.un.color=color;
-            self
-        }
-        pub fn send_and_draw(&mut self){
-            self.sys.sprite_buffer.update();
 
-            self.sys.sprite_program.set_buffer_and_draw(
-                &self.un,
-                self.sys.sprite_buffer.get_info()
-            );
-        }
+
+    pub struct UniformCommon{
+        pub(crate) offset:Vec2<f32>,
+        pub(crate) color:[f32;4]
     }
 
+    pub enum UniformVals<'a>{
+        Sprite(SpriteProgramUniformValues<'a>),
+        Regular(ProgramUniformValues),
+        Circle(ProgramUniformValues)
+    }
 
     pub struct Uniforms<'a>{
         pub(crate) sys:&'a mut SimpleCanvas,
-        pub(crate) un:ProgramUniformValues,
+        pub(crate) un:UniformVals<'a>,
+        pub(crate) common:UniformCommon
     }
 
     impl Uniforms<'_>{
 
         pub fn with_offset(&mut self,offset:[f32;2])->&mut Self{
-            self.un.offset=vec2(offset[0],offset[1]);
+            self.common.offset=vec2(offset[0],offset[1]);
             self
         }
         pub fn with_color(&mut self,color:[f32;4])->&mut Self{
-            self.un.color=color;
+            self.common.color=color;
             self
         }
 
         pub fn send_and_draw(&mut self){
-            self.sys.circle_buffer.update();
+            match &self.un{
+                UniformVals::Sprite(a)=>{
+                    self.sys.sprite_buffer.update();
+                    self.sys.sprite_program.set_buffer_and_draw(
+                        &self.common,
+                        a,
+                        self.sys.sprite_buffer.get_info()
+                    );
+                },
+                UniformVals::Regular(a)=>{
+                    self.sys.circle_buffer.update();
+                    self.sys.regular_program.set_buffer_and_draw(
+                        &self.common,
+                        a,
+                        self.sys.circle_buffer.get_info()
+                    );
 
-            self.sys.circle_program.set_buffer_and_draw(
-                &self.un,
-                self.sys.circle_buffer.get_info()
-            );
+                },
+                UniformVals::Circle(a)=>{
+                    self.sys.circle_buffer.update();
+
+                    self.sys.regular_program.set_buffer_and_draw(
+                        &self.common,
+                        a,
+                        self.sys.circle_buffer.get_info()
+                    );
+                }
+            }
+            
         }
-        //TODO add offset
     }
 
 }
@@ -177,6 +211,7 @@ pub mod uniforms{
 pub struct SimpleCanvas {
     _ns: NotSend,
     circle_program: CircleProgram,
+    regular_program: CircleProgram,
     sprite_program: SpriteProgram,
     point_mul: PointMul,
 
@@ -207,7 +242,10 @@ impl SimpleCanvas {
         let circle_buffer = vbo::GrowableBuffer::new();
         let sprite_buffer = vbo::GrowableBuffer::new();
 
-        let mut circle_program = CircleProgram::new();
+        let mut circle_program = CircleProgram::new(circle_program::REGULAR_FS_SRC);
+
+        let mut regular_program = CircleProgram::new(circle_program::REGULAR_FS_SRC);
+
 
         let mut sprite_program = SpriteProgram::new();
 
@@ -223,6 +261,7 @@ impl SimpleCanvas {
             _ns: ns(),
             point_mul,
             sprite_program,
+            regular_program,
             circle_program,
             circle_buffer,
             sprite_buffer,

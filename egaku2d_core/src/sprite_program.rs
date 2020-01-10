@@ -6,6 +6,7 @@ use std::ffi::CString;
 use std::str;
 use axgeom::Vec2;
 use crate::vbo::BufferInfo;
+use super::*;
 
 // Shader sources
 static VS_SRC: &'static str = "
@@ -96,9 +97,7 @@ pub struct PointMul(pub f32);
 #[derive(Copy,Clone,Debug)]
 pub struct SpriteProgramUniformValues<'a>{
     pub texture:&'a crate::sprite::Texture,
-    pub radius:f32,
-    pub color:[f32;4],
-    pub offset:Vec2<f32>
+    pub radius:f32
 }
 
 
@@ -135,17 +134,18 @@ impl SpriteProgram {
 
     pub(crate) fn set_buffer_and_draw(
         &mut self,
+        common:&UniformCommon,
         un:&SpriteProgramUniformValues,
         buffer_info:BufferInfo,
     ) {
-        let col=un.color;
+        let col=common.color;
         let buffer_id=buffer_info.id;
         let length=buffer_info.length;
         let point_size=un.radius;
         let mode = gl::POINTS;
         let texture=un.texture;
         let texture_id = un.texture.id;
-        let offset=un.offset;
+        let offset=common.offset;
 
         //TODO NO IDEA WHY THIS IS NEEDED ON LINUX.
         //Without this function call, on linux not every shape gets drawn.

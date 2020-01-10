@@ -6,21 +6,18 @@ use std::ffi::CString;
 use std::str;
 use axgeom::Vec2;
 use crate::vbo::BufferInfo;
-
+use super::*;
 
 #[derive(Copy,Clone,Debug)]
 pub struct ProgramUniformValues{
-    pub rect:bool,
     pub mode:u32,
-    pub radius:f32,
-    pub color:[f32;4],
-    pub offset:Vec2<f32>
+    pub radius:f32
 }
 
 
 
 // Shader sources
-static VS_SRC: &'static str = "
+pub static VS_SRC: &'static str = "
 #version 300 es
 in vec2 position;
 uniform vec2 offset;
@@ -33,27 +30,30 @@ void main() {
 }";
 
 //https://blog.lapingames.com/draw-circle-glsl-shader/
-static FS_SRC: &'static str = "
+pub static CIRCLE_FS_SRC: &'static str = "
 #version 300 es
 precision mediump float;
 uniform vec4 bcol;
 out vec4 out_color;
-uniform bool square;
 void main() {
 
-    //This is inefficient, but it does allow us to use only one shader program to
-    //do many things. In most use-cases of a 2d graphics library, the cpu is the bottle
-    //neck not the gpu anyway.
-    if (square){
-        vec2 coord = gl_PointCoord - vec2(0.5);
-        float dis=dot(coord,coord);
-        if(dis > 0.25){                  //outside of circle radius?
-            discard;
-            //out_color = vec4(gl_PointCoord,0.0,bcol[3]);
-            //return;
-        }
+    vec2 coord = gl_PointCoord - vec2(0.5);
+    float dis=dot(coord,coord);
+    if(dis > 0.25){                  //outside of circle radius?
+        discard;
+        //out_color = vec4(gl_PointCoord,0.0,bcol[3]);
+        //return;
     }
 
+    out_color = bcol;
+}";
+
+pub static REGULAR_FS_SRC: &'static str = "
+#version 300 es
+precision mediump float;
+uniform vec4 bcol;
+out vec4 out_color;
+void main() {
     out_color = bcol;
 }";
 
@@ -65,7 +65,7 @@ pub struct Vertex(pub [f32; 2]);
 pub struct CircleProgram {
     pub program: GLuint,
     pub matrix_uniform: GLint,
-    pub square_uniform: GLint,
+    //pub square_uniform: GLint,
     pub offset_uniform: GLint,
     pub point_size_uniform: GLint,
     pub bcol_uniform: GLint,
@@ -108,15 +108,16 @@ impl CircleProgram {
 
     pub(crate) fn set_buffer_and_draw(
         &mut self,
+        common:&UniformCommon,
         un:&ProgramUniformValues,
         buffer_info:BufferInfo,
     ) {
         let mode=un.mode;
         let point_size=un.radius;
-        let col=un.color;
-        let square=un.rect;
+        let col=common.color;
+        //let square=un.rect;
         let buffer_id=buffer_info.id;
-        let offset=un.offset;
+        let offset=common.offset;
         let length=buffer_info.length;
 
         //TODO NO IDEA WHY THIS IS NEEDED ON LINUX.
@@ -159,8 +160,8 @@ impl CircleProgram {
             gl::Uniform4fv(self.bcol_uniform, 1, col.as_ptr() as *const _);
             gl_ok!();
 
-            gl::Uniform1i(self.square_uniform, square as i32);
-            gl_ok!();
+            //gl::Uniform1i(self.square_uniform, square as i32);
+            //gl_ok!();
 
             gl::BindBuffer(gl::ARRAY_BUFFER, buffer_id);
             gl_ok!();
@@ -190,13 +191,13 @@ impl CircleProgram {
         }
     }
 
-    pub fn new() -> CircleProgram {
+    pub fn new(frag:&str) -> CircleProgram {
         unsafe {
             // Create GLSL shaders
             let vs = compile_shader(VS_SRC, gl::VERTEX_SHADER);
             gl_ok!();
 
-            let fs = compile_shader(FS_SRC, gl::FRAGMENT_SHADER);
+            let fs = compile_shader(frag, gl::FRAGMENT_SHADER);
             gl_ok!();
 
             let program = link_program(vs, fs);
@@ -211,9 +212,9 @@ impl CircleProgram {
             gl::UseProgram(program);
             gl_ok!();
 
-            let square_uniform: GLint =
-                gl::GetUniformLocation(program, CString::new("square").unwrap().as_ptr());
-            gl_ok!();
+            //let square_uniform: GLint =
+            //    gl::GetUniformLocation(program, CString::new("square").unwrap().as_ptr());
+            //gl_ok!();
 
             let point_size_uniform: GLint =
                 gl::GetUniformLocation(program, CString::new("point_size").unwrap().as_ptr());
@@ -238,7 +239,7 @@ impl CircleProgram {
             CircleProgram {
                 program,
                 offset_uniform,
-                square_uniform,
+                //square_uniform,
                 point_size_uniform,
                 matrix_uniform,
                 bcol_uniform,

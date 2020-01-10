@@ -7,8 +7,9 @@ pub struct SquareSave {
 impl SquareSave {
     
     pub fn uniforms<'a>(&'a self,sys:&'a mut SimpleCanvas,radius:f32)->StaticUniforms<'a>{
-        let un=ProgramUniformValues{radius,color:sys.color,mode:gl::POINTS,rect:false,offset:vec2same(0.0)};
-        StaticUniforms{sys,un,buffer:self.buffer.get_info()}
+        let common=UniformCommon{color:sys.color,offset:vec2same(0.0)};
+        let un=ProgramUniformValues{radius,mode:gl::POINTS};
+        StaticUniforms{sys,un:UniformVals::Regular(un),common,buffer:self.buffer.get_info()}
     }
 }
 
@@ -32,8 +33,9 @@ impl<'a> SquareSession<'a> {
     }
 
     pub fn uniforms(&mut self,radius:f32)->Uniforms{
-        let un=ProgramUniformValues{radius,color:self.sys.color,mode:gl::POINTS,rect:false,offset:vec2same(0.0)};
-        Uniforms{sys:self.sys,un}
+        let common=UniformCommon{color:self.sys.color,offset:vec2same(0.0)};
+        let un=ProgramUniformValues{radius,mode:gl::POINTS};
+        Uniforms{sys:self.sys,common,un:UniformVals::Regular(un)}
  
     }
 }
@@ -45,8 +47,9 @@ pub struct CircleSave {
 }
 impl CircleSave {
     pub fn uniforms<'a>(&'a self,sys:&'a mut SimpleCanvas,radius:f32)->StaticUniforms<'a>{
-        let un=ProgramUniformValues{radius,color:sys.color,mode:gl::POINTS,rect:true,offset:vec2same(0.0)};
-        StaticUniforms{sys,un,buffer:self.buffer.get_info()}
+        let common=UniformCommon{color:sys.color,offset:vec2same(0.0)};
+        let un=ProgramUniformValues{radius,mode:gl::POINTS};
+        StaticUniforms{common,sys,un:UniformVals::Circle(un),buffer:self.buffer.get_info()}
     }
 }
 pub struct CircleSession<'a> {
@@ -63,8 +66,9 @@ impl<'a> CircleSession<'a> {
     }
 
     pub fn uniforms(&mut self,radius:f32)->Uniforms{
-        let un=ProgramUniformValues{radius,color:self.sys.color,mode:gl::POINTS,rect:true,offset:vec2same(0.0)};
-        Uniforms{sys:self.sys,un}
+        let common=UniformCommon{color:self.sys.color,offset:vec2same(0.0)};
+        let un=ProgramUniformValues{radius,mode:gl::POINTS};
+        Uniforms{sys:self.sys,common,un:UniformVals::Circle(un)}
     }
 
     #[inline(always)]
@@ -89,8 +93,9 @@ pub struct RectSave {
 
 impl RectSave {
     pub fn uniforms<'a>(&'a self,sys:&'a mut SimpleCanvas)->StaticUniforms<'a>{
-        let un=ProgramUniformValues{radius:0.0,color:sys.color,mode:gl::TRIANGLES,rect:false,offset:vec2same(0.0)};
-        StaticUniforms{sys,un,buffer:self.buffer.get_info()}
+        let common=UniformCommon{color:sys.color,offset:vec2same(0.0)};
+        let un=ProgramUniformValues{radius:0.0,mode:gl::TRIANGLES};
+        StaticUniforms{sys,common,un:UniformVals::Regular(un),buffer:self.buffer.get_info()}
     }
 }
 
@@ -103,8 +108,9 @@ impl RectSession<'_> {
     }
 
     pub fn uniforms(&mut self)->Uniforms{
-        let un=ProgramUniformValues{radius:0.0,color:self.sys.color,mode:gl::TRIANGLES,rect:false,offset:vec2same(0.0)};
-        Uniforms{sys:self.sys,un}
+        let common=UniformCommon{color:self.sys.color,offset:vec2same(0.0)};
+        let un=ProgramUniformValues{radius:0.0,mode:gl::TRIANGLES};
+        Uniforms{sys:self.sys,common,un:UniformVals::Regular(un)}
     }
 
     #[inline(always)]
@@ -129,8 +135,9 @@ pub struct ArrowSave {
 }
 impl ArrowSave {
     pub fn uniforms<'a>(&'a self,sys:&'a mut SimpleCanvas)->StaticUniforms<'a>{
-        let un=ProgramUniformValues{radius:0.0,color:sys.color,mode:gl::TRIANGLES,rect:false,offset:vec2same(0.0)};
-        StaticUniforms{sys,un,buffer:self.buffer.get_info()}
+        let common=UniformCommon{color:sys.color,offset:vec2same(0.0)};
+        let un=ProgramUniformValues{radius:0.0,mode:gl::TRIANGLES};
+        StaticUniforms{sys,common,un:UniformVals::Regular(un),buffer:self.buffer.get_info()}
     }
 }
 pub struct ArrowSession<'a> {
@@ -147,8 +154,9 @@ impl ArrowSession<'_> {
     }
 
     pub fn uniforms(&mut self)->Uniforms{
-        let un=ProgramUniformValues{radius:0.0,color:self.sys.color,mode:gl::TRIANGLES,rect:false,offset:vec2same(0.0)};
-        Uniforms{sys:self.sys,un}
+        let common=UniformCommon{color:self.sys.color,offset:vec2same(0.0)};
+        let un=ProgramUniformValues{radius:0.0,mode:gl::TRIANGLES};
+        Uniforms{sys:self.sys,common,un:UniformVals::Regular(un)}
     }
 
     #[inline(always)]
@@ -188,8 +196,9 @@ pub struct LineSave {
 impl LineSave {
 
     pub fn uniforms<'a>(&'a self,sys:&'a mut SimpleCanvas)->StaticUniforms<'a>{
-        let un=ProgramUniformValues{radius:0.0,color:sys.color,mode:gl::TRIANGLES,rect:false,offset:vec2same(0.0)};
-        StaticUniforms{sys,un,buffer:self.buffer.get_info()}
+        let common=UniformCommon{color:sys.color,offset:vec2same(0.0)};
+        let un=ProgramUniformValues{radius:0.0,mode:gl::TRIANGLES};
+        StaticUniforms{sys,common,un:UniformVals::Regular(un),buffer:self.buffer.get_info()}
     }
 }
 
@@ -207,8 +216,10 @@ impl LineSession<'_> {
     }
 
     pub fn uniforms(&mut self)->Uniforms{
-        let un=ProgramUniformValues{radius:0.0,color:self.sys.color,mode:gl::TRIANGLES,rect:false,offset:vec2same(0.0)};
-        Uniforms{sys:self.sys,un}
+        let common=UniformCommon{color:self.sys.color,offset:vec2same(0.0)};
+        
+        let un=ProgramUniformValues{radius:0.0,mode:gl::TRIANGLES};
+        Uniforms{sys:self.sys,common,un:UniformVals::Regular(un)}
     }
 
     #[inline(always)]
