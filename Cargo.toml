@@ -16,7 +16,7 @@ members = [ "egaku2d_core"]
 
 [dependencies]
 axgeom = "1.5"
-egaku2d_core = {version="0.1.0", path="./egaku2d_core"}
+egaku2d_core = {version="0.1.2", path="./egaku2d_core"}
 glutin = "0.22"
 image = "0.22.3"
 
