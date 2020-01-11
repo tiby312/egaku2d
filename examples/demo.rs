@@ -12,6 +12,8 @@ fn main() {
     //let mut sys=egaku2d::FullScreenSystem::new(&events_loop);
     let food_tex = sys.texture("food.png", [8, 8]).unwrap();
 
+    let adv_tex = sys.texture("adventurer.png", [7, 11]).unwrap();
+
 
     let rect_save = {
         let mut k = sys.canvas_mut().rects();
@@ -155,7 +157,7 @@ fn main() {
                     }
                 }
 
-                k.uniforms(&food_tex,32.0).with_color(WHITE).send_and_draw();
+                k.uniforms(&adv_tex,64.0).with_color(WHITE).send_and_draw();
                 
 
                 
