@@ -111,9 +111,6 @@ void main() {
     //TODO optimize
     ivec2 ce=ivec2(cellindex / (grid_dim.x), cellindex % (grid_dim.x));
 
-
-    //texture_offset.x=float(ce.x)/float(grid_dim.x);
-    //texture_offset.y=float(ce.y)/float(grid_dim.y);
     texture_offset.x=float(ce.x);
     texture_offset.y=float(ce.y);
 }";
@@ -137,20 +134,26 @@ void main()
 
     vec2 mid=vec2(0.5,0.5);
 
+    //This is the offset from the outer rectangle to the inner rectangle.
+    //We need a larger outer rectangle since if the sprite rotates, its corners would clip.
+    //The width of the outer rectangle needs to be sqrt(2)*normal rectangle.
     float s2=(SQRT2-1.0)/(2.0*SQRT2);
     
     
-    vec2 pos1=  (rot_matrix*(gl_PointCoord.xy-mid) + mid);
+    //Handle rotation before we do anything.`
+    vec2 pos=  (rot_matrix*(gl_PointCoord.xy-mid) + mid);
 
-    //vec2 pos=pos1*SQRT2;//(pos1-mid)*SQRT2+mid;
-    vec2 pos=pos1;
+    //Now we make sure we don't draw anything in the wasted areas of the outer
+    //rectangle.
     if (pos.x>(1.0-s2) || pos.x<(0.0+s2) || pos.y>(1.0-s2) || pos.y<(0.0+s2)){
-        out_color=vec4(1.0,0.0,0.0,1.0);
-        //discard;
+        discard;
     }else{     
 
-        vec2 foo =  (pos*SQRT2-vec2(s2,s2)*SQRT2 +texture_offset)*grid_dim2;
-
+        //We must start drawing the sprite at the inner rectangle top left corder,
+        //instead of the default 0,0 since that would be the start of the
+        //outer rectangle.
+        //Here we also make sure we draw the right tile in the tileset
+        vec2 foo =  ((pos-vec2(s2,s2))*SQRT2 +texture_offset)*grid_dim2;
 
         out_color=texture(tex0,foo)*bcol;
     }
