@@ -75,26 +75,43 @@ void main()
 
     vec2 mid=vec2(0.5,0.5);
 
+
+
     //This is the offset from the outer rectangle to the inner rectangle.
     //We need a larger outer rectangle since if the sprite rotates, its corners would clip.
     //The width of the outer rectangle needs to be sqrt(2)*normal rectangle.
     float s2=(SQRT2-1.0)/(2.0*SQRT2);
     
+
     
     //Handle rotation before we do anything.`
-    vec2 pos=  (rot_matrix*(gl_PointCoord.xy-mid) + mid);
+    vec2 pos=  (rot_matrix*( (gl_PointCoord.xy-mid)) + mid);
+
+    //Either the x or y component MUST be 1.0
+    //The other component must be less than or equal to 1.0.
+    vec2 sprite_dim=vec2(1.0/3.0,1.0);
+
+    vec2 extra=vec2((sprite_dim.y-sprite_dim.x)/4.0,0.0) ;
 
     //Now we make sure we don't draw anything in the wasted areas of the outer
     //rectangle.
-    if (pos.x>=(1.0-s2) || pos.x<(0.0+s2) || pos.y>=(1.0-s2) || pos.y<(0.0+s2)){
-        discard;
+    if (pos.x>=(1.0-s2-extra.x) || pos.x<(0.0+s2+extra.x) || pos.y>=(1.0-s2-extra.y) || pos.y<(0.0+s2+extra.y)){
+        //discard;
+        out_color=vec4(1.0,0.0,0.0,1.0);
     }else{     
+
+
+        vec2 pp1=(pos-mid)*vec2(2.0,1.0)+mid;
 
         //We must start drawing the sprite at the inner rectangle top left corder,
         //instead of the default 0,0 since that would be the start of the
         //outer rectangle.
         //Here we also make sure we draw the right tile in the tileset
-        vec2 foo =  ((pos-vec2(s2,s2))*SQRT2 +texture_offset)*grid_dim2;
+        vec2 pp2=(pp1-vec2(s2,s2))*SQRT2;
+        
+
+
+        vec2 foo =  ( pp2+texture_offset)*grid_dim2;
 
         out_color=texture(tex0,foo)*bcol;
     }
@@ -112,7 +129,6 @@ out mat2 rot_matrix;
 
 uniform vec2 offset;
 uniform ivec2 grid_dim;
-//uniform float cell_size;
 
 uniform mat3 mmatrix;
 uniform float point_size;

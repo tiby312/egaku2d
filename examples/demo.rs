@@ -12,7 +12,8 @@ fn main() {
     //let mut sys=egaku2d::FullScreenSystem::new(&events_loop);
     let food_tex = sys.texture("food.png", [8, 8]).unwrap();
 
-    let adv_tex = sys.texture("adventurer.png", [7, 11]).unwrap();
+    //let adv_tex = sys.texture("adventurer.png", [7, 11]).unwrap();
+    let _300_tex = sys.texture("64_128.png", [1, 1]).unwrap();
 
 
     let rect_save = {
@@ -139,7 +140,7 @@ fn main() {
                 //draw some moving sprites
                 let mut k = canvas.sprites();
 
-                let st=30;
+                let st=300;
                 for y in (100..500).step_by(st).map(|a|a as f32) {
                     for x in (100..500).step_by(st).map(|a|a as f32) {
                         let c = (counter as f32 + x + y) * 0.01;
@@ -157,7 +158,7 @@ fn main() {
                     }
                 }
 
-                k.uniforms(&adv_tex,64.0).with_color(WHITE).send_and_draw();
+                k.uniforms(&_300_tex,300.0).with_color(WHITE).send_and_draw();
                 
 
                 
