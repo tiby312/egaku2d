@@ -28,8 +28,8 @@ impl SpriteSession<'_> {
     pub fn add(&mut self, point: PointType, index: u16,rotation:f32) -> &mut Self {
         
         assert!(rotation>=0.0); //TODO do this a better way
-        let k=rotation % core::f32::consts::PI*2.;
-        let k=k/core::f32::consts::PI*2.;
+        let k=rotation % (core::f32::consts::PI*2.);
+        let k=k/(core::f32::consts::PI*2.);
         let k= (k*(core::u16::MAX as f32)) as u16;
 
         self.sys.sprite_buffer.push(sprite_program::Vertex {

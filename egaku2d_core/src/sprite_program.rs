@@ -95,7 +95,7 @@ void main() {
     vec3 pp = vec3(position.xy+offset,1.0);
     gl_Position = vec4(mmatrix*pp.xyz, 1.0);
 
-    float rot=rotation*PI*2.0;
+    float rot=rotation*(PI*2.0);
     float c=cos(rot);
     float s=sin(rot);
 
