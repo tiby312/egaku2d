@@ -154,7 +154,7 @@ fn main() {
                     }
                 }
 
-                k.uniforms(&food_tex,20.0).with_color(WHITE).with_offset(wobble).send_and_draw();
+                k.uniforms(&food_tex,40.0).with_color(WHITE).with_offset(wobble).send_and_draw();
                 
 
                 

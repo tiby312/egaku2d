@@ -31,7 +31,14 @@
 //! This was a design decision to make each vertex as lightweight as possible (just a x and y position),
 //! making it more efficient to set and send to the gpu.
 //!
-//!
+//! # Key Design Themes
+//! 
+//! Assume cpu bound. This is a 2d drawing library even though most of the hardware outthere
+//! is made to handle 3d. This means that the gpu is under-utilized with this library.
+//! Because of this, there is little point to make a non-rotatable sprite version to save
+//! on gpu time. Especially since the vertex layout is the same size. So there are no gains
+//! from having to send less data to the gpu.
+//! 
 //!
 //! # Using Shapes
 //!
