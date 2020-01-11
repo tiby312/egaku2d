@@ -132,23 +132,28 @@ const float SQRT2=1.41421356237;
 
 void main() 
 {
-    mat2 grid_dim2=mat2(1.0/float(grid_dim.x),0.0,0.0,1.0/float(grid_dim.y));
+    vec2 dim=vec2(float(grid_dim.x),float(grid_dim.y));
+    mat2 grid_dim2=mat2(1.0/dim.x,0.0,0.0,1.0/dim.y);
 
     vec2 mid=vec2(0.5,0.5);
 
-    float s2=0.7*(SQRT2-1.0)/2.0;
-    //float s2=0.0;
+    float s2=(SQRT2-1.0)/(2.0*SQRT2);
+    
+    
+    vec2 pos1=  (rot_matrix*(gl_PointCoord.xy-mid) + mid);
 
-    vec2 pos=  (rot_matrix*(gl_PointCoord.xy-mid) + mid);
-
+    //vec2 pos=pos1*SQRT2;//(pos1-mid)*SQRT2+mid;
+    vec2 pos=pos1;
     if (pos.x>(1.0-s2) || pos.x<(0.0+s2) || pos.y>(1.0-s2) || pos.y<(0.0+s2)){
-        discard;
-    }     
+        out_color=vec4(1.0,0.0,0.0,1.0);
+        //discard;
+    }else{     
 
-    vec2 foo =  ((pos-mid)*SQRT2+mid +texture_offset)*grid_dim2;
+        vec2 foo =  (pos*SQRT2-vec2(s2,s2)*SQRT2 +texture_offset)*grid_dim2;
 
 
-    out_color=texture(tex0,foo)*bcol;
+        out_color=texture(tex0,foo)*bcol;
+    }
 }
 ";
 

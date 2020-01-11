@@ -113,11 +113,11 @@ fn main() {
                 sprite_save.uniforms(canvas, &food_tex,32.0).with_color(COL4).with_offset([-wobble[0],-wobble[1]]).draw();
                 arrow_save.uniforms(canvas).draw();
                 line_save.uniforms(canvas).with_color(COL2).draw();
-                square_save.uniforms(canvas,10.0).with_color(COL3).with_offset(wobble).draw();
+                square_save.uniforms(canvas,10.0).with_color(COL3).draw();
                 rect_save.uniforms(canvas).with_color(COL4).draw();
                 
 
-                
+                /*
                 //draw some moving circles
                 let mut k = canvas.circles();
                 for x in (0..1000).step_by(12).map(|a|a as f32) {
@@ -130,15 +130,16 @@ fn main() {
                         k.add([x,y]);
                     }
                 }
-                k.uniforms(8.0).with_color(COL1).with_offset(wobble).send_and_draw();
-                
+                k.uniforms(8.0).with_color(COL1).send_and_draw();
+                */
 
             
                 //draw some moving sprites
                 let mut k = canvas.sprites();
 
-                'outer: for y in (100..500).step_by(40).map(|a|a as f32) {
-                    for x in (100..500).step_by(40).map(|a|a as f32) {
+                let st=300;
+                'outer: for y in (100..500).step_by(st).map(|a|a as f32) {
+                    for x in (100..500).step_by(st).map(|a|a as f32) {
                         let c = (counter as f32 + x + y) * 0.01;
                         
                         let cc = ((counter as f32 + x + y) * 0.01) as u32;
@@ -160,8 +161,8 @@ fn main() {
                 //draw some moving sprites
                 let mut k = canvas.circles();
 
-                'outer: for y in (100..500).step_by(40).map(|a|a as f32) {
-                    for x in (100..500).step_by(40).map(|a|a as f32) {
+                'outer: for y in (100..500).step_by(st).map(|a|a as f32) {
+                    for x in (100..500).step_by(st).map(|a|a as f32) {
                         let c = (counter as f32 + x + y) * 0.01;
                         
                         let cc = ((counter as f32 + x + y) * 0.01) as u32;
