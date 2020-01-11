@@ -21,7 +21,8 @@ out mat2 rot_matrix;
 
 uniform vec2 offset;
 uniform ivec2 grid_dim;
-//uniform float cell_size;
+uniform vec2 sprite_dim;
+
 
 uniform mat3 mmatrix;
 uniform float point_size;
@@ -45,6 +46,9 @@ void main() {
     //Force cellindex to be in a valid range
     cellindex = cellindex % (grid_dim.x * grid_dim.y);
 
+
+
+
     
     //TODO optimize
     ivec2 ce=ivec2(cellindex / (grid_dim.x), cellindex % (grid_dim.x));
@@ -55,13 +59,13 @@ void main() {
 
 
 
-
 static FS_SRC: &'static str = "
 #version 300 es
 precision mediump float;
 in vec2 texture_offset;
 in mat2 rot_matrix;
 uniform highp ivec2 grid_dim;
+uniform highp vec2 sprite_dim;
 uniform sampler2D tex0;
 uniform vec4 bcol;
 out vec4 out_color;
@@ -75,7 +79,7 @@ void main()
 
     vec2 mid=vec2(0.5,0.5);
 
-
+    
 
     //This is the offset from the outer rectangle to the inner rectangle.
     //We need a larger outer rectangle since if the sprite rotates, its corners would clip.
@@ -87,98 +91,34 @@ void main()
     //Handle rotation before we do anything.`
     vec2 pos=  (rot_matrix*( (gl_PointCoord.xy-mid)) + mid);
 
-    //Either the x or y component MUST be 1.0
-    //The other component must be less than or equal to 1.0.
-    vec2 sprite_dim=vec2(1.0/3.0,1.0);
-
-    vec2 extra=vec2((sprite_dim.y-sprite_dim.x)/4.0,0.0) ;
+    
+    vec2 extra=vec2(max(0.0,(sprite_dim.y-sprite_dim.x)/3.0),max(0.0,(sprite_dim.x-sprite_dim.y)/3.0)) ;
+    extra.x+=0.01; //TODO why is this needed?
+    extra.y+=0.01; // I think some of the math needs to be simplified. floating point loss ofprecision??
 
     //Now we make sure we don't draw anything in the wasted areas of the outer
     //rectangle.
     if (pos.x>=(1.0-s2-extra.x) || pos.x<(0.0+s2+extra.x) || pos.y>=(1.0-s2-extra.y) || pos.y<(0.0+s2+extra.y)){
-        //discard;
-        out_color=vec4(1.0,0.0,0.0,1.0);
+        discard;
+        //out_color=vec4(1.0,0.0,0.0,0.2);
     }else{     
-
-
-        vec2 pp1=(pos-mid)*vec2(2.0,1.0)+mid;
-
+    
+        vec2 pp1=(pos-mid)/sprite_dim+mid;
+        
         //We must start drawing the sprite at the inner rectangle top left corder,
         //instead of the default 0,0 since that would be the start of the
         //outer rectangle.
         //Here we also make sure we draw the right tile in the tileset
         vec2 pp2=(pp1-vec2(s2,s2))*SQRT2;
-        
+                
 
 
-        vec2 foo =  ( pp2+texture_offset)*grid_dim2;
+        vec2 foo =  (pp2+ texture_offset)*grid_dim2;
 
         out_color=texture(tex0,foo)*bcol;
     }
 }
 ";
-
-// Shader sources
-static NON_ROTATE_VS_SRC: &'static str = "
-#version 300 es
-in vec2 position;
-in uint cellindex;
-
-out vec2 texture_offset;
-out mat2 rot_matrix;
-
-uniform vec2 offset;
-uniform ivec2 grid_dim;
-
-uniform mat3 mmatrix;
-uniform float point_size;
-
-const float PI = 3.1415926535897932384626433832795;
-
-void main() {
-    gl_PointSize = point_size;
-    vec3 pp = vec3(position.xy+offset,1.0);
-    gl_Position = vec4(mmatrix*pp.xyz, 1.0);
-
-    int cellindex = int(cellindex);
-
-    //Force cellindex to be in a valid range
-    cellindex = cellindex % (grid_dim.x * grid_dim.y);
-    
-    //TODO optimize
-    ivec2 ce=ivec2(cellindex / (grid_dim.x), cellindex % (grid_dim.x));
-
-    texture_offset.x=float(ce.x);
-    texture_offset.y=float(ce.y);
-}";
-
-
-static NON_ROTATE_FS_SRC: &'static str = "
-#version 300 es
-precision mediump float;
-in vec2 texture_offset;
-uniform highp ivec2 grid_dim;
-uniform sampler2D tex0;
-uniform vec4 bcol;
-out vec4 out_color;
-
-const float SQRT2=1.41421356237;
-
-void main() 
-{
-    vec2 dim=vec2(float(grid_dim.x),float(grid_dim.y));
-    mat2 grid_dim2=mat2(1.0/dim.x,0.0,0.0,1.0/dim.y);
-
-    vec2 mid=vec2(0.5,0.5);
-
-    vec2 pos= gl_PointCoord.xy;
-
-    vec2 foo =  (pos +texture_offset)*grid_dim2;
-
-    out_color=texture(tex0,foo)*bcol;
-}
-";
-
 
 #[repr(packed(4))]
 #[derive(Copy, Clone, Debug, Default)]
@@ -196,6 +136,7 @@ pub struct SpriteProgram {
     pub offset_uniform: GLint,
     pub point_size_uniform: GLint,
     pub grid_dim_uniform: GLint,
+    pub sprite_dim_uniform: GLint,
     pub bcol_uniform: GLint,
     pub pos_attr: GLint,
     pub rotation_attr: GLint,
@@ -285,6 +226,26 @@ impl SpriteProgram {
             gl_ok!();
 
             assert_eq!(core::mem::size_of::<Vertex>(),4*3);
+
+            let sx=texture.dim[0]/(texture.grid_dim[0]  as f32 );
+            let sy=texture.dim[1]/(texture.grid_dim[1] as f32 );
+
+            let sprite_dim=if sx>sy{
+                [1.0,sy/sx]
+            }else{
+                [sx/sy,1.0]
+            };
+
+
+            //Either the x or y component MUST be 1.0
+            //The other component must be less than or equal to 1.0.
+            gl::Uniform2f(
+                self.sprite_dim_uniform,
+                sprite_dim[0],
+                sprite_dim[1],
+            );
+            gl_ok!();
+
 
             gl::Uniform2i(
                 self.grid_dim_uniform,
@@ -376,6 +337,10 @@ impl SpriteProgram {
                 gl::GetUniformLocation(program, CString::new("grid_dim").unwrap().as_ptr());
             gl_ok!();
             
+            let sprite_dim_uniform: GLint =
+                gl::GetUniformLocation(program, CString::new("sprite_dim").unwrap().as_ptr());
+            gl_ok!();
+
             let square_uniform: GLint =
                 gl::GetUniformLocation(program, CString::new("square").unwrap().as_ptr());
             gl_ok!();
@@ -422,6 +387,7 @@ impl SpriteProgram {
                 offset_uniform,
                 point_size_uniform,
                 grid_dim_uniform,
+                sprite_dim_uniform,
                 matrix_uniform,
                 bcol_uniform,
                 pos_attr,

@@ -12,8 +12,9 @@ fn main() {
     //let mut sys=egaku2d::FullScreenSystem::new(&events_loop);
     let food_tex = sys.texture("food.png", [8, 8]).unwrap();
 
-    //let adv_tex = sys.texture("adventurer.png", [7, 11]).unwrap();
-    let _300_tex = sys.texture("64_128.png", [1, 1]).unwrap();
+    //let adventurer = sys.texture("adventurer.png", [7, 11]).unwrap();
+    //let _300_tex = sys.texture("128_64.png", [1, 1]).unwrap();
+    let tex = sys.texture("ascii.png", [16, 14]).unwrap();
 
 
     let rect_save = {
@@ -158,7 +159,7 @@ fn main() {
                     }
                 }
 
-                k.uniforms(&_300_tex,300.0).with_color(WHITE).send_and_draw();
+                k.uniforms(&tex,100.0).with_color(WHITE).send_and_draw();
                 
 
                 

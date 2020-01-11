@@ -509,7 +509,7 @@ fn texture(
             };
 
             let id = build_opengl_mipmapped_texture(width, height, img);
-            Ok(unsafe{Texture::new(id,grid_dim)})
+            Ok(unsafe{Texture::new(id,grid_dim,[width as f32,height as f32])})
         }
     }
 }

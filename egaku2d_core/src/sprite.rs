@@ -64,6 +64,7 @@ impl SpriteSession<'_> {
 pub struct Texture {
     _ns: NotSend,
     pub(crate) grid_dim: [u8;2],
+    pub(crate) dim:[f32;2],
     pub(crate) id: GLuint,
 }
 
@@ -77,8 +78,8 @@ impl Texture {
         self.grid_dim[0] as u16 * cell[0] + cell[1]
     }
 
-    pub unsafe fn new(textureid:GLuint,grid_dim:[u8;2])->Texture{
-        Texture{id:textureid,grid_dim,_ns:ns()}
+    pub unsafe fn new(textureid:GLuint,grid_dim:[u8;2],dim:[f32;2])->Texture{
+        Texture{id:textureid,grid_dim,_ns:ns(),dim}
     }
 
 }
