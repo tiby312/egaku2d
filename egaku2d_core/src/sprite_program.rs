@@ -128,18 +128,24 @@ uniform sampler2D tex0;
 uniform vec4 bcol;
 out vec4 out_color;
 
+const float SQRT2=1.41421356237;
+
 void main() 
 {
     mat2 grid_dim2=mat2(1.0/float(grid_dim.x),0.0,0.0,1.0/float(grid_dim.y));
 
     vec2 mid=vec2(0.5,0.5);
 
-    vec2 pos=rot_matrix*(gl_PointCoord.xy-mid) + mid;
+    float s2=(SQRT2-1.0)/2.0;
+    //float s2=0.0;
 
-    if (pos.x>1.0 || pos.x<0.0 || pos.y>1.0 || pos.y<0.0){
+    vec2 pos=  (rot_matrix*(gl_PointCoord.xy-mid) + mid);
+
+    if (pos.x>(1.0-s2) || pos.x<(0.0+s2) || pos.y>(1.0-s2) || pos.y<(0.0+s2)){
         discard;
     }     
-    vec2 foo =  (pos+texture_offset)*grid_dim2;
+
+    vec2 foo =  ((pos-mid)*SQRT2*0.9+mid +texture_offset)*grid_dim2;
 
 
 

@@ -137,24 +137,25 @@ fn main() {
                 //draw some moving sprites
                 let mut k = canvas.sprites();
 
-                for y in (100..500).step_by(40).map(|a|a as f32) {
+                'outer: for y in (100..500).step_by(40).map(|a|a as f32) {
                     for x in (100..500).step_by(40).map(|a|a as f32) {
                         let c = (counter as f32 + x + y) * 0.01;
                         
-                        let cc = ((counter as f32 + x + y) * 0.1) as u32;
+                        let cc = ((counter as f32 + x + y) * 0.01) as u32;
 
                         let x=x+c.sin() * 20.0;
                         let y=y+c.cos() * 20.0;
 
                         k.add(
                             [x,y],
-                            food_tex.coord_to_index([3,1]),//(cc % 64) as u16,
+                            (cc % 64) as u16,
                             c*0.2
                         );
+                        break 'outer;
                     }
                 }
 
-                k.uniforms(&food_tex,40.0).with_color(WHITE).with_offset(wobble).send_and_draw();
+                k.uniforms(&food_tex,100.0).with_color(WHITE).send_and_draw();
                 
 
                 

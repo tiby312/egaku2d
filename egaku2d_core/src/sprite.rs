@@ -23,6 +23,7 @@ impl SpriteSession<'_> {
     ///Add a point sprite.
     #[inline(always)]
     pub fn add(&mut self, point: PointType, index: u16,rotation:f32) -> &mut Self {
+        
         assert!(rotation>=0.0); //TODO do this a better way
         let k=rotation % core::f32::consts::PI*2.;
         let k=k/core::f32::consts::PI*2.;
@@ -45,6 +46,9 @@ impl SpriteSession<'_> {
     }
 
     pub fn uniforms<'a>(&'a mut self,texture: &'a Texture,radius:f32)->Uniforms<'a>{
+        let sqrt2:f32=1.41421356237;
+        let radius=radius*sqrt2;
+        
         let common=UniformCommon{color:self.sys.color,offset:vec2same(0.0)};
         let un=SpriteProgramUniformValues{radius,texture};
         Uniforms{common,sys:self.sys,un:UniformVals::Sprite(un)}
