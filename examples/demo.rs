@@ -148,7 +148,7 @@ fn main() {
 
                         k.add(
                             [x,y],
-                            0,//(cc % 64) as u16,
+                            food_tex.coord_to_index([3,1]),//(cc % 64) as u16,
                             c*0.2
                         );
                     }

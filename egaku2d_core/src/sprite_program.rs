@@ -132,16 +132,18 @@ void main()
 {
     mat2 grid_dim2=mat2(1.0/float(grid_dim.x),0.0,0.0,1.0/float(grid_dim.y));
 
-    
-    vec2 pos=gl_PointCoord.xy-vec2(0.5,0.5);
-    
-    vec2 k =(pos)*grid_dim2;
+    vec2 mid=vec2(0.5,0.5);
 
-    vec2 foo =  rot_matrix*k+(texture_offset*grid_dim2);
+    vec2 pos=rot_matrix*(gl_PointCoord.xy-mid) + mid;
 
-    vec2 foo2=foo+vec2(0.5,0.5);
+    if (pos.x>1.0 || pos.x<0.0 || pos.y>1.0 || pos.y<0.0){
+        discard;
+    }     
+    vec2 foo =  (pos+texture_offset)*grid_dim2;
 
-    out_color=texture(tex0,foo2)*bcol;
+
+
+    out_color=texture(tex0,foo)*bcol;
 }
 ";
 
