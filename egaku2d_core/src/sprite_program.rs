@@ -136,7 +136,7 @@ void main()
 
     vec2 mid=vec2(0.5,0.5);
 
-    float s2=(SQRT2-1.0)/2.0;
+    float s2=0.7*(SQRT2-1.0)/2.0;
     //float s2=0.0;
 
     vec2 pos=  (rot_matrix*(gl_PointCoord.xy-mid) + mid);
@@ -145,8 +145,7 @@ void main()
         discard;
     }     
 
-    vec2 foo =  ((pos-mid)*SQRT2*0.9+mid +texture_offset)*grid_dim2;
-
+    vec2 foo =  ((pos-mid)*SQRT2+mid +texture_offset)*grid_dim2;
 
 
     out_color=texture(tex0,foo)*bcol;
