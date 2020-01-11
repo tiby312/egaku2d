@@ -9,6 +9,9 @@ pub struct SpriteSave {
 impl SpriteSave {
 
     pub fn uniforms<'a>(&'a self,sys:&'a mut SimpleCanvas,texture:&'a Texture,radius:f32)->StaticUniforms<'a>{
+        let sqrt2:f32=1.41421356237;
+        let radius=radius*sqrt2;
+
         let common=UniformCommon{color:sys.color,offset:vec2same(0.0)};
         let un=SpriteProgramUniformValues{radius,texture};
         StaticUniforms{sys,common,un:UniformVals::Sprite(un),buffer:self.buffer.get_info()}
@@ -48,7 +51,7 @@ impl SpriteSession<'_> {
     pub fn uniforms<'a>(&'a mut self,texture: &'a Texture,radius:f32)->Uniforms<'a>{
         let sqrt2:f32=1.41421356237;
         let radius=radius*sqrt2;
-        
+
         let common=UniformCommon{color:self.sys.color,offset:vec2same(0.0)};
         let un=SpriteProgramUniformValues{radius,texture};
         Uniforms{common,sys:self.sys,un:UniformVals::Sprite(un)}
