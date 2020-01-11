@@ -180,7 +180,6 @@ pub struct SpriteProgram {
     pub offset_uniform: GLint,
     pub point_size_uniform: GLint,
     pub grid_dim_uniform: GLint,
-    //pub cell_size_uniform: GLint,
     pub bcol_uniform: GLint,
     pub pos_attr: GLint,
     pub rotation_attr: GLint,
@@ -360,11 +359,7 @@ impl SpriteProgram {
             let grid_dim_uniform: GLint =
                 gl::GetUniformLocation(program, CString::new("grid_dim").unwrap().as_ptr());
             gl_ok!();
-            /*
-            let cell_size_uniform: GLint =
-                gl::GetUniformLocation(program, CString::new("cell_size").unwrap().as_ptr());
-            gl_ok!();
-            */
+            
             let square_uniform: GLint =
                 gl::GetUniformLocation(program, CString::new("square").unwrap().as_ptr());
             gl_ok!();
@@ -411,7 +406,6 @@ impl SpriteProgram {
                 offset_uniform,
                 point_size_uniform,
                 grid_dim_uniform,
-                //cell_size_uniform,
                 matrix_uniform,
                 bcol_uniform,
                 pos_attr,
