@@ -145,7 +145,7 @@ void main()
 
     //Now we make sure we don't draw anything in the wasted areas of the outer
     //rectangle.
-    if (pos.x>(1.0-s2) || pos.x<(0.0+s2) || pos.y>(1.0-s2) || pos.y<(0.0+s2)){
+    if (pos.x>=(1.0-s2) || pos.x<(0.0+s2) || pos.y>=(1.0-s2) || pos.y<(0.0+s2)){
         discard;
     }else{     
 
