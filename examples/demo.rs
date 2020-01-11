@@ -117,7 +117,7 @@ fn main() {
                 rect_save.uniforms(canvas).with_color(COL4).draw();
                 
 
-                /*
+                
                 //draw some moving circles
                 let mut k = canvas.circles();
                 for x in (0..1000).step_by(12).map(|a|a as f32) {
@@ -131,13 +131,13 @@ fn main() {
                     }
                 }
                 k.uniforms(8.0).with_color(COL1).send_and_draw();
-                */
+                
 
             
                 //draw some moving sprites
                 let mut k = canvas.sprites();
 
-                let st=300;
+                let st=30;
                 for y in (100..500).step_by(st).map(|a|a as f32) {
                     for x in (100..500).step_by(st).map(|a|a as f32) {
                         let c = (counter as f32 + x + y) * 0.01;
@@ -150,12 +150,12 @@ fn main() {
                         k.add(
                             [x,y],
                             (cc % 64) as u16,
-                            c*0.2
+                            c
                         );
                     }
                 }
 
-                k.uniforms(&food_tex,64.0).with_color(WHITE).send_and_draw();
+                k.uniforms(&food_tex,32.0).with_color(WHITE).send_and_draw();
                 
 
                 

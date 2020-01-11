@@ -7,69 +7,7 @@ use std::str;
 
 use crate::vbo::BufferInfo;
 use super::*;
-/*
-// Shader sources
-static VS_SRC: &'static str = "
-#version 300 es
-in vec2 position;
-in uint cellindex;
 
-out vec2 texture_offset;
-uniform vec2 offset;
-uniform ivec2 grid_dim;
-uniform float cell_size;
-
-uniform mat3 mmatrix;
-uniform float point_size;
-
-void main() {
-    gl_PointSize = point_size;
-    vec3 pp = vec3(position.xy+offset,1.0);
-    gl_Position = vec4(mmatrix*pp.xyz, 1.0);
-
-    //float c=cos(position.z);
-    //float s=sin(position.z);
-
-    //rotation[0]=vec2(c,-s);
-    //rotation[1]=vec2(s,c);
-
-    int cellindex = int(cellindex);
-
-    //Force cellindex to be in a valid range
-    cellindex = cellindex % (grid_dim.x * grid_dim.y);
-
-    
-    //TODO optimize
-    ivec2 ce=ivec2(cellindex / (grid_dim.x), cellindex % (grid_dim.x));
-
-
-    //texture_offset.x=float(ce.x)/float(grid_dim.x);
-    //texture_offset.y=float(ce.y)/float(grid_dim.y);
-    texture_offset.x=float(ce.x);
-    texture_offset.y=float(ce.y);
-}";
-
-
-
-static FS_SRC: &'static str = "
-#version 300 es
-precision mediump float;
-in vec2 texture_offset;
-uniform highp ivec2 grid_dim;
-uniform sampler2D tex0;
-uniform vec4 bcol;
-out vec4 out_color;
-
-void main() 
-{
-    vec2 k=vec2((gl_PointCoord.x+texture_offset.x)/float(grid_dim.x),(gl_PointCoord.y+texture_offset.y)/float(grid_dim.y));
-    
-    vec2 foo=k;
-    out_color=texture(tex0,foo)*bcol;
-}
-";
-
-*/
 
 // Shader sources
 static VS_SRC: &'static str = "
@@ -83,7 +21,7 @@ out mat2 rot_matrix;
 
 uniform vec2 offset;
 uniform ivec2 grid_dim;
-uniform float cell_size;
+//uniform float cell_size;
 
 uniform mat3 mmatrix;
 uniform float point_size;
@@ -114,6 +52,9 @@ void main() {
     texture_offset.x=float(ce.x);
     texture_offset.y=float(ce.y);
 }";
+
+
+
 
 static FS_SRC: &'static str = "
 #version 300 es
@@ -160,8 +101,69 @@ void main()
 }
 ";
 
+// Shader sources
+static NON_ROTATE_VS_SRC: &'static str = "
+#version 300 es
+in vec2 position;
+in uint cellindex;
 
-//#[repr(transparent)]
+out vec2 texture_offset;
+out mat2 rot_matrix;
+
+uniform vec2 offset;
+uniform ivec2 grid_dim;
+//uniform float cell_size;
+
+uniform mat3 mmatrix;
+uniform float point_size;
+
+const float PI = 3.1415926535897932384626433832795;
+
+void main() {
+    gl_PointSize = point_size;
+    vec3 pp = vec3(position.xy+offset,1.0);
+    gl_Position = vec4(mmatrix*pp.xyz, 1.0);
+
+    int cellindex = int(cellindex);
+
+    //Force cellindex to be in a valid range
+    cellindex = cellindex % (grid_dim.x * grid_dim.y);
+    
+    //TODO optimize
+    ivec2 ce=ivec2(cellindex / (grid_dim.x), cellindex % (grid_dim.x));
+
+    texture_offset.x=float(ce.x);
+    texture_offset.y=float(ce.y);
+}";
+
+
+static NON_ROTATE_FS_SRC: &'static str = "
+#version 300 es
+precision mediump float;
+in vec2 texture_offset;
+uniform highp ivec2 grid_dim;
+uniform sampler2D tex0;
+uniform vec4 bcol;
+out vec4 out_color;
+
+const float SQRT2=1.41421356237;
+
+void main() 
+{
+    vec2 dim=vec2(float(grid_dim.x),float(grid_dim.y));
+    mat2 grid_dim2=mat2(1.0/dim.x,0.0,0.0,1.0/dim.y);
+
+    vec2 mid=vec2(0.5,0.5);
+
+    vec2 pos= gl_PointCoord.xy;
+
+    vec2 foo =  (pos +texture_offset)*grid_dim2;
+
+    out_color=texture(tex0,foo)*bcol;
+}
+";
+
+
 #[repr(packed(4))]
 #[derive(Copy, Clone, Debug, Default)]
 pub struct Vertex {
@@ -169,7 +171,6 @@ pub struct Vertex {
     pub index: u16,
     pub rotation: u16
 }
-//pub struct Vertex(pub ([f32; 3],u32));
 
 #[derive(Debug)]
 pub struct SpriteProgram {
@@ -179,7 +180,7 @@ pub struct SpriteProgram {
     pub offset_uniform: GLint,
     pub point_size_uniform: GLint,
     pub grid_dim_uniform: GLint,
-    pub cell_size_uniform: GLint,
+    //pub cell_size_uniform: GLint,
     pub bcol_uniform: GLint,
     pub pos_attr: GLint,
     pub rotation_attr: GLint,
@@ -359,11 +360,11 @@ impl SpriteProgram {
             let grid_dim_uniform: GLint =
                 gl::GetUniformLocation(program, CString::new("grid_dim").unwrap().as_ptr());
             gl_ok!();
-
+            /*
             let cell_size_uniform: GLint =
                 gl::GetUniformLocation(program, CString::new("cell_size").unwrap().as_ptr());
             gl_ok!();
-
+            */
             let square_uniform: GLint =
                 gl::GetUniformLocation(program, CString::new("square").unwrap().as_ptr());
             gl_ok!();
@@ -410,7 +411,7 @@ impl SpriteProgram {
                 offset_uniform,
                 point_size_uniform,
                 grid_dim_uniform,
-                cell_size_uniform,
+                //cell_size_uniform,
                 matrix_uniform,
                 bcol_uniform,
                 pos_attr,
