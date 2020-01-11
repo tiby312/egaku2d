@@ -7,7 +7,7 @@ use std::str;
 
 use crate::vbo::BufferInfo;
 use super::*;
-
+/*
 // Shader sources
 static VS_SRC: &'static str = "
 #version 300 es
@@ -49,6 +49,8 @@ void main() {
     texture_offset.y=float(ce.y);
 }";
 
+
+
 static FS_SRC: &'static str = "
 #version 300 es
 precision mediump float;
@@ -66,6 +68,83 @@ void main()
     out_color=texture(tex0,foo)*bcol;
 }
 ";
+
+*/
+
+// Shader sources
+static VS_SRC: &'static str = "
+#version 300 es
+in vec2 position;
+in float rotation;
+in uint cellindex;
+
+out vec2 texture_offset;
+out mat2 rot_matrix;
+
+uniform vec2 offset;
+uniform ivec2 grid_dim;
+uniform float cell_size;
+
+uniform mat3 mmatrix;
+uniform float point_size;
+
+const float PI = 3.1415926535897932384626433832795;
+
+void main() {
+    gl_PointSize = point_size;
+    vec3 pp = vec3(position.xy+offset,1.0);
+    gl_Position = vec4(mmatrix*pp.xyz, 1.0);
+
+    float rot=rotation*PI*2.0;
+    float c=cos(rot);
+    float s=sin(rot);
+
+    rot_matrix[0]=vec2(c,-s);
+    rot_matrix[1]=vec2(s,c);
+
+    int cellindex = int(cellindex);
+
+    //Force cellindex to be in a valid range
+    cellindex = cellindex % (grid_dim.x * grid_dim.y);
+
+    
+    //TODO optimize
+    ivec2 ce=ivec2(cellindex / (grid_dim.x), cellindex % (grid_dim.x));
+
+
+    //texture_offset.x=float(ce.x)/float(grid_dim.x);
+    //texture_offset.y=float(ce.y)/float(grid_dim.y);
+    texture_offset.x=float(ce.x);
+    texture_offset.y=float(ce.y);
+}";
+
+static FS_SRC: &'static str = "
+#version 300 es
+precision mediump float;
+in vec2 texture_offset;
+in mat2 rot_matrix;
+uniform highp ivec2 grid_dim;
+uniform sampler2D tex0;
+uniform vec4 bcol;
+out vec4 out_color;
+
+void main() 
+{
+    mat2 grid_dim2=mat2(1.0/float(grid_dim.x),0.0,0.0,1.0/float(grid_dim.y));
+
+    
+    vec2 pos=gl_PointCoord.xy-vec2(0.5,0.5);
+    
+    vec2 k =(pos)*grid_dim2;
+
+    vec2 foo =  rot_matrix*k+(texture_offset*grid_dim2);
+
+    vec2 foo2=foo+vec2(0.5,0.5);
+
+    out_color=texture(tex0,foo2)*bcol;
+}
+";
+
 
 //#[repr(transparent)]
 #[repr(packed(4))]
@@ -88,6 +167,7 @@ pub struct SpriteProgram {
     pub cell_size_uniform: GLint,
     pub bcol_uniform: GLint,
     pub pos_attr: GLint,
+    pub rotation_attr: GLint,
     pub index_attr: GLint,
     pub sample_location: GLint,
 }
@@ -173,6 +253,8 @@ impl SpriteProgram {
             gl::Uniform1i(self.sample_location, 0);
             gl_ok!();
 
+            assert_eq!(core::mem::size_of::<Vertex>(),4*3);
+
             gl::Uniform2i(
                 self.grid_dim_uniform,
                 texture.grid_dim[0] as i32,
@@ -204,6 +286,21 @@ impl SpriteProgram {
                 (4 * 2) as *const _,
             );
             gl_ok!();
+
+            
+            gl::EnableVertexAttribArray(self.rotation_attr as GLuint);
+            gl_ok!();
+
+            gl::VertexAttribPointer(
+                self.rotation_attr as GLuint,
+                1,
+                gl::UNSIGNED_SHORT,
+                gl::TRUE,
+                3 * 4 as i32,
+                ((4*2)+2) as *const _,
+            );
+            gl_ok!();
+            
 
             gl::DrawArrays(mode, 0 as i32, length as i32);
 
@@ -280,6 +377,12 @@ impl SpriteProgram {
                 gl::GetAttribLocation(program, CString::new("cellindex").unwrap().as_ptr());
             gl_ok!();
 
+            let rotation_attr =
+                gl::GetAttribLocation(program, CString::new("rotation").unwrap().as_ptr());
+            gl_ok!();
+            
+
+
             let sample_location =
                 gl::GetAttribLocation(program, CString::new("tex0").unwrap().as_ptr());
             gl_ok!();
@@ -288,6 +391,7 @@ impl SpriteProgram {
                 sample_location,
                 program,
                 square_uniform,
+                rotation_attr,
                 offset_uniform,
                 point_size_uniform,
                 grid_dim_uniform,

@@ -58,6 +58,7 @@ fn main() {
                 k.add(
                     [x, y],
                     food_tex.coord_to_index([i, j]),
+                    0.0
                 );
             }
         }
@@ -147,7 +148,8 @@ fn main() {
 
                         k.add(
                             [x,y],
-                            (cc % 64) as u16,
+                            0,//(cc % 64) as u16,
+                            c*0.2
                         );
                     }
                 }

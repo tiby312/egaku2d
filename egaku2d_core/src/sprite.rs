@@ -22,11 +22,16 @@ pub struct SpriteSession<'a> {
 impl SpriteSession<'_> {
     ///Add a point sprite.
     #[inline(always)]
-    pub fn add(&mut self, point: PointType, index: u16) -> &mut Self {
+    pub fn add(&mut self, point: PointType, index: u16,rotation:f32) -> &mut Self {
+        assert!(rotation>=0.0); //TODO do this a better way
+        let k=rotation % core::f32::consts::PI*2.;
+        let k=k/core::f32::consts::PI*2.;
+        let k= (k*(core::u16::MAX as f32)) as u16;
+
         self.sys.sprite_buffer.push(sprite_program::Vertex {
             pos: point,
             index: index as u16,
-            rotation:0
+            rotation:k
         });
         self
     }
