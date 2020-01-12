@@ -75,8 +75,8 @@ impl Texture {
     pub fn coord_to_index(&self, cell: [u8;2]) -> u16 {
         let cell=[cell[0] as u16,cell[1] as u16];
 
-        
-        self.grid_dim[0] as u16 * cell[0] + cell[1]
+
+        self.grid_dim[0] as u16 * cell[1] + cell[0]
     }
 
     pub unsafe fn new(textureid:GLuint,grid_dim:[u8;2],dim:[f32;2])->Texture{
