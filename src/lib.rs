@@ -520,6 +520,7 @@ fn build_opengl_mipmapped_texture(width: u32, height: u32, image: image::RgbaIma
         );
         gl_ok!();
 
+        //TODO convert these into options? with_linear() with_nearest() ??
         gl::TexParameteri(gl::TEXTURE_2D, gl::TEXTURE_MIN_FILTER, gl::NEAREST as i32);
         gl_ok!();
         gl::TexParameteri(gl::TEXTURE_2D, gl::TEXTURE_MAG_FILTER, gl::NEAREST as i32);
