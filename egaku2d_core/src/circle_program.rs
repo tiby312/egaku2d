@@ -52,7 +52,8 @@ void main() {
         discard;
     }
 
-    out_color = texture(tex0,(coord*0.001*ps)+vec2(0.5,0.5))*bcol;
+
+    out_color = texture(tex0,(coord*0.01*ps))*bcol;
 }";
 
 pub static REGULAR_FS_SRC: &'static str = "

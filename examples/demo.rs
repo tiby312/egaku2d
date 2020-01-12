@@ -28,6 +28,7 @@ fn main() {
     let food_tex = sys.texture("food.png", [8, 8]).unwrap();
     let adventurer = sys.texture("adventurer.png", [7, 11]).unwrap();
     let ascii_tex = sys.texture("ascii.png", [16, 14]).unwrap();
+    let bricks_tex = sys.texture("bricks.png", [1, 1]).unwrap();
 
     let rect_save = {
         let mut k = sys.canvas_mut().rects();
@@ -135,7 +136,7 @@ fn main() {
                 arrow_save.uniforms(canvas).draw();
                 line_save.uniforms(canvas).with_color(COL2).draw();
                 square_save.uniforms(canvas, 10.0).with_color(COL3).draw();
-                rect_save.uniforms(canvas).with_color(COL4).with_texture(&food_tex).draw();
+                rect_save.uniforms(canvas).with_color(COL4).with_texture(&bricks_tex).draw();
 
                 //draw some moving circles
                 let mut k = canvas.circles();
@@ -185,7 +186,7 @@ fn main() {
                     .add(cursor)
                     .uniforms(c)
                     .with_color(COL2)
-                    .with_texture(&food_tex)
+                    .with_texture(&bricks_tex)
                     .send_and_draw();
 
                 //draw a moving line
@@ -195,7 +196,7 @@ fn main() {
                     .add([50., 500.], [500., 50. + c.sin() * 50.])
                     .uniforms()
                     .with_color(COL3)
-                    .with_texture(&food_tex)
+                    .with_texture(&bricks_tex)
                     .send_and_draw();
 
                 //draw a rotating arrow
