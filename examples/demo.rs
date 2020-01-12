@@ -16,7 +16,6 @@ fn add_ascii(
     for a in st.chars() {
         let ascii = a as u8;
         assert!(ascii >= 32);
-        //assert!(ascii<32+(16*14));
         sprites.add(cc, (ascii - 32) as u16, rotation);
         cc[0] += width;
     }
@@ -27,9 +26,7 @@ fn main() {
     let mut sys = egaku2d::WindowedSystem::new([640, 480], &events_loop, "shapes example");
     //let mut sys=egaku2d::FullScreenSystem::new(&events_loop);
     let food_tex = sys.texture("food.png", [8, 8]).unwrap();
-
-    //let adventurer = sys.texture("adventurer.png", [7, 11]).unwrap();
-    //let _300_tex = sys.texture("128_64.png", [1, 1]).unwrap();
+    let adventurer = sys.texture("adventurer.png", [7, 11]).unwrap();
     let ascii_tex = sys.texture("ascii.png", [16, 14]).unwrap();
 
     let rect_save = {
@@ -171,7 +168,7 @@ fn main() {
                     }
                 }
 
-                k.uniforms(&food_tex, 100.0)
+                k.uniforms(&adventurer, 100.0)
                     .with_color(WHITE)
                     .send_and_draw();
 

@@ -76,6 +76,10 @@ pub mod uniforms {
             self.common.color = color;
             self
         }
+
+        pub fn with_texture(&mut self,texture:&sprite::Texture,offset:[f32;2],scale:f32)->&mut Self{
+            unimplemented!();
+        }
         pub fn draw(&mut self) {
             match &self.un {
                 UniformVals::Sprite(a) => {
