@@ -46,7 +46,7 @@ void main() {
     //Force cellindex to be in a valid range
     cellindex = cellindex % (grid_dim.x * grid_dim.y);
 
-    ivec2 ce=ivec2(cellindex / (grid_dim.x), cellindex % (grid_dim.x));
+    ivec2 ce=ivec2(cellindex % (grid_dim.x), cellindex / (grid_dim.x));
 
     texture_offset.x=float(ce.x);
     texture_offset.y=float(ce.y);

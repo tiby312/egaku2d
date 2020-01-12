@@ -6,6 +6,17 @@ use glutin::event::WindowEvent;
 use glutin::event_loop::ControlFlow;
 
 
+fn add_ascii(start:[f32;2],width:f32,rotation:f32,st:&str,sprites:&mut egaku2d::sprite::SpriteSession){
+    let mut cc=start;
+    for a in st.chars(){
+        let ascii=a as u8;
+        assert!(ascii>=32);
+        //assert!(ascii<32+(16*14));
+        sprites.add(cc,(ascii-32) as u16,rotation);
+        cc[0]+=width;
+    }
+}
+
 fn main() {
     let events_loop = glutin::event_loop::EventLoop::new();
     let mut sys = egaku2d::WindowedSystem::new([640, 480], &events_loop, "shapes example");
@@ -14,7 +25,7 @@ fn main() {
 
     //let adventurer = sys.texture("adventurer.png", [7, 11]).unwrap();
     //let _300_tex = sys.texture("128_64.png", [1, 1]).unwrap();
-    let tex = sys.texture("ascii.png", [16, 14]).unwrap();
+    let ascii_tex = sys.texture("ascii.png", [16, 14]).unwrap();
 
 
     let rect_save = {
@@ -159,8 +170,15 @@ fn main() {
                     }
                 }
 
-                k.uniforms(&tex,100.0).with_color(WHITE).send_and_draw();
+
+
+                k.uniforms(&food_tex,100.0).with_color(WHITE).send_and_draw();
                 
+                let mut text=canvas.sprites();
+                //text.add([400.,400.],1,0.0);
+                add_ascii([100.,400.],20.0,cc,"testing? testing!",&mut text);
+                text.add([100.,100.],ascii_tex.coord_to_index([2,2]),1.0);
+                text.uniforms(&ascii_tex,20.0).send_and_draw();
 
                 
                 //draw a growing circle
