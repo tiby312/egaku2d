@@ -13,10 +13,10 @@ fn add_ascii(
     sprites: &mut egaku2d::sprite::SpriteSession,
 ) {
     let mut cc = start;
-    for a in st.chars() {
+    for (i,a) in st.chars().enumerate() {
         let ascii = a as u8;
         assert!(ascii >= 32);
-        sprites.add(cc, (ascii - 32) as u16, rotation);
+        sprites.add(cc, (ascii - 32) as u16, rotation+(i as f32 * 0.1));
         cc[0] += width;
     }
 }
@@ -122,10 +122,10 @@ fn main() {
                 canvas.clear_color([0.2; 3]);
 
                 const COL1: [f32; 4] = [0.0, 1.0, 0.1, 0.1];
-                const COL2: [f32; 4] = [0.8, 0.8, 1.0, 0.4];
+                const COL2: [f32; 4] = [0.8, 0.8, 1.0, 1.0];
                 const COL3: [f32; 4] = [1.0, 0.0, 1.0, 0.4];
-                const COL4: [f32; 4] = [0.5, 1.0, 0.5, 0.6];
-                const WHITE: [f32; 4] = [1.0, 1.0, 1.0, 0.8];
+                const COL4: [f32; 4] = [0.5, 1.0, 0.5, 1.0];
+                const WHITE: [f32; 4] = [1.0, 1.0, 1.0, 1.0];
 
                 //draw static VBOs already on the gpu.
                 sprite_save
@@ -160,7 +160,7 @@ fn main() {
                     for x in (100..500).step_by(st).map(|a| a as f32) {
                         let c = (counter as f32 + x + y) * 0.01;
 
-                        let cc = ((counter as f32 + x + y) * 0.01) as u32;
+                        let cc = ((counter as f32 + x + y) * 0.1) as u32;
 
                         let x = x + c.sin() * 20.0;
                         let y = y + c.cos() * 20.0;
@@ -174,8 +174,8 @@ fn main() {
                     .send_and_draw();
 
                 let mut text = canvas.sprites();
-                //text.add([400.,400.],1,0.0);
-                add_ascii([100., 400.], 20.0, cc, "testing? testing!", &mut text);
+                
+                add_ascii([100., 400.], 20.0, cc.cos()*0.5-0.2, "testing? TESTING!", &mut text);
                 text.add([100., 100.], ascii_tex.coord_to_index([2, 2]), 1.0);
                 text.uniforms(&ascii_tex, 20.0).send_and_draw();
 
@@ -185,7 +185,7 @@ fn main() {
                     .circles()
                     .add(cursor)
                     .uniforms(c)
-                    .with_color(COL2)
+                    .with_color(WHITE)
                     .send_and_draw();
 
                 //draw a moving line
