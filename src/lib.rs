@@ -31,12 +31,16 @@
 //! This was a design decision to make each vertex as lightweight as possible (just a x and y position),
 //! making it more efficient to set and send to the gpu.
 //!
-//! # Key Design Themes
+//! # Key Design Goals
 //! 
-//! Assume cpu bound. This is a 2d drawing library even though most of the hardware outthere
-//! is made to handle 3d. This means that the gpu is under-utilized with this library.
-//! Because of this, there is little point to make a non-rotatable sprite version to save
-//! on gpu time. Especially since the vertex layout is the same size. So there are no gains
+//! The main goal was to make a very performat simple 2d graphics library. 
+//! There is special focus on reducing traffic between the cpu and the gpu by using compact vertices,
+//! point sprites, and by allowing the user to save vertex data to the gpu on their own.
+//!
+//! Writing fast shader programs is a seconady goal. This is a 2d drawing library even though most of the hardware outthere
+//! is made to handle 3d. This means that the gpu is most likely under-utilized with this library.
+//! Because of this, there is little point to make a non-rotatable sprite shader to save
+//! on gpu time, for example. Especially since the vertex layout is the same size. So there are no gains
 //! from having to send less data to the gpu.
 //! 
 //!
@@ -54,33 +58,26 @@
 //!   
 //! # Using Sprites
 //!
-//! Each sprite vertex has the following format:
-//! 
-//! position:[f32;2],
-//! index:u16,
-//! rotation:u16
-//!
-//!The texture index is the other piece of data every sprite has besides
-//!its position. It tells the gpu which part of a texture to draw.
-//!Each texture object has functions to create this index from a x and y coordinate. 
-//!On the gpu, the index will be split into a x and y coordinate.
-//!If the index is larger than texture.dim.x*texture.dim.y then it will be modded so that
-//!it can be mapped to a tile set. But obviously, the user should be picking an index
-//!that maps to a valid tile in the tile set to begin with.
-//! The rotation is normalized to a float on the gpu. The fact that the tile index has size u16,
-//! means you can have a texture with a mamimum of 256x256 tiles. 
-//! 
 //! You can also draw sprites! You can upload a tileset texture to the gpu and then draw thousands of sprites
 //! using a similar api to the shape drawing api. 
 //! The sprites are point sprites drawn using the opengl POINTS primitive in order to cut down on the data
-//! that needs to be sent to the gpu. The only information that is sent to the gpu on a sprite by sprite basis
-//! is its position, and its tile index.
+//! that needs to be sent to the gpu.
 //!
-//! While the user can pick different tile
-//! coorinates to draw different sprints within the texture they upload to the gpu, they cannot rotate the sprite.
-//! The sprite is drawn centered at the position the user specifies. They can change the size of all sprites in the 
-//! draw session by changing its radius. See the example below.
+//! Each sprite vertex is composed of the following:
+//! 
+//! * position:[f32;2]
+//! * index:u16 - the user can index up to 256*256 different sprites in a tile set.
+//! * rotation:u16 - this gets normalized to a float internally. The user passes a f32 float in radians.
 //!
+//! So each sprite vertex is compact at 4*3=12 bytes.
+//!
+//! Each texture object has functions to create this index from a x and y coordinate. 
+//! On the gpu, the index will be split into a x and y coordinate.
+//! If the index is larger than texture.dim.x*texture.dim.y then it will be modded so that
+//! it can be mapped to a tile set. But obviously, the user should be picking an index
+//! that maps to a valid tile in the tile set to begin with.
+//! The rotation is normalized to a float on the gpu. The fact that the tile index has size u16,
+//! means you can have a texture with a mamimum of 256x256 tiles. 
 //!
 //! # View
 //!
@@ -150,7 +147,7 @@
 //!   .uniforms(4.0).with_color([0., 1., 1., 0.1]).send_and_draw();
 //!
 //! //Draw the first tile in the top left corder of the texture.
-//! canvas.sprites().add([100.,100.],food_texture.coord_to_index([0,0])).uniforms(&food_texture,4.0).send_and_draw();
+//! canvas.sprites().add([100.,100.],food_texture.coord_to_index([0,0]),3.14).uniforms(&food_texture,4.0).send_and_draw();
 //!
 //! //Swap buffers on the opengl context.
 //! glsys.swap_buffers();
