@@ -43,7 +43,7 @@ uniform vec4 bcol;
 out vec4 out_color;
 in vec2 pos;
 in float ps;
-uniform sampler2D tex0;
+//uniform sampler2D tex0;
 void main() {
 
     vec2 coord = gl_PointCoord - vec2(0.5,0.5);
@@ -53,7 +53,8 @@ void main() {
     }
 
 
-    out_color = texture(tex0,(coord*0.01*ps))*bcol;
+    //out_color = texture(tex0,(coord*0.01*ps))*bcol;
+    out_color = bcol;
 }";
 
 pub static REGULAR_FS_SRC: &'static str = "
@@ -63,9 +64,10 @@ uniform vec4 bcol;
 in vec2 pos;
 out vec4 out_color;
 
-uniform sampler2D tex0;
+//uniform sampler2D tex0;
 void main() {
-    out_color = texture(tex0,pos)*bcol;
+    //out_color = texture(tex0,pos)*bcol;
+    out_color=bcol;
 }";
 
 #[repr(transparent)]
@@ -80,7 +82,7 @@ pub struct CircleProgram {
     pub point_size_uniform: GLint,
     pub bcol_uniform: GLint,
     pub pos_attr: GLint,
-    pub sample_location: GLint,
+    //pub sample_location: GLint,
 }
 
 #[derive(Debug)]
@@ -151,6 +153,7 @@ impl CircleProgram {
             gl::BindBuffer(gl::ARRAY_BUFFER, buffer_id);
             gl_ok!();
 
+            /*
             match un.texture{
                 Some(t)=>{
                     let texture_id=t.id;
@@ -169,6 +172,7 @@ impl CircleProgram {
 
                 }
             }
+            */
             
 
 
@@ -242,20 +246,20 @@ impl CircleProgram {
                 gl::GetAttribLocation(program, CString::new("position").unwrap().as_ptr());
             gl_ok!();
 
+            /*
             let sample_location =
                 gl::GetAttribLocation(program, CString::new("tex0").unwrap().as_ptr());
             gl_ok!();
-
+            */
 
             CircleProgram {
                 program,
                 offset_uniform,
-                //square_uniform,
                 point_size_uniform,
                 matrix_uniform,
                 bcol_uniform,
                 pos_attr,
-                sample_location
+                //sample_location
             }
         }
     }

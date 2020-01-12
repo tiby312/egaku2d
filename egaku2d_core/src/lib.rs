@@ -76,7 +76,7 @@ pub mod uniforms {
             self.common.color = color;
             self
         }
-
+/*
         pub fn with_texture(&mut self,texture:&'a sprite::Texture)->&mut Self{
             //add offset:[f32;2],scale:f32
             //println!("offset ignored");
@@ -95,7 +95,7 @@ pub mod uniforms {
             }   
             self
         }
-
+*/
         pub fn draw(&mut self) {
             match &self.un {
                 UniformVals::Sprite(a) => {
@@ -139,7 +139,7 @@ pub mod uniforms {
             self.common.offset = vec2(offset[0], offset[1]);
             self
         }
-
+/*
         pub fn with_texture(&mut self,texture:&'a sprite::Texture)->&mut Self{
             //add offset:[f32;2],scale:f32
             //println!("offset ignored");
@@ -158,7 +158,7 @@ pub mod uniforms {
             }   
             self
         }
-
+*/
         pub fn with_color(&mut self, color: [f32; 4]) -> &mut Self {
             self.common.color = color;
             self
