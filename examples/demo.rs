@@ -135,7 +135,7 @@ fn main() {
                 arrow_save.uniforms(canvas).draw();
                 line_save.uniforms(canvas).with_color(COL2).draw();
                 square_save.uniforms(canvas, 10.0).with_color(COL3).draw();
-                rect_save.uniforms(canvas).with_color(COL4).draw();
+                rect_save.uniforms(canvas).with_color(COL4).with_texture(&food_tex).draw();
 
                 //draw some moving circles
                 let mut k = canvas.circles();
@@ -185,6 +185,7 @@ fn main() {
                     .add(cursor)
                     .uniforms(c)
                     .with_color(COL2)
+                    .with_texture(&food_tex)
                     .send_and_draw();
 
                 //draw a moving line
@@ -194,6 +195,7 @@ fn main() {
                     .add([50., 500.], [500., 50. + c.sin() * 50.])
                     .uniforms()
                     .with_color(COL3)
+                    .with_texture(&food_tex)
                     .send_and_draw();
 
                 //draw a rotating arrow

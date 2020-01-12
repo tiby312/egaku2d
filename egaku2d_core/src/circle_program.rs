@@ -7,21 +7,31 @@ use std::ffi::CString;
 use std::str;
 
 #[derive(Copy, Clone, Debug)]
-pub struct ProgramUniformValues {
-    pub mode: u32,
+pub struct ProgramUniformValues<'a>{
     pub radius: f32,
+    pub mode: u32,
+    pub texture:Option<&'a sprite::Texture>
+}
+impl ProgramUniformValues<'_>{
+    pub fn new(radius:f32,mode:u32)->Self{
+        ProgramUniformValues{mode,radius,texture:None}
+    }
 }
 
 // Shader sources
 pub static VS_SRC: &'static str = "
 #version 300 es
 in vec2 position;
+out vec2 pos;
+out float ps;
 uniform vec2 offset;
 uniform mat3 mmatrix;
 uniform float point_size;
 void main() {
     gl_PointSize = point_size;
     vec3 pp=vec3(position+offset,1.0);
+    pos=position*0.005;
+    ps=gl_PointSize;
     gl_Position = vec4(mmatrix*pp.xyz, 1.0);
 }";
 
@@ -31,26 +41,30 @@ pub static CIRCLE_FS_SRC: &'static str = "
 precision mediump float;
 uniform vec4 bcol;
 out vec4 out_color;
+in vec2 pos;
+in float ps;
+uniform sampler2D tex0;
 void main() {
 
-    vec2 coord = gl_PointCoord - vec2(0.5);
+    vec2 coord = gl_PointCoord - vec2(0.5,0.5);
     float dis=dot(coord,coord);
     if(dis > 0.25){                  //outside of circle radius?
         discard;
-        //out_color = vec4(gl_PointCoord,0.0,bcol[3]);
-        //return;
     }
 
-    out_color = bcol;
+    out_color = texture(tex0,(coord*0.001*ps)+vec2(0.5,0.5))*bcol;
 }";
 
 pub static REGULAR_FS_SRC: &'static str = "
 #version 300 es
 precision mediump float;
 uniform vec4 bcol;
+in vec2 pos;
 out vec4 out_color;
+
+uniform sampler2D tex0;
 void main() {
-    out_color = bcol;
+    out_color = texture(tex0,pos)*bcol;
 }";
 
 #[repr(transparent)]
@@ -61,11 +75,11 @@ pub struct Vertex(pub [f32; 2]);
 pub struct CircleProgram {
     pub program: GLuint,
     pub matrix_uniform: GLint,
-    //pub square_uniform: GLint,
     pub offset_uniform: GLint,
     pub point_size_uniform: GLint,
     pub bcol_uniform: GLint,
     pub pos_attr: GLint,
+    pub sample_location: GLint,
 }
 
 #[derive(Debug)]
@@ -115,33 +129,7 @@ impl CircleProgram {
         let buffer_id = buffer_info.id;
         let offset = common.offset;
         let length = buffer_info.length;
-
-        //TODO NO IDEA WHY THIS IS NEEDED ON LINUX.
-        //Without this function call, on linux not every shape gets drawn.
-        //gl_PointCoord will always return zero if you you try
-        //and draw some circles after drawing a rect save.
-        //It is something to do with changing between gl::TRIANGLES to gl::POINTS.
-        //but this shouldnt be a problem since they are seperate vbos.
-
-        unsafe {
-            gl::UseProgram(self.program);
-            gl_ok!();
-
-            gl::BindBuffer(gl::ARRAY_BUFFER, buffer_id);
-            gl_ok!();
-
-            gl::EnableVertexAttribArray(self.pos_attr as GLuint);
-            gl_ok!();
-
-            gl::Uniform1f(self.point_size_uniform, 0.0);
-            gl_ok!();
-
-            gl::DrawArrays(mode, 0, 1);
-            gl_ok!();
-
-            gl::BindBuffer(gl::ARRAY_BUFFER, 0);
-            gl_ok!();
-        }
+        
 
         unsafe {
             gl::UseProgram(self.program);
@@ -161,6 +149,27 @@ impl CircleProgram {
 
             gl::BindBuffer(gl::ARRAY_BUFFER, buffer_id);
             gl_ok!();
+
+            match un.texture{
+                Some(t)=>{
+                    let texture_id=t.id;
+
+                    gl::ActiveTexture(gl::TEXTURE0);
+                    gl_ok!();
+
+                    gl::BindTexture(gl::TEXTURE_2D, texture_id);
+                    gl_ok!();
+
+                    gl::Uniform1i(self.sample_location, 0);
+                    gl_ok!();
+                    
+                },
+                None=>{
+
+                }
+            }
+            
+
 
             gl::EnableVertexAttribArray(self.pos_attr as GLuint);
             gl_ok!();
@@ -232,6 +241,11 @@ impl CircleProgram {
                 gl::GetAttribLocation(program, CString::new("position").unwrap().as_ptr());
             gl_ok!();
 
+            let sample_location =
+                gl::GetAttribLocation(program, CString::new("tex0").unwrap().as_ptr());
+            gl_ok!();
+
+
             CircleProgram {
                 program,
                 offset_uniform,
@@ -240,6 +254,7 @@ impl CircleProgram {
                 matrix_uniform,
                 bcol_uniform,
                 pos_attr,
+                sample_location
             }
         }
     }

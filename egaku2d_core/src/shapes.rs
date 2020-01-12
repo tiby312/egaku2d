@@ -10,10 +10,8 @@ impl SquareSave {
             color: sys.color,
             offset: vec2same(0.0),
         };
-        let un = ProgramUniformValues {
-            radius,
-            mode: gl::POINTS,
-        };
+        let un = ProgramUniformValues::new(radius,gl::POINTS);
+
         StaticUniforms {
             sys,
             un: UniformVals::Regular(un),
@@ -45,10 +43,8 @@ impl<'a> SquareSession<'a> {
             color: self.sys.color,
             offset: vec2same(0.0),
         };
-        let un = ProgramUniformValues {
-            radius,
-            mode: gl::POINTS,
-        };
+        let un = ProgramUniformValues::new(radius,gl::POINTS);
+
         Uniforms {
             sys: self.sys,
             common,
@@ -67,10 +63,7 @@ impl CircleSave {
             color: sys.color,
             offset: vec2same(0.0),
         };
-        let un = ProgramUniformValues {
-            radius,
-            mode: gl::POINTS,
-        };
+        let un = ProgramUniformValues::new(radius,gl::POINTS);
         StaticUniforms {
             common,
             sys,
@@ -96,10 +89,8 @@ impl<'a> CircleSession<'a> {
             color: self.sys.color,
             offset: vec2same(0.0),
         };
-        let un = ProgramUniformValues {
-            radius,
-            mode: gl::POINTS,
-        };
+        let un = ProgramUniformValues::new(radius,gl::POINTS);
+
         Uniforms {
             sys: self.sys,
             common,
@@ -129,10 +120,7 @@ impl RectSave {
             color: sys.color,
             offset: vec2same(0.0),
         };
-        let un = ProgramUniformValues {
-            radius: 0.0,
-            mode: gl::TRIANGLES,
-        };
+        let un = ProgramUniformValues::new(0.0,gl::TRIANGLES);
         StaticUniforms {
             sys,
             common,
@@ -155,10 +143,7 @@ impl RectSession<'_> {
             color: self.sys.color,
             offset: vec2same(0.0),
         };
-        let un = ProgramUniformValues {
-            radius: 0.0,
-            mode: gl::TRIANGLES,
-        };
+        let un = ProgramUniformValues::new(0.0,gl::TRIANGLES);
         Uniforms {
             sys: self.sys,
             common,
@@ -192,10 +177,7 @@ impl ArrowSave {
             color: sys.color,
             offset: vec2same(0.0),
         };
-        let un = ProgramUniformValues {
-            radius: 0.0,
-            mode: gl::TRIANGLES,
-        };
+        let un = ProgramUniformValues::new(0.0,gl::TRIANGLES);
         StaticUniforms {
             sys,
             common,
@@ -222,10 +204,7 @@ impl ArrowSession<'_> {
             color: self.sys.color,
             offset: vec2same(0.0),
         };
-        let un = ProgramUniformValues {
-            radius: 0.0,
-            mode: gl::TRIANGLES,
-        };
+        let un = ProgramUniformValues::new(0.0,gl::TRIANGLES);
         Uniforms {
             sys: self.sys,
             common,
@@ -273,10 +252,7 @@ impl LineSave {
             color: sys.color,
             offset: vec2same(0.0),
         };
-        let un = ProgramUniformValues {
-            radius: 0.0,
-            mode: gl::TRIANGLES,
-        };
+        let un = ProgramUniformValues::new(0.0,gl::TRIANGLES);
         StaticUniforms {
             sys,
             common,
@@ -305,10 +281,7 @@ impl LineSession<'_> {
             offset: vec2same(0.0),
         };
 
-        let un = ProgramUniformValues {
-            radius: 0.0,
-            mode: gl::TRIANGLES,
-        };
+        let un = ProgramUniformValues::new(0.0,gl::TRIANGLES);
         Uniforms {
             sys: self.sys,
             common,
