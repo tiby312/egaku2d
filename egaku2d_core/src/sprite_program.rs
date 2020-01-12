@@ -46,11 +46,6 @@ void main() {
     //Force cellindex to be in a valid range
     cellindex = cellindex % (grid_dim.x * grid_dim.y);
 
-
-
-
-    
-    //TODO optimize
     ivec2 ce=ivec2(cellindex / (grid_dim.x), cellindex % (grid_dim.x));
 
     texture_offset.x=float(ce.x);
@@ -72,25 +67,20 @@ out vec4 out_color;
 
 const float SQRT2=1.41421356237;
 
+//This is the offset from the outer rectangle to the inner rectangle.
+//We need a larger outer rectangle since if the sprite rotates, its corners would clip.
+//The width of the outer rectangle needs to be sqrt(2)*normal rectangle.
+const float s2=(SQRT2-1.0)/(2.0*SQRT2);
+
+const vec2 mid=vec2(0.5,0.5);
+
 void main() 
 {
     vec2 dim=vec2(float(grid_dim.x),float(grid_dim.y));
     mat2 grid_dim2=mat2(1.0/dim.x,0.0,0.0,1.0/dim.y);
-
-    vec2 mid=vec2(0.5,0.5);
-
-    
-
-    //This is the offset from the outer rectangle to the inner rectangle.
-    //We need a larger outer rectangle since if the sprite rotates, its corners would clip.
-    //The width of the outer rectangle needs to be sqrt(2)*normal rectangle.
-    float s2=(SQRT2-1.0)/(2.0*SQRT2);
-    
-
     
     //Handle rotation before we do anything.`
     vec2 pos=  (rot_matrix*( (gl_PointCoord.xy-mid)) + mid);
-
     
     vec2 extra=vec2(max(0.0,(sprite_dim.y-sprite_dim.x)/3.0),max(0.0,(sprite_dim.x-sprite_dim.y)/3.0)) ;
     extra.x+=0.01; //TODO why is this needed?
@@ -100,7 +90,6 @@ void main()
     //rectangle.
     if (pos.x>=(1.0-s2-extra.x) || pos.x<(0.0+s2+extra.x) || pos.y>=(1.0-s2-extra.y) || pos.y<(0.0+s2+extra.y)){
         discard;
-        //out_color=vec4(1.0,0.0,0.0,0.2);
     }else{     
     
         vec2 pp1=(pos-mid)/sprite_dim+mid;
