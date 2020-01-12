@@ -5,15 +5,20 @@ use glutin::event::VirtualKeyCode;
 use glutin::event::WindowEvent;
 use glutin::event_loop::ControlFlow;
 
-
-fn add_ascii(start:[f32;2],width:f32,rotation:f32,st:&str,sprites:&mut egaku2d::sprite::SpriteSession){
-    let mut cc=start;
-    for a in st.chars(){
-        let ascii=a as u8;
-        assert!(ascii>=32);
+fn add_ascii(
+    start: [f32; 2],
+    width: f32,
+    rotation: f32,
+    st: &str,
+    sprites: &mut egaku2d::sprite::SpriteSession,
+) {
+    let mut cc = start;
+    for a in st.chars() {
+        let ascii = a as u8;
+        assert!(ascii >= 32);
         //assert!(ascii<32+(16*14));
-        sprites.add(cc,(ascii-32) as u16,rotation);
-        cc[0]+=width;
+        sprites.add(cc, (ascii - 32) as u16, rotation);
+        cc[0] += width;
     }
 }
 
@@ -27,7 +32,6 @@ fn main() {
     //let _300_tex = sys.texture("128_64.png", [1, 1]).unwrap();
     let ascii_tex = sys.texture("ascii.png", [16, 14]).unwrap();
 
-
     let rect_save = {
         let mut k = sys.canvas_mut().rects();
         k.add([400., 420., 410., 420.]);
@@ -39,9 +43,9 @@ fn main() {
     let square_save = {
         //Draw some squares
         let mut k = sys.canvas_mut().squares();
-        for x in (0..1000).step_by(100).map(|a|a as f32) {
-            for y in (0..1000).step_by(100).map(|a|a as f32) {
-                k.add([x,y]);
+        for x in (0..1000).step_by(100).map(|a| a as f32) {
+            for y in (0..1000).step_by(100).map(|a| a as f32) {
+                k.add([x, y]);
             }
         }
         k.save()
@@ -65,27 +69,29 @@ fn main() {
             .save()
     };
 
-    
     let sprite_save = {
         let mut k = sys.canvas_mut().sprites();
-        for (i, x) in (032..200).step_by(32).enumerate().map(|(a,b)|(a as u8,b as f32)) {
-            for (j, y) in (032..200).step_by(32).enumerate().map(|(a,b)|(a as u8,b as f32)) {
-                k.add(
-                    [x, y],
-                    food_tex.coord_to_index([i, j]),
-                    0.0
-                );
+        for (i, x) in (032..200)
+            .step_by(32)
+            .enumerate()
+            .map(|(a, b)| (a as u8, b as f32))
+        {
+            for (j, y) in (032..200)
+                .step_by(32)
+                .enumerate()
+                .map(|(a, b)| (a as u8, b as f32))
+            {
+                k.add([x, y], food_tex.coord_to_index([i, j]), 0.0);
             }
         }
         k.save()
     };
-    
 
     //Draw 60 frames per second.
     let mut timer = egaku2d::RefreshTimer::new(16);
 
     let mut counter = 0;
-    let mut cursor = [0.0;2];
+    let mut cursor = [0.0; 2];
     events_loop.run(move |event, _, control_flow| match event {
         Event::WindowEvent { event, .. } => match event {
             WindowEvent::KeyboardInput { input, .. } => match input.virtual_keycode {
@@ -112,9 +118,8 @@ fn main() {
             if timer.is_ready() {
                 let canvas = sys.canvas_mut();
 
-                
-                let cc=counter as f32*0.1;
-                let wobble=[cc.cos()*10.0,cc.sin()*10.0];
+                let cc = counter as f32 * 0.1;
+                let wobble = [cc.cos() * 10.0, cc.sin() * 10.0];
 
                 canvas.clear_color([0.2; 3]);
 
@@ -125,68 +130,66 @@ fn main() {
                 const WHITE: [f32; 4] = [1.0, 1.0, 1.0, 0.8];
 
                 //draw static VBOs already on the gpu.
-                sprite_save.uniforms(canvas, &food_tex,32.0).with_color(COL4).with_offset([-wobble[0],-wobble[1]]).draw();
+                sprite_save
+                    .uniforms(canvas, &food_tex, 32.0)
+                    .with_color(COL4)
+                    .with_offset([-wobble[0], -wobble[1]])
+                    .draw();
                 arrow_save.uniforms(canvas).draw();
                 line_save.uniforms(canvas).with_color(COL2).draw();
-                square_save.uniforms(canvas,10.0).with_color(COL3).draw();
+                square_save.uniforms(canvas, 10.0).with_color(COL3).draw();
                 rect_save.uniforms(canvas).with_color(COL4).draw();
-                
 
-                
                 //draw some moving circles
                 let mut k = canvas.circles();
-                for x in (0..1000).step_by(12).map(|a|a as f32) {
-                    for y in (0..1000).step_by(12).map(|a|a as f32) {
+                for x in (0..1000).step_by(12).map(|a| a as f32) {
+                    for y in (0..1000).step_by(12).map(|a| a as f32) {
                         let c = (counter as f32 + x + y) * 0.01;
 
-                        let x=x+c.sin() * y * 0.1;
-                        let y=y+c.cos() * x * 0.1;
-                        
-                        k.add([x,y]);
+                        let x = x + c.sin() * y * 0.1;
+                        let y = y + c.cos() * x * 0.1;
+
+                        k.add([x, y]);
                     }
                 }
                 k.uniforms(8.0).with_color(COL1).send_and_draw();
-                
 
-            
                 //draw some moving sprites
                 let mut k = canvas.sprites();
 
-                let st=300;
-                for y in (100..500).step_by(st).map(|a|a as f32) {
-                    for x in (100..500).step_by(st).map(|a|a as f32) {
+                let st = 300;
+                for y in (100..500).step_by(st).map(|a| a as f32) {
+                    for x in (100..500).step_by(st).map(|a| a as f32) {
                         let c = (counter as f32 + x + y) * 0.01;
-                        
+
                         let cc = ((counter as f32 + x + y) * 0.01) as u32;
 
-                        let x=x+c.sin() * 20.0;
-                        let y=y+c.cos() * 20.0;
+                        let x = x + c.sin() * 20.0;
+                        let y = y + c.cos() * 20.0;
 
-                        k.add(
-                            [x,y],
-                            (cc % 64) as u16,
-                            c
-                        );
+                        k.add([x, y], (cc % 64) as u16, c);
                     }
                 }
 
+                k.uniforms(&food_tex, 100.0)
+                    .with_color(WHITE)
+                    .send_and_draw();
 
-
-                k.uniforms(&food_tex,100.0).with_color(WHITE).send_and_draw();
-                
-                let mut text=canvas.sprites();
+                let mut text = canvas.sprites();
                 //text.add([400.,400.],1,0.0);
-                add_ascii([100.,400.],20.0,cc,"testing? testing!",&mut text);
-                text.add([100.,100.],ascii_tex.coord_to_index([2,2]),1.0);
-                text.uniforms(&ascii_tex,20.0).send_and_draw();
+                add_ascii([100., 400.], 20.0, cc, "testing? testing!", &mut text);
+                text.add([100., 100.], ascii_tex.coord_to_index([2, 2]), 1.0);
+                text.uniforms(&ascii_tex, 20.0).send_and_draw();
 
-                
                 //draw a growing circle
                 let c = ((counter as f32 * 0.06).sin() * 100.0).abs();
-                canvas.circles().add(cursor).uniforms(c).with_color(COL2).send_and_draw();
-            
+                canvas
+                    .circles()
+                    .add(cursor)
+                    .uniforms(c)
+                    .with_color(COL2)
+                    .send_and_draw();
 
-                
                 //draw a moving line
                 let c = counter as f32 * 0.07;
                 canvas
@@ -195,21 +198,18 @@ fn main() {
                     .uniforms()
                     .with_color(COL3)
                     .send_and_draw();
-            
 
-            
                 //draw a rotating arrow
                 let c = counter as f32 * 0.04;
                 let center = [400., 400.];
 
-                let other=[center[0]+c.cos() * 80.,center[1]+c.sin() * 80.];
+                let other = [center[0] + c.cos() * 80., center[1] + c.sin() * 80.];
                 canvas
                     .arrows(10.0)
                     .add(center, other)
                     .uniforms()
                     .with_color(COL4)
                     .send_and_draw();
-                
 
                 //display what we drew
                 sys.swap_buffers();

@@ -5,9 +5,8 @@ use axgeom;
 use std::ffi::CString;
 use std::str;
 
-use crate::vbo::BufferInfo;
 use super::*;
-
+use crate::vbo::BufferInfo;
 
 // Shader sources
 static VS_SRC: &'static str = "
@@ -51,8 +50,6 @@ void main() {
     texture_offset.x=float(ce.x);
     texture_offset.y=float(ce.y);
 }";
-
-
 
 static FS_SRC: &'static str = "
 #version 300 es
@@ -114,7 +111,7 @@ void main()
 pub struct Vertex {
     pub pos: [f32; 2], //TODO use half floats??
     pub index: u16,
-    pub rotation: u16
+    pub rotation: u16,
 }
 
 #[derive(Debug)]
@@ -136,12 +133,11 @@ pub struct SpriteProgram {
 #[derive(Debug)]
 pub struct PointMul(pub f32);
 
-#[derive(Copy,Clone,Debug)]
-pub struct SpriteProgramUniformValues<'a>{
-    pub texture:&'a crate::sprite::Texture,
-    pub radius:f32
+#[derive(Copy, Clone, Debug)]
+pub struct SpriteProgramUniformValues<'a> {
+    pub texture: &'a crate::sprite::Texture,
+    pub radius: f32,
 }
-
 
 impl SpriteProgram {
     pub fn set_viewport(
@@ -176,32 +172,32 @@ impl SpriteProgram {
 
     pub(crate) fn set_buffer_and_draw(
         &mut self,
-        common:&UniformCommon,
-        un:&SpriteProgramUniformValues,
-        buffer_info:BufferInfo,
+        common: &UniformCommon,
+        un: &SpriteProgramUniformValues,
+        buffer_info: BufferInfo,
     ) {
-        let col=common.color;
-        let buffer_id=buffer_info.id;
-        let length=buffer_info.length;
-        let point_size=un.radius;
+        let col = common.color;
+        let buffer_id = buffer_info.id;
+        let length = buffer_info.length;
+        let point_size = un.radius;
         let mode = gl::POINTS;
-        let texture=un.texture;
+        let texture = un.texture;
         let texture_id = un.texture.id;
-        let offset=common.offset;
-        
+        let offset = common.offset;
+
         unsafe {
             gl::UseProgram(self.program);
             gl_ok!();
 
             gl::Uniform1f(self.point_size_uniform, point_size);
             gl_ok!();
-            
-            gl::Uniform2f(self.offset_uniform, offset.x,offset.y);
+
+            gl::Uniform2f(self.offset_uniform, offset.x, offset.y);
             gl_ok!();
 
             gl::Uniform4fv(self.bcol_uniform, 1, col.as_ptr() as *const _);
             gl_ok!();
-        
+
             gl::BindBuffer(gl::ARRAY_BUFFER, buffer_id);
             gl_ok!();
 
@@ -214,27 +210,21 @@ impl SpriteProgram {
             gl::Uniform1i(self.sample_location, 0);
             gl_ok!();
 
-            assert_eq!(core::mem::size_of::<Vertex>(),4*3);
+            assert_eq!(core::mem::size_of::<Vertex>(), 4 * 3);
 
-            let sx=texture.dim[0]/(texture.grid_dim[0]  as f32 );
-            let sy=texture.dim[1]/(texture.grid_dim[1] as f32 );
+            let sx = texture.dim[0] / (texture.grid_dim[0] as f32);
+            let sy = texture.dim[1] / (texture.grid_dim[1] as f32);
 
-            let sprite_dim=if sx>sy{
-                [1.0,sy/sx]
-            }else{
-                [sx/sy,1.0]
+            let sprite_dim = if sx > sy {
+                [1.0, sy / sx]
+            } else {
+                [sx / sy, 1.0]
             };
-
 
             //Either the x or y component MUST be 1.0
             //The other component must be less than or equal to 1.0.
-            gl::Uniform2f(
-                self.sprite_dim_uniform,
-                sprite_dim[0],
-                sprite_dim[1],
-            );
+            gl::Uniform2f(self.sprite_dim_uniform, sprite_dim[0], sprite_dim[1]);
             gl_ok!();
-
 
             gl::Uniform2i(
                 self.grid_dim_uniform,
@@ -268,7 +258,6 @@ impl SpriteProgram {
             );
             gl_ok!();
 
-            
             gl::EnableVertexAttribArray(self.rotation_attr as GLuint);
             gl_ok!();
 
@@ -278,10 +267,9 @@ impl SpriteProgram {
                 gl::UNSIGNED_SHORT,
                 gl::TRUE,
                 3 * 4 as i32,
-                ((4*2)+2) as *const _,
+                ((4 * 2) + 2) as *const _,
             );
             gl_ok!();
-            
 
             gl::DrawArrays(mode, 0 as i32, length as i32);
 
@@ -325,7 +313,7 @@ impl SpriteProgram {
             let grid_dim_uniform: GLint =
                 gl::GetUniformLocation(program, CString::new("grid_dim").unwrap().as_ptr());
             gl_ok!();
-            
+
             let sprite_dim_uniform: GLint =
                 gl::GetUniformLocation(program, CString::new("sprite_dim").unwrap().as_ptr());
             gl_ok!();
@@ -361,8 +349,6 @@ impl SpriteProgram {
             let rotation_attr =
                 gl::GetAttribLocation(program, CString::new("rotation").unwrap().as_ptr());
             gl_ok!();
-            
-
 
             let sample_location =
                 gl::GetAttribLocation(program, CString::new("tex0").unwrap().as_ptr());

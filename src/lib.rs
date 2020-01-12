@@ -1,6 +1,6 @@
 //! # Overview
 //!
-//! A library that lets you draw various simple 2d geometry primitives and sprites fast using 
+//! A library that lets you draw various simple 2d geometry primitives and sprites fast using
 //! vertex buffer objects with a safe api (provided no other libray
 //! is calling opengl functions). Uses the builder pattern for a convinient api.
 //! The main design goal is to be able to draw thousands of shapes efficiently.
@@ -8,7 +8,7 @@
 //!
 //! ![](https://raw.githubusercontent.com/tiby312/egaku2d/master/assets/screenshot.gif)
 //!
-//! # Pipeline 
+//! # Pipeline
 //!
 //! The egaku2d drawing pipeline works as follows:
 //!
@@ -32,8 +32,8 @@
 //! making it more efficient to set and send to the gpu.
 //!
 //! # Key Design Goals
-//! 
-//! The main goal was to make a very performat simple 2d graphics library. 
+//!
+//! The main goal was to make a very performat simple 2d graphics library.
 //! There is special focus on reducing traffic between the cpu and the gpu by using compact vertices,
 //! point sprites, and by allowing the user to save vertex data to the gpu on their own.
 //!
@@ -42,7 +42,7 @@
 //! Because of this, there is little point to make a non-rotatable sprite shader to save
 //! on gpu time, for example. Especially since the vertex layout is the same size. So there are no gains
 //! from having to send less data to the gpu.
-//! 
+//!
 //!
 //! # Using Shapes
 //!
@@ -59,25 +59,25 @@
 //! # Using Sprites
 //!
 //! You can also draw sprites! You can upload a tileset texture to the gpu and then draw thousands of sprites
-//! using a similar api to the shape drawing api. 
+//! using a similar api to the shape drawing api.
 //! The sprites are point sprites drawn using the opengl POINTS primitive in order to cut down on the data
 //! that needs to be sent to the gpu.
 //!
 //! Each sprite vertex is composed of the following:
-//! 
+//!
 //! * position:[f32;2]
 //! * index:u16 - the user can index up to 256*256 different sprites in a tile set.
 //! * rotation:u16 - this gets normalized to a float internally. The user passes a f32 float in radians.
 //!
 //! So each sprite vertex is compact at 4*3=12 bytes.
 //!
-//! Each texture object has functions to create this index from a x and y coordinate. 
+//! Each texture object has functions to create this index from a x and y coordinate.
 //! On the gpu, the index will be split into a x and y coordinate.
 //! If the index is larger than texture.dim.x*texture.dim.y then it will be modded so that
 //! it can be mapped to a tile set. But obviously, the user should be picking an index
 //! that maps to a valid tile in the tile set to begin with.
 //! The rotation is normalized to a float on the gpu. The fact that the tile index has size u16,
-//! means you can have a texture with a mamimum of 256x256 tiles. 
+//! means you can have a texture with a mamimum of 256x256 tiles.
 //!
 //! # View
 //!
@@ -153,9 +153,6 @@
 //! glsys.swap_buffers();
 //! ```
 
-
-
-
 use axgeom::*;
 pub use glutin;
 use glutin::PossiblyCurrent;
@@ -163,10 +160,9 @@ use glutin::PossiblyCurrent;
 use egaku2d_core;
 use egaku2d_core::gl;
 
-
-pub use egaku2d_core::uniforms;
 pub use egaku2d_core::shapes;
 pub use egaku2d_core::sprite;
+pub use egaku2d_core::uniforms;
 pub use egaku2d_core::SimpleCanvas;
 
 ///A timer to determine how often to refresh the screen.
@@ -238,7 +234,7 @@ pub mod fullscreen {
 
             let window_dim = axgeom::FixedAspectVec2 {
                 ratio: AspectRatio(vec2(width as f64, height as f64)),
-                width:width as f64,
+                width: width as f64,
             };
 
             let windowed_context = Some(windowed_context);
@@ -323,9 +319,9 @@ pub mod fullscreen {
         pub fn texture(
             &mut self,
             file: &str,
-            grid_dim: [u32;2],
+            grid_dim: [u32; 2],
         ) -> image::ImageResult<sprite::Texture> {
-            crate::texture(file,grid_dim)
+            crate::texture(file, grid_dim)
         }
 
         pub fn canvas(&self) -> &SimpleCanvas {
@@ -349,9 +345,6 @@ pub mod fullscreen {
     }
 }
 
-
-
-
 ///A version where the user can control the size of the window.
 pub struct WindowedSystem {
     inner: SimpleCanvas,
@@ -361,11 +354,11 @@ pub struct WindowedSystem {
 
 impl WindowedSystem {
     pub fn new(
-        dim: [usize;2],
+        dim: [usize; 2],
         events_loop: &glutin::event_loop::EventLoop<()>,
         title: &str,
     ) -> WindowedSystem {
-        let dim=vec2(dim[0],dim[1]);
+        let dim = vec2(dim[0], dim[1]);
         let dim = dim.inner_as::<f32>();
 
         let game_world = Rect::new(0.0, dim.x, 0.0, dim.y);
@@ -375,7 +368,8 @@ impl WindowedSystem {
 
         let monitor = prompt_for_monitor(events_loop);
         let dpi = monitor.scale_factor();
-        let p : glutin::dpi::LogicalSize<f64>= glutin::dpi::PhysicalSize { width, height }.to_logical(dpi);
+        let p: glutin::dpi::LogicalSize<f64> =
+            glutin::dpi::PhysicalSize { width, height }.to_logical(dpi);
 
         let gl_window = glutin::window::WindowBuilder::new()
             .with_inner_size(p)
@@ -397,14 +391,13 @@ impl WindowedSystem {
         assert_eq!(unsafe { gl::GetError() }, gl::NO_ERROR);
 
         //let dpi = windowed_context.window().scale_factor();
-        let glutin::dpi::PhysicalSize { width, height } =
-            windowed_context.window().inner_size();
+        let glutin::dpi::PhysicalSize { width, height } = windowed_context.window().inner_size();
         assert_eq!(width as usize, dim.x as usize);
         assert_eq!(height as usize, dim.y as usize);
 
         let window_dim = axgeom::FixedAspectVec2 {
             ratio: AspectRatio(vec2(width as f64, height as f64)),
-            width:width as f64,
+            width: width as f64,
         };
 
         WindowedSystem {
@@ -413,7 +406,6 @@ impl WindowedSystem {
             inner: unsafe { SimpleCanvas::new(window_dim) },
         }
     }
-
 
     pub fn set_viewport_from_width(&mut self, width: f32) {
         self.inner.set_viewport(self.window_dim, width);
@@ -432,9 +424,9 @@ impl WindowedSystem {
         self.inner.set_viewport(self.window_dim, width);
     }
 
-    pub fn get_dim(&self) -> [usize;2] {
-        let v=self.window_dim.as_vec().inner_as();
-        [v.x,v.y]
+    pub fn get_dim(&self) -> [usize; 2] {
+        let v = self.window_dim.as_vec().inner_as();
+        [v.x, v.y]
     }
 
     ///Creates a new texture from the specified file.
@@ -445,9 +437,9 @@ impl WindowedSystem {
     pub fn texture(
         &mut self,
         file: &str,
-        grid_dim: [u8;2],
+        grid_dim: [u8; 2],
     ) -> image::ImageResult<sprite::Texture> {
-        crate::texture(file,grid_dim)
+        crate::texture(file, grid_dim)
     }
 
     pub fn canvas(&self) -> &SimpleCanvas {
@@ -476,23 +468,16 @@ fn prompt_for_monitor(el: &EventLoop<()>) -> MonitorHandle {
     monitor
 }
 
-
-
-
+use egaku2d_core::gl::types::GLuint;
 use egaku2d_core::gl_ok;
 use egaku2d_core::sprite::*;
-use egaku2d_core::gl::types::GLuint;
 
 ///Creates a new texture from the specified file.
 ///The fact that we need a mutable reference to this object
 ///Ensures that we make the texture in the same thread.
 ///The grid dimensions passed are the tile dimensions is
 ///the texture is a tile set.
-fn texture(
-    file: &str,
-    grid_dim: [u8;2],
-) -> image::ImageResult<sprite::Texture> {
-
+fn texture(file: &str, grid_dim: [u8; 2]) -> image::ImageResult<sprite::Texture> {
     match image::open(&file.to_string()) {
         Err(err) => Err(err),
         Ok(img) => {
@@ -506,7 +491,7 @@ fn texture(
             };
 
             let id = build_opengl_mipmapped_texture(width, height, img);
-            Ok(unsafe{Texture::new(id,grid_dim,[width as f32,height as f32])})
+            Ok(unsafe { Texture::new(id, grid_dim, [width as f32, height as f32]) })
         }
     }
 }

@@ -1,20 +1,16 @@
+use super::*;
 use crate::gl;
-use crate::gl::types::*;
 use crate::shader::*;
+use crate::vbo::BufferInfo;
 use axgeom;
 use std::ffi::CString;
 use std::str;
-use axgeom::Vec2;
-use crate::vbo::BufferInfo;
-use super::*;
 
-#[derive(Copy,Clone,Debug)]
-pub struct ProgramUniformValues{
-    pub mode:u32,
-    pub radius:f32
+#[derive(Copy, Clone, Debug)]
+pub struct ProgramUniformValues {
+    pub mode: u32,
+    pub radius: f32,
 }
-
-
 
 // Shader sources
 pub static VS_SRC: &'static str = "
@@ -108,17 +104,17 @@ impl CircleProgram {
 
     pub(crate) fn set_buffer_and_draw(
         &mut self,
-        common:&UniformCommon,
-        un:&ProgramUniformValues,
-        buffer_info:BufferInfo,
+        common: &UniformCommon,
+        un: &ProgramUniformValues,
+        buffer_info: BufferInfo,
     ) {
-        let mode=un.mode;
-        let point_size=un.radius;
-        let col=common.color;
+        let mode = un.mode;
+        let point_size = un.radius;
+        let col = common.color;
         //let square=un.rect;
-        let buffer_id=buffer_info.id;
-        let offset=common.offset;
-        let length=buffer_info.length;
+        let buffer_id = buffer_info.id;
+        let offset = common.offset;
+        let length = buffer_info.length;
 
         //TODO NO IDEA WHY THIS IS NEEDED ON LINUX.
         //Without this function call, on linux not every shape gets drawn.
@@ -126,7 +122,7 @@ impl CircleProgram {
         //and draw some circles after drawing a rect save.
         //It is something to do with changing between gl::TRIANGLES to gl::POINTS.
         //but this shouldnt be a problem since they are seperate vbos.
-        
+
         unsafe {
             gl::UseProgram(self.program);
             gl_ok!();
@@ -151,9 +147,8 @@ impl CircleProgram {
             gl::UseProgram(self.program);
             gl_ok!();
 
-            gl::Uniform2f(self.offset_uniform, offset.x,offset.y);
+            gl::Uniform2f(self.offset_uniform, offset.x, offset.y);
             gl_ok!();
-
 
             gl::Uniform1f(self.point_size_uniform, point_size);
             gl_ok!();
@@ -192,7 +187,7 @@ impl CircleProgram {
         }
     }
 
-    pub fn new(frag:&str) -> CircleProgram {
+    pub fn new(frag: &str) -> CircleProgram {
         unsafe {
             // Create GLSL shaders
             let vs = compile_shader(VS_SRC, gl::VERTEX_SHADER);

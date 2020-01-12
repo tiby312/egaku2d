@@ -1,18 +1,15 @@
 use super::*;
 use core::marker::PhantomData;
 
-
-
-#[derive(Copy,Clone,Debug)]
-pub(crate) struct BufferInfo{
-    pub id:u32,
-    pub length:usize
+#[derive(Copy, Clone, Debug)]
+pub(crate) struct BufferInfo {
+    pub id: u32,
+    pub length: usize,
 }
-
 
 #[derive(Debug)]
 pub struct StaticBuffer<V> {
-    info:BufferInfo,
+    info: BufferInfo,
     _p: PhantomData<V>,
 }
 impl<V> Drop for StaticBuffer<V> {
@@ -23,7 +20,7 @@ impl<V> Drop for StaticBuffer<V> {
     }
 }
 impl<V: core::fmt::Debug + Copy + Clone> StaticBuffer<V> {
-    pub(crate) fn get_info(&self)->BufferInfo{
+    pub(crate) fn get_info(&self) -> BufferInfo {
         self.info
     }
     pub fn new(data: &[V]) -> StaticBuffer<V> {
@@ -42,9 +39,9 @@ impl<V: core::fmt::Debug + Copy + Clone> StaticBuffer<V> {
             );
         }
         StaticBuffer {
-            info : BufferInfo{
-                id:vbo,
-                length:data.len()
+            info: BufferInfo {
+                id: vbo,
+                length: data.len(),
             },
             _p: PhantomData,
         }
@@ -68,8 +65,11 @@ impl<V> Drop for GrowableBuffer<V> {
 }
 
 impl<V: Default> GrowableBuffer<V> {
-    pub(crate) fn get_info(&self)->BufferInfo{
-        BufferInfo{id:self.vbo,length:self.buffer.len()}
+    pub(crate) fn get_info(&self) -> BufferInfo {
+        BufferInfo {
+            id: self.vbo,
+            length: self.buffer.len(),
+        }
     }
     #[inline(always)]
     pub fn get_verts(&self) -> &[V] {
@@ -138,7 +138,6 @@ impl<V: Default> GrowableBuffer<V> {
     pub fn push(&mut self, a: V) {
         self.buffer.push(a);
     }
-
 
     #[inline(always)]
     pub fn clear(&mut self) {
