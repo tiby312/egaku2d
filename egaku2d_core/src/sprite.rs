@@ -27,8 +27,7 @@ impl SpriteSession<'_> {
     #[inline(always)]
     pub fn add(&mut self, point: PointType, index: u16,rotation:f32) -> &mut Self {
         
-        assert!(rotation>=0.0); //TODO do this a better way
-        let k=rotation % (core::f32::consts::PI*2.);
+        let k=rotation.rem_euclid(core::f32::consts::PI*2.);
         let k=k/(core::f32::consts::PI*2.);
         let k= (k*(core::u16::MAX as f32)) as u16;
 
