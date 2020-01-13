@@ -12,9 +12,8 @@ fn main() {
     let adventurer = sys.texture("adventurer.png", [7, 11]).unwrap();
     let ascii_tex = sys.texture("ascii.png", [16, 14]).unwrap();
     
-
-    let fat_rect_tex = sys.texture("128_32.png",[1,1]).unwrap();
-    let tall_rect_tex = sys.texture("64_128.png", [1, 1]).unwrap();
+    let tall_tiles_tex = sys.texture("tall_tiles.png",[2,3]).unwrap();
+    let fat_tiles_tex = sys.texture("fat_tiles.png",[2,3]).unwrap();
     
     let rect_save = {
         let mut k = sys.canvas_mut().rects();
@@ -141,9 +140,8 @@ fn main() {
                 //draw some moving sprites
                 let mut k = canvas.sprites();
 
-                let st = 300;
-                for y in (100..500).step_by(st).map(|a| a as f32) {
-                    for x in (100..500).step_by(st).map(|a| a as f32) {
+                for y in (100..500).step_by(80).map(|a| a as f32) {
+                    for x in (100..500).step_by(80).map(|a| a as f32) {
                         let c = (counter as f32 + x + y) * 0.01;
 
                         let cc = ((counter as f32 + x + y) * 0.1) as u32;
@@ -195,8 +193,10 @@ fn main() {
                     .with_color(COL4)
                     .send_and_draw();
 
-                canvas.sprites().add([500.,400.],0,c).uniforms(&tall_rect_tex,100.).send_and_draw();
-                canvas.sprites().add([500.,200.],0,c).uniforms(&fat_rect_tex,100.).send_and_draw();
+                canvas.sprites().add([500.,200.],c as u16,c).uniforms(&fat_tiles_tex,100.).send_and_draw();
+
+                canvas.sprites().add([500.,50.],c as u16,c).uniforms(&tall_tiles_tex,100.).send_and_draw();
+
 
                 //display what we drew
                 sys.swap_buffers();
