@@ -1,25 +1,8 @@
 extern crate egaku2d;
 
-use glutin::event::Event;
-use glutin::event::VirtualKeyCode;
-use glutin::event::WindowEvent;
-use glutin::event_loop::ControlFlow;
 
-fn add_ascii(
-    start: [f32; 2],
-    width: f32,
-    rotation: f32,
-    st: &str,
-    sprites: &mut egaku2d::sprite::SpriteSession,
-) {
-    let mut cc = start;
-    for (i,a) in st.chars().enumerate() {
-        let ascii = a as u8;
-        assert!(ascii >= 32);
-        sprites.add(cc, (ascii - 32) as u16, rotation+(i as f32 * 0.1));
-        cc[0] += width;
-    }
-}
+use glutin::event::{Event,VirtualKeyCode,WindowEvent};
+use glutin::event_loop::ControlFlow;
 
 fn main() {
     let events_loop = glutin::event_loop::EventLoop::new();
@@ -28,8 +11,7 @@ fn main() {
     let food_tex = sys.texture("food.png", [8, 8]).unwrap();
     let adventurer = sys.texture("adventurer.png", [7, 11]).unwrap();
     let ascii_tex = sys.texture("ascii.png", [16, 14]).unwrap();
-    //let bricks_tex = sys.texture("bricks.png", [1, 1]).unwrap();
-
+    
     let rect_save = {
         let mut k = sys.canvas_mut().rects();
         k.add([400., 420., 410., 420.]);
@@ -217,4 +199,22 @@ fn main() {
         }
         _ => {}
     });
+}
+
+
+
+fn add_ascii(
+    start: [f32; 2],
+    width: f32,
+    rotation: f32,
+    st: &str,
+    sprites: &mut egaku2d::sprite::SpriteSession,
+) {
+    let mut cc = start;
+    for (i,a) in st.chars().enumerate() {
+        let ascii = a as u8;
+        assert!(ascii >= 32);
+        sprites.add(cc, (ascii - 32) as u16, rotation+(i as f32 * 0.1));
+        cc[0] += width;
+    }
 }
