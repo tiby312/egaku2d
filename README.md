@@ -16,7 +16,7 @@ See the github example, or see the crate documentation.
 
 ## Demo
 
-Demo sprites are provided courtesy of Henry Software and rvros
+Demo sprites are provided courtesy of:
 
-https://henrysoftware.itch.io/pixel-food
-https://rvros.itch.io/animated-pixel-hero
+* Henry Software - https://henrysoftware.itch.io/pixel-food
+* rvros - https://rvros.itch.io/animated-pixel-hero
