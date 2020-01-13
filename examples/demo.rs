@@ -12,6 +12,10 @@ fn main() {
     let adventurer = sys.texture("adventurer.png", [7, 11]).unwrap();
     let ascii_tex = sys.texture("ascii.png", [16, 14]).unwrap();
     
+
+    let fat_rect_tex = sys.texture("128_32.png",[1,1]).unwrap();
+    let tall_rect_tex = sys.texture("64_128.png", [1, 1]).unwrap();
+    
     let rect_save = {
         let mut k = sys.canvas_mut().rects();
         k.add([400., 420., 410., 420.]);
@@ -190,6 +194,9 @@ fn main() {
                     .uniforms()
                     .with_color(COL4)
                     .send_and_draw();
+
+                canvas.sprites().add([500.,400.],0,c).uniforms(&tall_rect_tex,100.).send_and_draw();
+                canvas.sprites().add([500.,200.],0,c).uniforms(&fat_rect_tex,100.).send_and_draw();
 
                 //display what we drew
                 sys.swap_buffers();
