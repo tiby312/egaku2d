@@ -83,6 +83,12 @@ pub struct Texture {
 }
 
 impl Texture {
+    pub fn grid_dim(&self)->[u8;2]{
+        self.grid_dim
+    }
+    pub fn dim(&self)->[f32;2]{
+        self.dim
+    }
     ///Create a texture index from a coordinate in the tile set.
     ///The top left time maps to 0,0.
     ///The x component grows to the right.
