@@ -83,7 +83,6 @@ pub struct CircleProgram {
     pub point_size_uniform: GLint,
     pub bcol_uniform: GLint,
     pub pos_attr: GLint,
-    //pub sample_location: GLint,
 }
 
 #[derive(Debug)]
@@ -153,29 +152,6 @@ impl CircleProgram {
 
             gl::BindBuffer(gl::ARRAY_BUFFER, buffer_id);
             gl_ok!();
-
-            /*
-            match un.texture{
-                Some(t)=>{
-                    let texture_id=t.id;
-
-                    gl::ActiveTexture(gl::TEXTURE0);
-                    gl_ok!();
-
-                    gl::BindTexture(gl::TEXTURE_2D, texture_id);
-                    gl_ok!();
-
-                    gl::Uniform1i(self.sample_location, 0);
-                    gl_ok!();
-                    
-                },
-                None=>{
-
-                }
-            }
-            */
-            
-
 
             gl::EnableVertexAttribArray(self.pos_attr as GLuint);
             gl_ok!();

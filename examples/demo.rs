@@ -1,27 +1,31 @@
 extern crate egaku2d;
-
-
 use glutin::event::{Event,VirtualKeyCode,WindowEvent};
 use glutin::event_loop::ControlFlow;
+
+
+const COL1: [f32; 4] = [0.0, 1.0, 0.1, 0.3];
+const COL2: [f32; 4] = [0.8, 0.8, 1.0, 1.0];
+const COL3: [f32; 4] = [1.0, 0.0, 1.0, 0.4];
+const COL4: [f32; 4] = [0.5, 1.0, 0.5, 1.0];
+const WHITE: [f32; 4] = [1.0, 1.0, 1.0, 1.0];
+
+
 
 fn main() {
     let events_loop = glutin::event_loop::EventLoop::new();
     let mut sys = egaku2d::WindowedSystem::new([640, 480], &events_loop, "shapes example");
-    
     //let mut sys=egaku2d::FullScreenSystem::new(&events_loop);
     
+    //Make a bunch of textures
     let sky=sys.texture("day_sky.png",[1,1]).unwrap();
-
     let food_tex = sys.texture("food.png", [8, 8]).unwrap();
     let adventurer = sys.texture("adventurer.png", [7, 11]).unwrap();
     let ascii_tex = sys.texture("ascii.png", [16, 14]).unwrap();
-    
     let tall_tiles_tex = sys.texture("tall_tiles.png",[2,3]).unwrap();
     let fat_tiles_tex = sys.texture("fat_tiles.png",[2,3]).unwrap();
-    
     let leaves = sys.texture("leaves.png",[1,1]).unwrap();
     
-
+    //Make a bunch of static vbos
     let background = {
         sys.canvas_mut().rects().add([0.0,640.0,0.0,480.0]).save()
     };
@@ -33,9 +37,7 @@ fn main() {
         k.add([300., 500., 300., 500.]);
         k.save()
     };
-
     let square_save = {
-        //Draw some squares
         let mut k = sys.canvas_mut().squares();
         for x in (0..1000).step_by(100).map(|a| a as f32) {
             for y in (0..1000).step_by(100).map(|a| a as f32) {
@@ -44,25 +46,20 @@ fn main() {
         }
         k.save()
     };
-
     let arrow_save = {
-        //Draw some arrows
         sys.canvas_mut()
             .arrows(5.0)
             .add([40., 40.], [40., 200.])
             .add([40., 40.], [200., 40.])
             .save()
     };
-
     let line_save = {
-        //Draw some lines
         sys.canvas_mut()
             .lines(3.0)
             .add([400., 0.], [600., 400.])
             .add([10., 300.], [300., 400.])
             .save()
     };
-
     let sprite_save = {
         let mut k = sys.canvas_mut().sprites();
         for (i, x) in (032..200)
@@ -80,6 +77,7 @@ fn main() {
         }
         k.save()
     };
+
 
     //Draw 60 frames per second.
     let mut timer = egaku2d::RefreshTimer::new(16);
@@ -116,18 +114,9 @@ fn main() {
                 let wobble = [cc.cos() * 10.0, cc.sin() * 10.0];
 
                 canvas.clear_color([0.2; 3]);
-
-
-                const COL1: [f32; 4] = [0.0, 1.0, 0.1, 0.3];
-                const COL2: [f32; 4] = [0.8, 0.8, 1.0, 1.0];
-                const COL3: [f32; 4] = [1.0, 0.0, 1.0, 0.4];
-                const COL4: [f32; 4] = [0.5, 1.0, 0.5, 1.0];
-                const WHITE: [f32; 4] = [1.0, 1.0, 1.0, 1.0];
-
                 
-                background.uniforms(canvas).with_texture(&sky,2.0,[0.0;2]).draw();
-
                 //draw static VBOs already on the gpu.
+                background.uniforms(canvas).with_texture(&sky,2.0,[0.0;2]).draw();
                 sprite_save
                     .uniforms(canvas, &food_tex, 32.0)
                     .with_color(COL4)
@@ -138,55 +127,37 @@ fn main() {
                 square_save.uniforms(canvas, 10.0).with_color(COL3).draw();
                 rect_save.uniforms(canvas).with_texture(&fat_tiles_tex,2.0,wobble).with_color(WHITE).with_offset(wobble).draw();
 
-                //draw some moving circles
-                let mut k = canvas.circles();
+                //Draw a bunch of dyanmic shapes.
+                let mut builder = canvas.circles();
                 for x in (0..1000).step_by(12).map(|a| a as f32) {
                     for y in (0..1000).step_by(12).map(|a| a as f32) {
                         let c = (counter as f32 + x + y) * 0.01;
-
                         let x = x + c.sin() * y * 0.1;
                         let y = y + c.cos() * x * 0.1;
-
-                        k.add([x, y]);
+                        builder.add([x, y]);
                     }
                 }
-                k.uniforms(8.0).with_color(COL1).send_and_draw();
+                builder.uniforms(8.0).with_color(COL1).send_and_draw();
 
-                //draw some moving sprites
-                let mut k = canvas.sprites();
-
+                let mut builder = canvas.sprites();
                 for y in (100..500).step_by(80).map(|a| a as f32) {
                     for x in (100..500).step_by(80).map(|a| a as f32) {
                         let c = (counter as f32 + x + y) * 0.01;
-
                         let cc = ((counter as f32 + x + y) * 0.1) as u32;
-
                         let x = x + c.sin() * 20.0;
                         let y = y + c.cos() * 20.0;
-
-                        k.add([x, y], (cc % 64) as u16, c);
+                        builder.add([x, y], (cc % 64) as u16, c);
                     }
                 }
+                builder.uniforms(&adventurer, 100.0).with_color(WHITE).send_and_draw();
 
-                k.uniforms(&adventurer, 100.0)
-                    .with_color(WHITE)
-                    .send_and_draw();
+                let mut builder = canvas.sprites();
+                add_ascii([100., 400.], 20.0, cc.cos()*0.5-0.2, "testing? TESTING!", &mut builder);
+                builder.add([100., 100.], ascii_tex.coord_to_index([2, 2]), 1.0);
+                builder.uniforms(&ascii_tex, 20.0).send_and_draw();
 
-                let mut text = canvas.sprites();
-                
-                add_ascii([100., 400.], 20.0, cc.cos()*0.5-0.2, "testing? TESTING!", &mut text);
-                text.add([100., 100.], ascii_tex.coord_to_index([2, 2]), 1.0);
-                text.uniforms(&ascii_tex, 20.0).send_and_draw();
-
-                //draw a growing circle
                 let c = ((counter as f32 * 0.06).sin() * 100.0).abs();
-                canvas
-                    .circles()
-                    .add(cursor)
-                    .uniforms(c)
-                    //.with_color(WHITE)
-                    .with_texture(&leaves,1.0,[0.0;2])
-                    .send_and_draw();
+                canvas.circles().add(cursor).uniforms(c).with_texture(&leaves,1.0,[0.0;2]).send_and_draw();
                 
                 //draw a moving line
                 let c = counter as f32 * 0.07;
@@ -210,10 +181,8 @@ fn main() {
                     .send_and_draw();
 
                 canvas.sprites().add([500.,200.],c as u16,c).uniforms(&fat_tiles_tex,100.).send_and_draw();
-
                 canvas.sprites().add([500.,50.],c as u16,c).uniforms(&tall_tiles_tex,100.).send_and_draw();
                 
-
                 //display what we drew
                 sys.swap_buffers();
 
