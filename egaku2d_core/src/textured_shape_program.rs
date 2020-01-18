@@ -42,8 +42,11 @@ void main() {
         discard;
     }
 
-
-    out_color = texture(tex0,( ((gl_FragCoord.xy-texture_offset)/texture_dim)/texture_scale))*bcol;
+    vec2 pos;
+    pos.x=gl_FragCoord.x;
+    pos.y=-gl_FragCoord.y;
+    
+    out_color = texture(tex0,( ((pos-texture_offset)/texture_dim)/texture_scale))*bcol;
 }";
 
 pub static REGULAR_FS_SRC: &'static str = "
@@ -58,7 +61,10 @@ uniform vec2 texture_offset;
 uniform sampler2D tex0;
 
 void main() {
-    out_color = texture(tex0, ((gl_FragCoord.xy-texture_offset)/texture_dim)/texture_scale)*bcol;
+    vec2 pos;
+    pos.x=gl_FragCoord.x;
+    pos.y=-gl_FragCoord.y;
+    out_color = texture(tex0, ((pos-texture_offset)/texture_dim)/texture_scale)*bcol;
 
 }";
 
@@ -165,7 +171,7 @@ impl TexturedShapeProgram {
                     gl::Uniform2f(self.texture_dim_uniform,t.dim[0] as f32,t.dim[1] as f32);
                     gl_ok!();
 
-                    gl::Uniform2f(self.texture_offset_uniform,offset[0],-offset[1]);
+                    gl::Uniform2f(self.texture_offset_uniform,offset[0],offset[1]);
                     gl_ok!();
                     
 

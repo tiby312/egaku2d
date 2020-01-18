@@ -1,6 +1,6 @@
 [package]
 name = "egaku2d"
-version = "0.3.0"
+version = "0.3.1"
 authors = ["Ken Reed <kenakioreed@gmail.com>"]
 repository = "https://github.com/tiby312/egaku2d"
 readme = "README.md"
@@ -16,7 +16,7 @@ members = [ "egaku2d_core"]
 
 [dependencies]
 axgeom = "1.5"
-egaku2d_core = {version="0.3.0", path="./egaku2d_core"}
+egaku2d_core = {version="0.3.1", path="./egaku2d_core"}
 glutin = "0.22"
 image = "0.22.3"
 

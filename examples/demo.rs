@@ -10,6 +10,8 @@ fn main() {
     
     //let mut sys=egaku2d::FullScreenSystem::new(&events_loop);
     
+    let sky=sys.texture("day_sky.png",[1,1]).unwrap();
+
     let food_tex = sys.texture("food.png", [8, 8]).unwrap();
     let adventurer = sys.texture("adventurer.png", [7, 11]).unwrap();
     let ascii_tex = sys.texture("ascii.png", [16, 14]).unwrap();
@@ -20,6 +22,9 @@ fn main() {
     let leaves = sys.texture("leaves.png",[1,1]).unwrap();
     
 
+    let background = {
+        sys.canvas_mut().rects().add([0.0,640.0,0.0,480.0]).save()
+    };
     let rect_save = {
         let mut k = sys.canvas_mut().rects();
         k.add([400., 420., 410., 420.]);
@@ -112,13 +117,16 @@ fn main() {
 
                 canvas.clear_color([0.2; 3]);
 
-                const COL1: [f32; 4] = [0.0, 1.0, 0.1, 0.1];
+
+                const COL1: [f32; 4] = [0.0, 1.0, 0.1, 0.3];
                 const COL2: [f32; 4] = [0.8, 0.8, 1.0, 1.0];
                 const COL3: [f32; 4] = [1.0, 0.0, 1.0, 0.4];
                 const COL4: [f32; 4] = [0.5, 1.0, 0.5, 1.0];
                 const WHITE: [f32; 4] = [1.0, 1.0, 1.0, 1.0];
 
                 
+                background.uniforms(canvas).with_texture(&sky,2.0,[0.0;2]).draw();
+
                 //draw static VBOs already on the gpu.
                 sprite_save
                     .uniforms(canvas, &food_tex, 32.0)
