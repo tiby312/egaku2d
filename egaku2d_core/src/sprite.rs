@@ -18,7 +18,7 @@ impl SpriteSave {
             color: sys.color,
             offset: vec2same(0.0),
         };
-        let un = SpriteProgramUniformValues { radius, texture };
+        let un = SpriteProgramUniformValues { radius, texture,verts:None };
         StaticUniforms {
             sys,
             common,
@@ -30,6 +30,7 @@ impl SpriteSave {
 
 pub struct SpriteSession<'a> {
     pub(crate) sys: &'a mut SimpleCanvas,
+    pub(crate) verts:Vec<sprite_program::Vertex>
 }
 
 impl SpriteSession<'_> {
@@ -40,7 +41,7 @@ impl SpriteSession<'_> {
         let k = k / (core::f32::consts::PI * 2.);
         let k = (k * (core::u16::MAX as f32)) as u16;
 
-        self.sys.sprite_buffer.push(sprite_program::Vertex {
+        self.verts.push(sprite_program::Vertex {
             pos: point,
             index: index as u16,
             rotation: k,
@@ -52,7 +53,7 @@ impl SpriteSession<'_> {
     pub fn save(&mut self) -> SpriteSave {
         SpriteSave {
             _ns: ns(),
-            buffer: vbo::StaticBuffer::new(self.sys.sprite_buffer.get_verts()),
+            buffer: vbo::StaticBuffer::new(&self.verts),
         }
     }
 
@@ -64,7 +65,7 @@ impl SpriteSession<'_> {
             color: self.sys.color,
             offset: vec2same(0.0),
         };
-        let un = SpriteProgramUniformValues { radius, texture };
+        let un = SpriteProgramUniformValues { radius, texture,verts:Some(&self.verts) };
         Uniforms {
             common,
             sys: self.sys,

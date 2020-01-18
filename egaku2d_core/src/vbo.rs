@@ -49,13 +49,12 @@ impl<V: core::fmt::Debug + Copy + Clone> StaticBuffer<V> {
 }
 
 #[derive(Clone,Debug)]
-pub struct GrowableBuffer2<B>{
+pub struct GrowableBuffer<B>{
     vbo:u32,
-    total_length:usize,
-    inner_length:usize,
+    length:usize,
     _p:PhantomData<B>
 }
-impl<B> GrowableBuffer2<B>{
+impl<B> Drop for GrowableBuffer<B>{
     fn drop(&mut self) {
         //TODO make sure this is ok to do
         unsafe {
@@ -63,57 +62,70 @@ impl<B> GrowableBuffer2<B>{
         }
     }
 }
-impl<B> GrowableBuffer2<B>{
-    pub(crate) fn new(vbo:u32)->GrowableBuffer2<B>{
-        GrowableBuffer2{vbo,total_length:0,inner_length:0,_p:PhantomData}
+impl<B> GrowableBuffer<B>{
+    pub(crate) fn new()->GrowableBuffer<B>{
+        let mut vbo:u32=0;
+        // Create a Vertex Buffer Object and copy the vertex data to it
+        unsafe{
+            gl::GenBuffers(1, &mut vbo);
+        }
+        /*    
+        gl::BindBuffer(gl::ARRAY_BUFFER, &mut vbo);
+        gl_ok!();
+        gl::BufferData(
+            gl::ARRAY_BUFFER,
+            (0 * mem::size_of::<B>()) as GLsizeiptr,
+            [].as_ptr() as *const _,
+            gl::DYNAMIC_DRAW,
+        );
+        gl_ok!();
+        */
+        GrowableBuffer{vbo,length:0,_p:PhantomData}
     }
 
-    pub(crate) fn send_to_gpu(&mut self,arr:&[B],total_length:usize){
-        if arr.len()>self.total_length{
+    pub(crate) fn send_to_gpu(&mut self,arr:&[B]){
+        if arr.len()>self.length{
 
             let vbo = &mut self.vbo;
             unsafe {
                 gl::DeleteBuffers(1, vbo);
-
+                gl_ok!();
                 gl::BindBuffer(gl::ARRAY_BUFFER, *vbo);
+                gl_ok!();
                 gl::BufferData(
                     gl::ARRAY_BUFFER,
-                    (total_length * mem::size_of::<B>()) as GLsizeiptr,
+                    (arr.len() * mem::size_of::<B>()) as GLsizeiptr,
                     arr.as_ptr() as *const _,
                     gl::DYNAMIC_DRAW,
                 );
                 gl_ok!()
             }
+        }else{
+            unsafe {
+                gl::BindBuffer(gl::ARRAY_BUFFER, self.vbo);
+                gl_ok!();
+
+                gl::BufferSubData(
+                    gl::ARRAY_BUFFER,
+                    0,
+                    (arr.len() * mem::size_of::<B>()) as GLsizeiptr,
+                    arr.as_ptr() as *const _,
+                );
+                gl_ok!();
+            }
         }
 
-        self.total_length=total_length;
-        self.inner_length=arr.len();
-
-
-        unsafe {
-            gl::BindBuffer(gl::ARRAY_BUFFER, self.vbo);
-            gl_ok!();
-
-            gl::BufferSubData(
-                gl::ARRAY_BUFFER,
-                0,
-                (self.inner_length * mem::size_of::<B>()) as GLsizeiptr,
-                arr.as_ptr() as *const _,
-            );
-            gl_ok!();
-        }
-
-
+        self.length=arr.len();
     }
     pub(crate) fn get_info(&self) -> BufferInfo {
         BufferInfo {
             id: self.vbo,
-            length: self.inner_length,
+            length: self.length,
         }
     }
 }
 
-
+/*
 #[derive(Clone, Debug)]
 pub struct GrowableBuffer<V> {
     vbo: u32,
@@ -226,3 +238,4 @@ impl<V: Default> GrowableBuffer<V> {
         self.vbo_size = Some(self.buffer.capacity());
     }
 }
+*/

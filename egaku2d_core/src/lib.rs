@@ -167,7 +167,8 @@ pub mod uniforms {
         pub fn send_and_draw(&mut self) {
             match &self.un {
                 UniformVals::Sprite(a) => {
-                    self.sys.sprite_buffer.update();
+                    let verts=a.verts.unwrap();
+                    self.sys.sprite_buffer.send_to_gpu(verts);
                     self.sys.sprite_program.set_buffer_and_draw(
                         &self.common,
                         a,
@@ -175,7 +176,8 @@ pub mod uniforms {
                     );
                 }
                 UniformVals::Regular(a) => {
-                    self.sys.circle_buffer.update();
+                    let verts=a.verts.unwrap();
+                    self.sys.circle_buffer.send_to_gpu(verts);
                     self.sys.regular_program.set_buffer_and_draw(
                         &self.common,
                         a,
@@ -183,8 +185,10 @@ pub mod uniforms {
                     );
                 }
                 UniformVals::Circle(a) => {
-                    self.sys.circle_buffer.update();
-
+                    //self.sys.circle_buffer.update();
+                    let verts=a.verts.unwrap();
+                    self.sys.circle_buffer.send_to_gpu(verts);
+                    
                     self.sys.circle_program.set_buffer_and_draw(
                         &self.common,
                         a,
@@ -261,38 +265,34 @@ impl SimpleCanvas {
     }
 
     pub fn sprites(&mut self) -> sprite::SpriteSession {
-        self.sprite_buffer.clear();
-        sprite::SpriteSession { sys: self }
+        sprite::SpriteSession { sys: self,verts:Vec::new() }
     }
 
     pub fn circles(&mut self) -> CircleSession {
-        self.circle_buffer.clear();
-        CircleSession { sys: self }
+        CircleSession { sys: self ,verts:Vec::new()}
     }
     pub fn squares(&mut self) -> SquareSession {
-        self.circle_buffer.clear();
-        SquareSession { sys: self }
+        SquareSession { sys: self ,verts:Vec::new()}
     }
     pub fn rects(&mut self) -> RectSession {
-        self.circle_buffer.clear();
-        RectSession { sys: self }
+        RectSession { sys: self ,verts:Vec::new()}
     }
     pub fn arrows(&mut self, radius: f32) -> ArrowSession {
-        self.circle_buffer.clear();
         let kk = self.point_mul.0;
 
         ArrowSession {
             sys: self,
             radius: radius * kk,
+            verts:Vec::new()
         }
     }
 
     pub fn lines(&mut self, radius: f32) -> LineSession {
-        self.circle_buffer.clear();
         let kk = self.point_mul.0;
         LineSession {
             sys: self,
             radius: radius * kk,
+            verts:Vec::new()
         }
     }
 

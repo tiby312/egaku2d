@@ -10,7 +10,7 @@ impl SquareSave {
             color: sys.color,
             offset: vec2same(0.0),
         };
-        let un = ProgramUniformValues::new(radius,gl::POINTS);
+        let un = ProgramUniformValues::new(radius,gl::POINTS,None);
 
         StaticUniforms {
             sys,
@@ -23,18 +23,20 @@ impl SquareSave {
 
 pub struct SquareSession<'a> {
     pub(crate) sys: &'a mut SimpleCanvas,
+    pub(crate) verts:Vec<circle_program::Vertex>
+
 }
 impl<'a> SquareSession<'a> {
     #[inline(always)]
     pub fn add(&mut self, point: [f32; 2]) -> &mut Self {
-        self.sys.circle_buffer.push(circle_program::Vertex(point));
+        self.verts.push(circle_program::Vertex(point));
         self
     }
 
     pub fn save(&mut self) -> SquareSave {
         SquareSave {
             _ns: ns(),
-            buffer: vbo::StaticBuffer::new(self.sys.circle_buffer.get_verts()),
+            buffer: vbo::StaticBuffer::new(&self.verts),
         }
     }
 
@@ -43,7 +45,7 @@ impl<'a> SquareSession<'a> {
             color: self.sys.color,
             offset: vec2same(0.0),
         };
-        let un = ProgramUniformValues::new(radius,gl::POINTS);
+        let un = ProgramUniformValues::new(radius,gl::POINTS,Some(&self.verts));
 
         Uniforms {
             sys: self.sys,
@@ -63,7 +65,7 @@ impl CircleSave {
             color: sys.color,
             offset: vec2same(0.0),
         };
-        let un = ProgramUniformValues::new(radius,gl::POINTS);
+        let un = ProgramUniformValues::new(radius,gl::POINTS,None);
         StaticUniforms {
             common,
             sys,
@@ -74,13 +76,14 @@ impl CircleSave {
 }
 pub struct CircleSession<'a> {
     pub(crate) sys: &'a mut SimpleCanvas,
+    pub(crate) verts:Vec<circle_program::Vertex>
 }
 
 impl<'a> CircleSession<'a> {
     pub fn save(&mut self) -> CircleSave {
         CircleSave {
             _ns: ns(),
-            buffer: vbo::StaticBuffer::new(self.sys.circle_buffer.get_verts()),
+            buffer: vbo::StaticBuffer::new(&self.verts),
         }
     }
 
@@ -89,7 +92,7 @@ impl<'a> CircleSession<'a> {
             color: self.sys.color,
             offset: vec2same(0.0),
         };
-        let un = ProgramUniformValues::new(radius,gl::POINTS);
+        let un = ProgramUniformValues::new(radius,gl::POINTS,Some(&self.verts));
 
         Uniforms {
             sys: self.sys,
@@ -100,13 +103,14 @@ impl<'a> CircleSession<'a> {
 
     #[inline(always)]
     pub fn add(&mut self, point: [f32; 2]) -> &mut Self {
-        self.sys.circle_buffer.push(circle_program::Vertex(point));
+        self.verts.push(circle_program::Vertex(point));
         self
     }
 }
 
 pub struct RectSession<'a> {
     pub(crate) sys: &'a mut SimpleCanvas,
+    pub(crate) verts:Vec<circle_program::Vertex>
 }
 
 pub struct RectSave {
@@ -120,7 +124,7 @@ impl RectSave {
             color: sys.color,
             offset: vec2same(0.0),
         };
-        let un = ProgramUniformValues::new(0.0,gl::TRIANGLES);
+        let un = ProgramUniformValues::new(0.0,gl::TRIANGLES,None);
         StaticUniforms {
             sys,
             common,
@@ -134,7 +138,7 @@ impl RectSession<'_> {
     pub fn save(&mut self) -> RectSave {
         RectSave {
             _ns: ns(),
-            buffer: vbo::StaticBuffer::new(self.sys.circle_buffer.get_verts()),
+            buffer: vbo::StaticBuffer::new(&self.verts),
         }
     }
 
@@ -143,7 +147,7 @@ impl RectSession<'_> {
             color: self.sys.color,
             offset: vec2same(0.0),
         };
-        let un = ProgramUniformValues::new(0.0,gl::TRIANGLES);
+        let un = ProgramUniformValues::new(0.0,gl::TRIANGLES,Some(&self.verts));
         Uniforms {
             sys: self.sys,
             common,
@@ -158,9 +162,7 @@ impl RectSession<'_> {
         //let arr = [a, b, c, c, d, a];
         let arr = [tr, tl, bl, bl, br, tr];
         for a in arr.iter() {
-            self.sys
-                .circle_buffer
-                .push(circle_program::Vertex([a.x, a.y]));
+            self.verts.push(circle_program::Vertex([a.x, a.y]));
         }
 
         self
@@ -177,7 +179,7 @@ impl ArrowSave {
             color: sys.color,
             offset: vec2same(0.0),
         };
-        let un = ProgramUniformValues::new(0.0,gl::TRIANGLES);
+        let un = ProgramUniformValues::new(0.0,gl::TRIANGLES,None);
         StaticUniforms {
             sys,
             common,
@@ -189,13 +191,14 @@ impl ArrowSave {
 pub struct ArrowSession<'a> {
     pub(crate) sys: &'a mut SimpleCanvas,
     pub(crate) radius: f32,
+    pub(crate) verts:Vec<circle_program::Vertex>
 }
 
 impl ArrowSession<'_> {
     pub fn save(&mut self) -> ArrowSave {
         ArrowSave {
             _ns: ns(),
-            buffer: vbo::StaticBuffer::new(self.sys.circle_buffer.get_verts()),
+            buffer: vbo::StaticBuffer::new(&self.verts),
         }
     }
 
@@ -204,7 +207,7 @@ impl ArrowSession<'_> {
             color: self.sys.color,
             offset: vec2same(0.0),
         };
-        let un = ProgramUniformValues::new(0.0,gl::TRIANGLES);
+        let un = ProgramUniformValues::new(0.0,gl::TRIANGLES,Some(&self.verts));
         Uniforms {
             sys: self.sys,
             common,
@@ -233,10 +236,9 @@ impl ArrowSession<'_> {
         let arr = [start1, start2, end1, start2, end1, end2, end, end11, end22];
 
         for a in arr.iter() {
-            self.sys
-                .circle_buffer
-                .push(circle_program::Vertex([a.x, a.y]));
+            self.verts.push(circle_program::Vertex([a.x, a.y]));
         }
+
         self
     }
 }
@@ -252,7 +254,7 @@ impl LineSave {
             color: sys.color,
             offset: vec2same(0.0),
         };
-        let un = ProgramUniformValues::new(0.0,gl::TRIANGLES);
+        let un = ProgramUniformValues::new(0.0,gl::TRIANGLES,None);
         StaticUniforms {
             sys,
             common,
@@ -265,13 +267,14 @@ impl LineSave {
 pub struct LineSession<'a> {
     pub(crate) sys: &'a mut SimpleCanvas,
     pub(crate) radius: f32,
+    pub(crate) verts:Vec<circle_program::Vertex>
 }
 
 impl LineSession<'_> {
     pub fn save(&mut self) -> LineSave {
         LineSave {
             _ns: ns(),
-            buffer: vbo::StaticBuffer::new(self.sys.circle_buffer.get_verts()),
+            buffer: vbo::StaticBuffer::new(&self.verts),
         }
     }
 
@@ -281,7 +284,8 @@ impl LineSession<'_> {
             offset: vec2same(0.0),
         };
 
-        let un = ProgramUniformValues::new(0.0,gl::TRIANGLES);
+
+        let un = ProgramUniformValues::new(0.0,gl::TRIANGLES,Some(&self.verts));
         Uniforms {
             sys: self.sys,
             common,
@@ -306,9 +310,7 @@ impl LineSession<'_> {
         let arr = [start1, start2, end1, start2, end1, end2];
 
         for a in arr.iter() {
-            self.sys
-                .circle_buffer
-                .push(circle_program::Vertex([a.x, a.y]));
+            self.verts.push(circle_program::Vertex([a.x, a.y]));
         }
         self
     }
