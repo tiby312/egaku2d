@@ -91,8 +91,9 @@ pub mod uniforms {
             //println!("scale ignored");
 
             match &mut self.un{
-                UniformVals::Sprite(_s)=>{
-                    println!("not implemented");
+                UniformVals::Sprite(s)=>{
+                    s.texture=texture;
+                    //println!("not implemented");
                 },
                 UniformVals::Regular(s)=>{
                     s.texture=Some((texture,scale,offset));
@@ -163,8 +164,9 @@ pub mod uniforms {
             //println!("scale ignored");
 
             match &mut self.un{
-                UniformVals::Sprite(_s)=>{
-                    println!("not implemented");
+                UniformVals::Sprite(s)=>{
+                    //println!("not implemented");
+                    s.texture=texture;
                 },
                 UniformVals::Regular(s)=>{
                     s.texture=Some((texture,scale,offset));
