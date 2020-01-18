@@ -23,7 +23,7 @@ pub static VS_SRC: &'static str = "
 #version 300 es
 in vec2 position;
 out vec2 pos;
-out float ps;
+//out float ps;
 uniform vec2 offset;
 uniform mat3 mmatrix;
 uniform float point_size;
@@ -31,7 +31,7 @@ void main() {
     gl_PointSize = point_size;
     vec3 pp=vec3(position+offset,1.0);
     pos=position*0.005;
-    ps=gl_PointSize;
+    //ps=gl_PointSize;
     gl_Position = vec4(mmatrix*pp.xyz, 1.0);
 }";
 

@@ -48,7 +48,7 @@ impl<V: core::fmt::Debug + Copy + Clone> StaticBuffer<V> {
     }
 }
 
-//TODO make this be composed of a static buffer!!!!!!!!!!
+
 #[derive(Clone, Debug)]
 pub struct GrowableBuffer<V> {
     vbo: u32,
