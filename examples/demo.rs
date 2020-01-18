@@ -126,8 +126,7 @@ fn main() {
                 rect_save.uniforms(canvas).with_color(COL4).draw();
 
                 //draw some moving circles
-                //let mut k = canvas.circles();
-                let mut cc1=Vec::new();
+                let mut k = canvas.circles();
                 for x in (0..1000).step_by(12).map(|a| a as f32) {
                     for y in (0..1000).step_by(12).map(|a| a as f32) {
                         let c = (counter as f32 + x + y) * 0.01;
@@ -135,13 +134,10 @@ fn main() {
                         let x = x + c.sin() * y * 0.1;
                         let y = y + c.cos() * x * 0.1;
 
-
-                        cc1.push([x,y]);
-                        //k.add([x, y]);
+                        k.add([x, y]);
                     }
                 }
-                canvas.circles_from_slice(&cc1,8.0).with_color(COL1).send_and_draw();
-                //k.uniforms(8.0).with_color(COL1).send_and_draw();
+                k.uniforms(8.0).with_color(COL1).send_and_draw();
 
                 //draw some moving sprites
                 let mut k = canvas.sprites();

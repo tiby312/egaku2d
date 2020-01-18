@@ -13,6 +13,10 @@ use gl::types::*;
 use crate::circle_program::*;
 use crate::sprite_program::*;
 
+
+
+
+
 type PointType = [f32; 2];
 
 mod shader;
