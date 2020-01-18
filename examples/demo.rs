@@ -7,7 +7,9 @@ use glutin::event_loop::ControlFlow;
 fn main() {
     let events_loop = glutin::event_loop::EventLoop::new();
     let mut sys = egaku2d::WindowedSystem::new([640, 480], &events_loop, "shapes example");
+    
     //let mut sys=egaku2d::FullScreenSystem::new(&events_loop);
+    
     let food_tex = sys.texture("food.png", [8, 8]).unwrap();
     let adventurer = sys.texture("adventurer.png", [7, 11]).unwrap();
     let ascii_tex = sys.texture("ascii.png", [16, 14]).unwrap();

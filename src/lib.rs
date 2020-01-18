@@ -165,6 +165,20 @@ pub use egaku2d_core::sprite;
 pub use egaku2d_core::uniforms;
 pub use egaku2d_core::SimpleCanvas;
 
+
+mod onein{
+    use std::sync::atomic::{AtomicUsize,Ordering::SeqCst};
+    static INSTANCES: AtomicUsize = AtomicUsize::new(0);
+
+    pub fn assert_only_one_instance(){
+        assert_eq!(INSTANCES.fetch_add(1,SeqCst),0,"Cannot have multiple instances of the egaku2d system at the same time!");
+    }
+    pub fn decrement_one_instance(){
+        assert_eq!(INSTANCES.fetch_sub(1,SeqCst),1,"The last egaku2d system object was not properly destroyed");
+        
+    }
+}
+
 ///A timer to determine how often to refresh the screen.
 ///You pass it the desired refresh rate, then you can poll
 ///with is_ready() to determine if it is time to refresh.
@@ -189,6 +203,7 @@ impl RefreshTimer {
     }
 }
 
+
 ///Unlike a windowed system, we do not have control over the dimensions of the
 ///window we end up with.
 ///After construction, the user must set the viewport using the window dimension
@@ -198,6 +213,14 @@ pub use self::fullscreen::FullScreenSystem;
 #[cfg(feature = "fullscreen")]
 pub mod fullscreen {
     use super::*;
+
+    impl Drop for FullScreenSystem{
+        fn drop(&mut self){
+            onein::decrement_one_instance();
+        }
+    }
+
+
     pub struct FullScreenSystem {
         inner: SimpleCanvas,
         window_dim: FixedAspectVec2,
@@ -205,6 +228,8 @@ pub mod fullscreen {
     }
     impl FullScreenSystem {
         pub fn new(events_loop: &glutin::event_loop::EventLoop<()>) -> Self {
+            assert_only_one_instance();
+
             use glutin::window::Fullscreen;
             let fullscreen = Fullscreen::Borderless(prompt_for_monitor(events_loop));
 
@@ -352,12 +377,20 @@ pub struct WindowedSystem {
     windowed_context: glutin::WindowedContext<PossiblyCurrent>,
 }
 
+impl Drop for WindowedSystem{
+    fn drop(&mut self){
+        onein::decrement_one_instance();
+    }
+}
+
 impl WindowedSystem {
     pub fn new(
         dim: [usize; 2],
         events_loop: &glutin::event_loop::EventLoop<()>,
         title: &str,
     ) -> WindowedSystem {
+        onein::assert_only_one_instance();
+            
         let dim = vec2(dim[0], dim[1]);
         let dim = dim.inner_as::<f32>();
 
