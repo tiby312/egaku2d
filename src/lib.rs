@@ -319,7 +319,7 @@ pub mod fullscreen {
         pub fn texture(
             &mut self,
             file: &str,
-            grid_dim: [u32; 2],
+            grid_dim: [u8; 2],
         ) -> image::ImageResult<sprite::Texture> {
             crate::texture(file, grid_dim)
         }
