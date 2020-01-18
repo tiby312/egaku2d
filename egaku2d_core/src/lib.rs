@@ -271,6 +271,22 @@ impl SimpleCanvas {
     pub fn circles(&mut self) -> CircleSession {
         CircleSession { sys: self ,verts:Vec::new()}
     }
+
+    pub fn circles_from_slice<'a>(&'a mut self,verts:&'a [[f32;2]],radius:f32) ->Uniforms<'a>{
+        let common = UniformCommon {
+            color: self.color,
+            offset: vec2same(0.0),
+        };
+        let arr=unsafe{& * (verts as *const _ as *const [circle_program::Vertex])};
+        let un = ProgramUniformValues::new(radius,gl::POINTS,Some(arr));
+
+        Uniforms {
+            sys: self,
+            common,
+            un: UniformVals::Circle(un),
+        }
+    } 
+
     pub fn squares(&mut self) -> SquareSession {
         SquareSession { sys: self ,verts:Vec::new()}
     }
