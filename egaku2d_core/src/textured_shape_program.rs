@@ -6,33 +6,20 @@ use axgeom;
 use std::ffi::CString;
 use std::str;
 
-#[derive(Copy, Clone, Debug)]
-pub struct ProgramUniformValues<'a>{
-    pub radius: f32,
-    pub mode: u32,
-    pub texture:Option<(&'a sprite::Texture,f32,[f32;2])>,
-    pub(crate) verts:Option<&'a [circle_program::Vertex]>
-}
-impl<'a> ProgramUniformValues<'a>{
-    pub fn new(radius:f32,mode:u32,verts:Option<&'a [circle_program::Vertex]>)->Self{
-        ProgramUniformValues{mode,radius,texture:None,verts}
-    }
-}
 
 // Shader sources
 pub static VS_SRC: &'static str = "
 #version 300 es
 in vec2 position;
-out vec2 pos;
-//out float ps;
+out float ps;
+
 uniform vec2 offset;
 uniform mat3 mmatrix;
 uniform float point_size;
 void main() {
     gl_PointSize = point_size;
     vec3 pp=vec3(position+offset,1.0);
-    pos=position*0.005;
-    //ps=gl_PointSize;
+    ps=gl_PointSize;
     gl_Position = vec4(mmatrix*pp.xyz, 1.0);
 }";
 
@@ -42,9 +29,11 @@ pub static CIRCLE_FS_SRC: &'static str = "
 precision mediump float;
 uniform vec4 bcol;
 out vec4 out_color;
-in vec2 pos;
 in float ps;
-//uniform sampler2D tex0;
+uniform sampler2D tex0;
+uniform vec2 texture_dim;
+uniform float texture_scale;
+uniform vec2 texture_offset;
 void main() {
 
     vec2 coord = gl_PointCoord - vec2(0.5,0.5);
@@ -54,21 +43,23 @@ void main() {
     }
 
 
-    //out_color = texture(tex0,(coord*0.01*ps))*bcol;
-    out_color = bcol;
+    out_color = texture(tex0,( ((gl_FragCoord.xy-texture_offset)/texture_dim)/texture_scale))*bcol;
 }";
 
 pub static REGULAR_FS_SRC: &'static str = "
 #version 300 es
 precision mediump float;
 uniform vec4 bcol;
-in vec2 pos;
 out vec4 out_color;
 
-//uniform sampler2D tex0;
+uniform vec2 texture_dim;
+uniform float texture_scale;
+uniform vec2 texture_offset;
+uniform sampler2D tex0;
+
 void main() {
-    //out_color = texture(tex0,pos)*bcol;
-    out_color=bcol;
+    out_color = texture(tex0, ((gl_FragCoord.xy-texture_offset)/texture_dim)/texture_scale)*bcol;
+
 }";
 
 #[repr(transparent)]
@@ -76,20 +67,24 @@ void main() {
 pub struct Vertex(pub [f32; 2]);
 
 #[derive(Debug)]
-pub struct CircleProgram {
+pub struct TexturedShapeProgram {
     pub program: GLuint,
     pub matrix_uniform: GLint,
     pub offset_uniform: GLint,
+    pub texture_dim_uniform: GLint,
+    pub texture_offset_uniform: GLint,
+    pub texture_scale_uniform: GLint,
     pub point_size_uniform: GLint,
     pub bcol_uniform: GLint,
     pub pos_attr: GLint,
-    //pub sample_location: GLint,
+    pub sample_location: GLint,
+
 }
 
 #[derive(Debug)]
 pub struct PointMul(pub f32);
 
-impl CircleProgram {
+impl TexturedShapeProgram {
     pub fn set_viewport(
         &mut self,
         window_dim: axgeom::FixedAspectVec2,
@@ -129,7 +124,6 @@ impl CircleProgram {
         let mode = un.mode;
         let point_size = un.radius;
         let col = common.color;
-        //let square=un.rect;
         let buffer_id = buffer_info.id;
         let offset = common.offset;
         let length = buffer_info.length;
@@ -142,21 +136,20 @@ impl CircleProgram {
             gl::Uniform2f(self.offset_uniform, offset.x, offset.y);
             gl_ok!();
 
+
             gl::Uniform1f(self.point_size_uniform, point_size);
             gl_ok!();
 
             gl::Uniform4fv(self.bcol_uniform, 1, col.as_ptr() as *const _);
             gl_ok!();
 
-            //gl::Uniform1i(self.square_uniform, square as i32);
-            //gl_ok!();
 
             gl::BindBuffer(gl::ARRAY_BUFFER, buffer_id);
             gl_ok!();
 
-            /*
+            
             match un.texture{
-                Some(t)=>{
+                Some((t,scale,offset))=>{
                     let texture_id=t.id;
 
                     gl::ActiveTexture(gl::TEXTURE0);
@@ -167,13 +160,24 @@ impl CircleProgram {
 
                     gl::Uniform1i(self.sample_location, 0);
                     gl_ok!();
+
+                    //dbg!(t.dim);
+                    gl::Uniform2f(self.texture_dim_uniform,t.dim[0] as f32,t.dim[1] as f32);
+                    gl_ok!();
+
+                    gl::Uniform2f(self.texture_offset_uniform,offset[0],-offset[1]);
+                    gl_ok!();
                     
+
+                    gl::Uniform1f(self.texture_scale_uniform,scale);
+                    gl_ok!();
+                      
                 },
                 None=>{
-
+                    unreachable!();
                 }
             }
-            */
+            
             
 
 
@@ -202,7 +206,7 @@ impl CircleProgram {
         }
     }
 
-    pub fn new(frag: &str) -> CircleProgram {
+    pub fn new(frag: &str) -> TexturedShapeProgram {
         unsafe {
             // Create GLSL shaders
             let vs = compile_shader(VS_SRC, gl::VERTEX_SHADER);
@@ -223,9 +227,18 @@ impl CircleProgram {
             gl::UseProgram(program);
             gl_ok!();
 
-            //let square_uniform: GLint =
-            //    gl::GetUniformLocation(program, CString::new("square").unwrap().as_ptr());
-            //gl_ok!();
+            let texture_scale_uniform :GLint = 
+                gl::GetUniformLocation(program, CString::new("texture_scale").unwrap().as_ptr());
+            gl_ok!();
+
+
+            let texture_dim_uniform :GLint = 
+                gl::GetUniformLocation(program, CString::new("texture_dim").unwrap().as_ptr());
+            gl_ok!();
+            
+            let texture_offset_uniform :GLint = 
+                gl::GetUniformLocation(program, CString::new("texture_offset").unwrap().as_ptr());
+            gl_ok!();
 
             let point_size_uniform: GLint =
                 gl::GetUniformLocation(program, CString::new("point_size").unwrap().as_ptr());
@@ -247,26 +260,29 @@ impl CircleProgram {
                 gl::GetAttribLocation(program, CString::new("position").unwrap().as_ptr());
             gl_ok!();
 
-            /*
+            
             let sample_location =
                 gl::GetAttribLocation(program, CString::new("tex0").unwrap().as_ptr());
             gl_ok!();
-            */
+            
 
-            CircleProgram {
+            TexturedShapeProgram {
                 program,
                 offset_uniform,
+                texture_dim_uniform,
+                texture_offset_uniform,
+                texture_scale_uniform,
                 point_size_uniform,
                 matrix_uniform,
                 bcol_uniform,
                 pos_attr,
-                //sample_location
+                sample_location
             }
         }
     }
 }
 
-impl Drop for CircleProgram {
+impl Drop for TexturedShapeProgram {
     fn drop(&mut self) {
         // Cleanup
         unsafe {

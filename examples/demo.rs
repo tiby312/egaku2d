@@ -17,11 +17,15 @@ fn main() {
     let tall_tiles_tex = sys.texture("tall_tiles.png",[2,3]).unwrap();
     let fat_tiles_tex = sys.texture("fat_tiles.png",[2,3]).unwrap();
     
+    let leaves = sys.texture("leaves.png",[1,1]).unwrap();
+    
+
     let rect_save = {
         let mut k = sys.canvas_mut().rects();
         k.add([400., 420., 410., 420.]);
         k.add([50., 100., 60., 80.]);
         k.add([300., 500., 30., 50.]);
+        k.add([300., 500., 300., 500.]);
         k.save()
     };
 
@@ -114,6 +118,7 @@ fn main() {
                 const COL4: [f32; 4] = [0.5, 1.0, 0.5, 1.0];
                 const WHITE: [f32; 4] = [1.0, 1.0, 1.0, 1.0];
 
+                
                 //draw static VBOs already on the gpu.
                 sprite_save
                     .uniforms(canvas, &food_tex, 32.0)
@@ -123,7 +128,7 @@ fn main() {
                 arrow_save.uniforms(canvas).draw();
                 line_save.uniforms(canvas).with_color(COL2).draw();
                 square_save.uniforms(canvas, 10.0).with_color(COL3).draw();
-                rect_save.uniforms(canvas).with_color(COL4).draw();
+                rect_save.uniforms(canvas).with_texture(&fat_tiles_tex,2.0,wobble).with_color(WHITE).with_offset(wobble).draw();
 
                 //draw some moving circles
                 let mut k = canvas.circles();
@@ -171,18 +176,19 @@ fn main() {
                     .circles()
                     .add(cursor)
                     .uniforms(c)
-                    .with_color(WHITE)
+                    //.with_color(WHITE)
+                    .with_texture(&leaves,1.0,[0.0;2])
                     .send_and_draw();
-
+                
                 //draw a moving line
                 let c = counter as f32 * 0.07;
                 canvas
                     .lines(10.)
                     .add([50., 500.], [500., 50. + c.sin() * 50.])
                     .uniforms()
-                    .with_color(COL3)
+                    .with_texture(&leaves,4.0,[0.0;2])
                     .send_and_draw();
-
+                
                 //draw a rotating arrow
                 let c = counter as f32 * 0.04;
                 let center = [400., 400.];
@@ -198,7 +204,7 @@ fn main() {
                 canvas.sprites().add([500.,200.],c as u16,c).uniforms(&fat_tiles_tex,100.).send_and_draw();
 
                 canvas.sprites().add([500.,50.],c as u16,c).uniforms(&tall_tiles_tex,100.).send_and_draw();
-
+                
 
                 //display what we drew
                 sys.swap_buffers();
