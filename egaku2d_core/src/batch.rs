@@ -1,3 +1,4 @@
+//! Contains all batch drawing code. See the crate level documentation.
 
 use super::*;
 use core::marker::PhantomData;

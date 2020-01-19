@@ -63,9 +63,9 @@
 //!
 //! Each sprite vertex is composed of the following:
 //!
-//! * position:[f32;2]
-//! * index:u16 - the user can index up to 256*256 different sprites in a tile set.
-//! * rotation:u16 - this gets normalized to a float internally. The user passes a f32 float in radians.
+//! * position:`[f32;2]`
+//! * index:`u16` - the user can index up to 256*256 different sprites in a tile set.
+//! * rotation:`u16` - this gets normalized to a float internally. The user passes a f32 float in radians.
 //!
 //! So each sprite vertex is compact at 4*3=12 bytes.
 //!
@@ -142,24 +142,24 @@
 //! canvas.arrows(5.0)
 //!   .add([40., 40.], [40., 200.])
 //!   .add([40., 40.], [200., 40.])
-//!   .uniforms(canvas).send_and_draw();
+//!   .send_and_uniforms(canvas).draw();
 //!
 //! //Draw some circles.
 //! canvas.circles()
 //!   .add([5.,6.])
 //!   .add([7.,8.])
 //!   .add([9.,5.])
-//!   .uniforms(canvas,4.0).with_color([0., 1., 1., 0.1]).send_and_draw();
+//!   .send_and_uniforms(canvas,4.0).with_color([0., 1., 1., 0.1]).draw();
 //!
 //! //Draw some circles from f32 primitives.
 //! canvas.circles()
 //!   .add([5.,6.])
 //!   .add([7.,8.])
 //!   .add([9.,5.])
-//!   .uniforms(canvas,4.0).with_color([0., 1., 1., 0.1]).send_and_draw();
+//!   .send_and_uniforms(canvas,4.0).with_color([0., 1., 1., 0.1]).draw();
 //!
 //! //Draw the first tile in the top left corder of the texture.
-//! canvas.sprites().add([100.,100.],food_texture.coord_to_index([0,0]),3.14).uniforms(canvas,&food_texture,4.0).send_and_draw();
+//! canvas.sprites().add([100.,100.],food_texture.coord_to_index([0,0]),3.14).send_and_uniforms(canvas,&food_texture,4.0).draw();
 //!
 //! //Swap buffers on the opengl context.
 //! glsys.swap_buffers();
