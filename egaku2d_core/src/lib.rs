@@ -13,10 +13,6 @@ use gl::types::*;
 use crate::circle_program::*;
 use crate::sprite_program::*;
 
-
-
-
-
 type PointType = [f32; 2];
 
 mod shader;
@@ -51,7 +47,6 @@ pub mod batch;
 
 mod textured_shape_program;
 
-
 ///All the opengl functions generated from the gl_generator crate.
 pub mod gl {
     include!(concat!(env!("OUT_DIR"), "/bindings.rs"));
@@ -60,7 +55,6 @@ pub mod gl {
 ///Contains all the shape drawing session and save objects
 ///They all follow the same api outlined in the crate documentation.
 pub mod shapes;
-
 
 use self::uniforms::UniformCommon;
 use self::uniforms::*;
@@ -87,23 +81,28 @@ pub mod uniforms {
             self
         }
 
-        pub fn with_texture(&mut self,texture:&'a sprite::Texture,scale:f32,offset:[f32;2])->&mut Self{
+        pub fn with_texture(
+            &mut self,
+            texture: &'a sprite::Texture,
+            scale: f32,
+            offset: [f32; 2],
+        ) -> &mut Self {
             //add offset:[f32;2],scale:f32
             //println!("offset ignored");
             //println!("scale ignored");
 
-            match &mut self.un{
-                UniformVals::Sprite(s)=>{
-                    s.texture=texture;
+            match &mut self.un {
+                UniformVals::Sprite(s) => {
+                    s.texture = texture;
                     //println!("not implemented");
-                },
-                UniformVals::Regular(s)=>{
-                    s.texture=Some((texture,scale,offset));
-                },
-                UniformVals::Circle(s)=>{
-                    s.texture=Some((texture,scale,offset));
                 }
-            }   
+                UniformVals::Regular(s) => {
+                    s.texture = Some((texture, scale, offset));
+                }
+                UniformVals::Circle(s) => {
+                    s.texture = Some((texture, scale, offset));
+                }
+            }
             self
         }
 
@@ -115,22 +114,29 @@ pub mod uniforms {
                         .set_buffer_and_draw(&self.common, a, self.buffer);
                 }
                 UniformVals::Regular(a) => {
-                    if a.texture.is_some(){
-                        self.sys.textured_shape_program.set_buffer_and_draw(&self.common,a,self.buffer);
-                    }else{
+                    if a.texture.is_some() {
+                        self.sys.textured_shape_program.set_buffer_and_draw(
+                            &self.common,
+                            a,
+                            self.buffer,
+                        );
+                    } else {
                         self.sys
                             .regular_program
-                            .set_buffer_and_draw(&self.common, a, self.buffer);                        
+                            .set_buffer_and_draw(&self.common, a, self.buffer);
                     }
-
                 }
                 UniformVals::Circle(a) => {
-                    if a.texture.is_some(){
-                        self.sys.textured_circle_program.set_buffer_and_draw(&self.common,a,self.buffer);
-                    }else{
+                    if a.texture.is_some() {
+                        self.sys.textured_circle_program.set_buffer_and_draw(
+                            &self.common,
+                            a,
+                            self.buffer,
+                        );
+                    } else {
                         self.sys
                             .circle_program
-                            .set_buffer_and_draw(&self.common, a, self.buffer);   
+                            .set_buffer_and_draw(&self.common, a, self.buffer);
                     }
                 }
             }
@@ -148,7 +154,6 @@ pub mod uniforms {
         Circle(ProgramUniformValues<'a>),
     }
 }
-
 
 ///Allows the user to start drawing shapes.
 ///The top left corner is the origin.
@@ -181,8 +186,12 @@ impl SimpleCanvas {
         self.point_mul = self.circle_program.set_viewport(window_dim, game_width);
         let _ = self.regular_program.set_viewport(window_dim, game_width);
         let _ = self.sprite_program.set_viewport(window_dim, game_width);
-        let _ = self.textured_shape_program.set_viewport(window_dim,game_width);
-        let _ = self.textured_circle_program.set_viewport(window_dim,game_width);
+        let _ = self
+            .textured_shape_program
+            .set_viewport(window_dim, game_width);
+        let _ = self
+            .textured_circle_program
+            .set_viewport(window_dim, game_width);
     }
 
     //Unsafe since user might create two instances, both of
@@ -195,17 +204,20 @@ impl SimpleCanvas {
 
         let mut regular_program = CircleProgram::new(circle_program::REGULAR_FS_SRC);
 
-        let mut textured_shape_program = textured_shape_program::TexturedShapeProgram::new(textured_shape_program::REGULAR_FS_SRC);
-        let mut textured_circle_program = textured_shape_program::TexturedShapeProgram::new(textured_shape_program::CIRCLE_FS_SRC);
-
+        let mut textured_shape_program = textured_shape_program::TexturedShapeProgram::new(
+            textured_shape_program::REGULAR_FS_SRC,
+        );
+        let mut textured_circle_program = textured_shape_program::TexturedShapeProgram::new(
+            textured_shape_program::CIRCLE_FS_SRC,
+        );
 
         let mut sprite_program = SpriteProgram::new();
 
         let point_mul = circle_program.set_viewport(window_dim, window_dim.width as f32);
         let _ = regular_program.set_viewport(window_dim, window_dim.width as f32);
         let _ = sprite_program.set_viewport(window_dim, window_dim.width as f32);
-        let _ = textured_shape_program.set_viewport(window_dim,window_dim.width as f32);
-        let _ = textured_circle_program.set_viewport(window_dim,window_dim.width as f32);
+        let _ = textured_shape_program.set_viewport(window_dim, window_dim.width as f32);
+        let _ = textured_circle_program.set_viewport(window_dim, window_dim.width as f32);
 
         gl::Enable(gl::BLEND);
         gl_ok!();
@@ -227,25 +239,25 @@ impl SimpleCanvas {
     }
 
     pub fn sprites(&mut self) -> sprite::SpriteSession {
-        sprite::SpriteSession { verts:Vec::new() }
+        sprite::SpriteSession { verts: Vec::new() }
     }
 
     pub fn circles(&mut self) -> CircleSession {
-        CircleSession { verts:Vec::new()}
+        CircleSession { verts: Vec::new() }
     }
 
     pub fn squares(&mut self) -> SquareSession {
-        SquareSession { verts:Vec::new()}
+        SquareSession { verts: Vec::new() }
     }
     pub fn rects(&mut self) -> RectSession {
-        RectSession { verts:Vec::new()}
+        RectSession { verts: Vec::new() }
     }
     pub fn arrows(&mut self, radius: f32) -> ArrowSession {
         let kk = self.point_mul.0;
 
         ArrowSession {
             radius: radius * kk,
-            verts:Vec::new()
+            verts: Vec::new(),
         }
     }
 
@@ -253,7 +265,7 @@ impl SimpleCanvas {
         let kk = self.point_mul.0;
         LineSession {
             radius: radius * kk,
-            verts:Vec::new()
+            verts: Vec::new(),
         }
     }
 
@@ -268,8 +280,11 @@ impl SimpleCanvas {
     }
 
     //The reference returned by the closure must be a pointer into a member of T.
-    pub unsafe fn batch_circles<T,F:Fn(&T)->&[f32;2]>(&mut self,bots:&[T],func:F)->batch::BatchCircle<T,F>{
-        batch::BatchCircle::new(bots,func)
+    pub unsafe fn batch_circles<T, F: Fn(&T) -> &[f32; 2]>(
+        &mut self,
+        bots: &[T],
+        func: F,
+    ) -> batch::BatchCircle<T, F> {
+        batch::BatchCircle::new(bots, func)
     }
 }
-

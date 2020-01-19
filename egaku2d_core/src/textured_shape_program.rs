@@ -6,7 +6,6 @@ use axgeom;
 use std::ffi::CString;
 use std::str;
 
-
 // Shader sources
 pub static VS_SRC: &'static str = "
 #version 300 es
@@ -84,7 +83,6 @@ pub struct TexturedShapeProgram {
     pub bcol_uniform: GLint,
     pub pos_attr: GLint,
     pub sample_location: GLint,
-
 }
 
 #[derive(Debug)]
@@ -133,7 +131,6 @@ impl TexturedShapeProgram {
         let buffer_id = buffer_info.id;
         let offset = common.offset;
         let length = buffer_info.length;
-        
 
         unsafe {
             gl::UseProgram(self.program);
@@ -142,21 +139,18 @@ impl TexturedShapeProgram {
             gl::Uniform2f(self.offset_uniform, offset.x, offset.y);
             gl_ok!();
 
-
             gl::Uniform1f(self.point_size_uniform, point_size);
             gl_ok!();
 
             gl::Uniform4fv(self.bcol_uniform, 1, col.as_ptr() as *const _);
             gl_ok!();
 
-
             gl::BindBuffer(gl::ARRAY_BUFFER, buffer_id);
             gl_ok!();
 
-            
-            match un.texture{
-                Some((t,scale,offset))=>{
-                    let texture_id=t.id;
+            match un.texture {
+                Some((t, scale, offset)) => {
+                    let texture_id = t.id;
 
                     gl::ActiveTexture(gl::TEXTURE0);
                     gl_ok!();
@@ -168,24 +162,19 @@ impl TexturedShapeProgram {
                     gl_ok!();
 
                     //dbg!(t.dim);
-                    gl::Uniform2f(self.texture_dim_uniform,t.dim[0] as f32,t.dim[1] as f32);
+                    gl::Uniform2f(self.texture_dim_uniform, t.dim[0] as f32, t.dim[1] as f32);
                     gl_ok!();
 
-                    gl::Uniform2f(self.texture_offset_uniform,offset[0],offset[1]);
+                    gl::Uniform2f(self.texture_offset_uniform, offset[0], offset[1]);
                     gl_ok!();
-                    
 
-                    gl::Uniform1f(self.texture_scale_uniform,scale);
+                    gl::Uniform1f(self.texture_scale_uniform, scale);
                     gl_ok!();
-                      
-                },
-                None=>{
+                }
+                None => {
                     unreachable!();
                 }
             }
-            
-            
-
 
             gl::EnableVertexAttribArray(self.pos_attr as GLuint);
             gl_ok!();
@@ -233,16 +222,15 @@ impl TexturedShapeProgram {
             gl::UseProgram(program);
             gl_ok!();
 
-            let texture_scale_uniform :GLint = 
+            let texture_scale_uniform: GLint =
                 gl::GetUniformLocation(program, CString::new("texture_scale").unwrap().as_ptr());
             gl_ok!();
 
-
-            let texture_dim_uniform :GLint = 
+            let texture_dim_uniform: GLint =
                 gl::GetUniformLocation(program, CString::new("texture_dim").unwrap().as_ptr());
             gl_ok!();
-            
-            let texture_offset_uniform :GLint = 
+
+            let texture_offset_uniform: GLint =
                 gl::GetUniformLocation(program, CString::new("texture_offset").unwrap().as_ptr());
             gl_ok!();
 
@@ -266,11 +254,9 @@ impl TexturedShapeProgram {
                 gl::GetAttribLocation(program, CString::new("position").unwrap().as_ptr());
             gl_ok!();
 
-            
             let sample_location =
                 gl::GetAttribLocation(program, CString::new("tex0").unwrap().as_ptr());
             gl_ok!();
-            
 
             TexturedShapeProgram {
                 program,
@@ -282,7 +268,7 @@ impl TexturedShapeProgram {
                 matrix_uniform,
                 bcol_uniform,
                 pos_attr,
-                sample_location
+                sample_location,
             }
         }
     }

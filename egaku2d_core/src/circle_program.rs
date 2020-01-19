@@ -7,15 +7,20 @@ use std::ffi::CString;
 use std::str;
 
 #[derive(Copy, Clone, Debug)]
-pub struct ProgramUniformValues<'a>{
+pub struct ProgramUniformValues<'a> {
     pub radius: f32,
     pub mode: u32,
-    pub stride:i32,
-    pub texture:Option<(&'a sprite::Texture,f32,[f32;2])>
+    pub stride: i32,
+    pub texture: Option<(&'a sprite::Texture, f32, [f32; 2])>,
 }
-impl<'a> ProgramUniformValues<'a>{
-    pub fn new(radius:f32,mode:u32)->Self{
-        ProgramUniformValues{mode,radius,texture:None,stride:0}
+impl<'a> ProgramUniformValues<'a> {
+    pub fn new(radius: f32, mode: u32) -> Self {
+        ProgramUniformValues {
+            mode,
+            radius,
+            texture: None,
+            stride: 0,
+        }
     }
 }
 
@@ -132,7 +137,7 @@ impl CircleProgram {
         let buffer_id = buffer_info.id;
         let offset = common.offset;
         let length = buffer_info.length;
-        let stride=un.stride;
+        let stride = un.stride;
 
         unsafe {
             gl::UseProgram(self.program);
@@ -196,7 +201,6 @@ impl CircleProgram {
             gl::UseProgram(program);
             gl_ok!();
 
-
             let point_size_uniform: GLint =
                 gl::GetUniformLocation(program, CString::new("point_size").unwrap().as_ptr());
             gl_ok!();
@@ -216,7 +220,6 @@ impl CircleProgram {
             let pos_attr =
                 gl::GetAttribLocation(program, CString::new("position").unwrap().as_ptr());
             gl_ok!();
-
 
             CircleProgram {
                 program,

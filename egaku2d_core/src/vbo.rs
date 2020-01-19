@@ -7,7 +7,6 @@ pub(crate) struct BufferInfo {
     pub length: usize,
 }
 
-
 #[derive(Debug)]
 pub struct StaticBuffer<V> {
     info: BufferInfo,
@@ -49,13 +48,13 @@ impl<V: core::fmt::Debug + Copy + Clone> StaticBuffer<V> {
     }
 }
 
-#[derive(Clone,Debug)]
-pub struct GrowableBuffer<B>{
-    vbo:u32,
-    length:usize,
-    _p:PhantomData<B>
+#[derive(Clone, Debug)]
+pub struct GrowableBuffer<B> {
+    vbo: u32,
+    length: usize,
+    _p: PhantomData<B>,
 }
-impl<B> Drop for GrowableBuffer<B>{
+impl<B> Drop for GrowableBuffer<B> {
     fn drop(&mut self) {
         //TODO make sure this is ok to do
         unsafe {
@@ -63,14 +62,14 @@ impl<B> Drop for GrowableBuffer<B>{
         }
     }
 }
-impl<B> GrowableBuffer<B>{
-    pub(crate) fn new()->GrowableBuffer<B>{
-        let mut vbo:u32=0;
+impl<B> GrowableBuffer<B> {
+    pub(crate) fn new() -> GrowableBuffer<B> {
+        let mut vbo: u32 = 0;
         // Create a Vertex Buffer Object and copy the vertex data to it
-        unsafe{
+        unsafe {
             gl::GenBuffers(1, &mut vbo);
         }
-        /*    
+        /*
         gl::BindBuffer(gl::ARRAY_BUFFER, &mut vbo);
         gl_ok!();
         gl::BufferData(
@@ -81,12 +80,15 @@ impl<B> GrowableBuffer<B>{
         );
         gl_ok!();
         */
-        GrowableBuffer{vbo,length:0,_p:PhantomData}
+        GrowableBuffer {
+            vbo,
+            length: 0,
+            _p: PhantomData,
+        }
     }
 
-    pub(crate) fn send_to_gpu(&mut self,arr:&[B]){
-        if arr.len()>self.length{
-
+    pub(crate) fn send_to_gpu(&mut self, arr: &[B]) {
+        if arr.len() > self.length {
             let vbo = &mut self.vbo;
             unsafe {
                 gl::DeleteBuffers(1, vbo);
@@ -101,7 +103,7 @@ impl<B> GrowableBuffer<B>{
                 );
                 gl_ok!()
             }
-        }else{
+        } else {
             unsafe {
                 gl::BindBuffer(gl::ARRAY_BUFFER, self.vbo);
                 gl_ok!();
@@ -116,11 +118,11 @@ impl<B> GrowableBuffer<B>{
             }
         }
 
-        self.length=arr.len();
+        self.length = arr.len();
     }
-    
-    pub(crate) fn get_info(&self,length:usize) -> BufferInfo {
-        assert!(length<=self.length);
+
+    pub(crate) fn get_info(&self, length: usize) -> BufferInfo {
+        assert!(length <= self.length);
         BufferInfo {
             id: self.vbo,
             length,

@@ -2,7 +2,6 @@ use super::*;
 
 //pub use self::sprite_program::Vertex;
 
-
 pub struct SpriteSave {
     _ns: NotSend,
     pub(crate) buffer: vbo::StaticBuffer<sprite_program::Vertex>,
@@ -31,13 +30,13 @@ impl SpriteSave {
     }
 }
 
-pub struct SpriteSession{
-    pub(crate) verts:Vec<sprite_program::Vertex>
+pub struct SpriteSession {
+    pub(crate) verts: Vec<sprite_program::Vertex>,
 }
 
-impl SpriteSession{
-    pub fn new()->Self{
-        SpriteSession{verts:Vec::new()}
+impl SpriteSession {
+    pub fn new() -> Self {
+        SpriteSession { verts: Vec::new() }
     }
     ///Add a point sprite.
     #[inline(always)]
@@ -53,20 +52,25 @@ impl SpriteSession{
         });
         self
     }
-    
-    pub fn append(&mut self,other:&mut Self){
+
+    pub fn append(&mut self, other: &mut Self) {
         self.verts.append(&mut other.verts);
     }
 
     ///Save this sprite session to into its own static buffer to be drawn later.
-    pub fn save(&mut self,_sys:&mut SimpleCanvas) -> SpriteSave {
+    pub fn save(&mut self, _sys: &mut SimpleCanvas) -> SpriteSave {
         SpriteSave {
             _ns: ns(),
             buffer: vbo::StaticBuffer::new(&self.verts),
         }
     }
 
-    pub fn send_and_uniforms<'a>(&'a mut self, sys:&'a mut SimpleCanvas,texture: &'a Texture, radius: f32) -> Uniforms<'a> {
+    pub fn send_and_uniforms<'a>(
+        &'a mut self,
+        sys: &'a mut SimpleCanvas,
+        texture: &'a Texture,
+        radius: f32,
+    ) -> Uniforms<'a> {
         sys.sprite_buffer.send_to_gpu(&self.verts);
 
         let sqrt2: f32 = 1.41421356237;
@@ -76,14 +80,14 @@ impl SpriteSession{
             color: sys.color,
             offset: vec2same(0.0),
         };
-        let un = SpriteProgramUniformValues { radius, texture};
-        
-        let buffer=sys.sprite_buffer.get_info(self.verts.len());
+        let un = SpriteProgramUniformValues { radius, texture };
+
+        let buffer = sys.sprite_buffer.get_info(self.verts.len());
         Uniforms {
             common,
             sys,
             un: UniformVals::Sprite(un),
-            buffer
+            buffer,
         }
     }
 }
@@ -97,10 +101,10 @@ pub struct Texture {
 }
 
 impl Texture {
-    pub fn grid_dim(&self)->[u8;2]{
+    pub fn grid_dim(&self) -> [u8; 2] {
         self.grid_dim
     }
-    pub fn dim(&self)->[f32;2]{
+    pub fn dim(&self) -> [f32; 2] {
         self.dim
     }
     ///Create a texture index from a coordinate in the tile set.

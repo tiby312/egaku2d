@@ -1,8 +1,7 @@
 extern crate egaku2d;
 
-use glutin::event::{Event,VirtualKeyCode,WindowEvent};
+use glutin::event::{Event, VirtualKeyCode, WindowEvent};
 use glutin::event_loop::ControlFlow;
-
 
 fn main() {
     let events_loop = glutin::event_loop::EventLoop::new();
@@ -38,23 +37,26 @@ fn main() {
             if timer.is_ready() {
                 let canvas = sys.canvas_mut();
 
-
                 canvas.clear_color([0.2; 3]);
 
+                let mut circles = canvas.circles();
 
-                let mut circles=canvas.circles();
-
-                for x in (20..400).step_by(20){
-                    for y in (20..400).step_by(20){
-                        circles.add([cursor[0]+(x as f32)*(cursor[0]*0.01),cursor[1]+y as f32]);
+                for x in (20..400).step_by(20) {
+                    for y in (20..400).step_by(20) {
+                        circles.add([
+                            cursor[0] + (x as f32) * (cursor[0] * 0.01),
+                            cursor[1] + y as f32,
+                        ]);
                     }
                 }
 
-                circles.send_and_uniforms(canvas,10.0).with_color([1.0,1.0,1.0,1.0]).draw();
+                circles
+                    .send_and_uniforms(canvas, 10.0)
+                    .with_color([1.0, 1.0, 1.0, 1.0])
+                    .draw();
 
                 //display what we drew
                 sys.swap_buffers();
-
             }
         }
         _ => {}

@@ -178,17 +178,23 @@ pub use egaku2d_core::sprite;
 pub use egaku2d_core::uniforms;
 pub use egaku2d_core::SimpleCanvas;
 
-
-mod onein{
-    use std::sync::atomic::{AtomicUsize,Ordering::SeqCst};
+mod onein {
+    use std::sync::atomic::{AtomicUsize, Ordering::SeqCst};
     static INSTANCES: AtomicUsize = AtomicUsize::new(0);
 
-    pub fn assert_only_one_instance(){
-        assert_eq!(INSTANCES.fetch_add(1,SeqCst),0,"Cannot have multiple instances of the egaku2d system at the same time!");
+    pub fn assert_only_one_instance() {
+        assert_eq!(
+            INSTANCES.fetch_add(1, SeqCst),
+            0,
+            "Cannot have multiple instances of the egaku2d system at the same time!"
+        );
     }
-    pub fn decrement_one_instance(){
-        assert_eq!(INSTANCES.fetch_sub(1,SeqCst),1,"The last egaku2d system object was not properly destroyed");
-        
+    pub fn decrement_one_instance() {
+        assert_eq!(
+            INSTANCES.fetch_sub(1, SeqCst),
+            1,
+            "The last egaku2d system object was not properly destroyed"
+        );
     }
 }
 
@@ -216,7 +222,6 @@ impl RefreshTimer {
     }
 }
 
-
 ///Unlike a windowed system, we do not have control over the dimensions of the
 ///window we end up with.
 ///After construction, the user must set the viewport using the window dimension
@@ -227,12 +232,11 @@ pub use self::fullscreen::FullScreenSystem;
 pub mod fullscreen {
     use super::*;
 
-    impl Drop for FullScreenSystem{
-        fn drop(&mut self){
+    impl Drop for FullScreenSystem {
+        fn drop(&mut self) {
             onein::decrement_one_instance();
         }
     }
-
 
     pub struct FullScreenSystem {
         inner: SimpleCanvas,
@@ -263,7 +267,7 @@ pub mod fullscreen {
             //let dpi = windowed_context.window().scale_factor();
             let glutin::dpi::PhysicalSize { width, height } =
                 windowed_context.window().inner_size();
-            
+
             // Load the OpenGL function pointers
             gl::load_with(|symbol| windowed_context.get_proc_address(symbol) as *const _);
             assert_eq!(unsafe { gl::GetError() }, gl::NO_ERROR);
@@ -388,8 +392,8 @@ pub struct WindowedSystem {
     windowed_context: glutin::WindowedContext<PossiblyCurrent>,
 }
 
-impl Drop for WindowedSystem{
-    fn drop(&mut self){
+impl Drop for WindowedSystem {
+    fn drop(&mut self) {
         onein::decrement_one_instance();
     }
 }
@@ -401,7 +405,7 @@ impl WindowedSystem {
         title: &str,
     ) -> WindowedSystem {
         onein::assert_only_one_instance();
-            
+
         let dim = vec2(dim[0], dim[1]);
         let dim = dim.inner_as::<f32>();
 
