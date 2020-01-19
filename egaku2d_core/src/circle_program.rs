@@ -10,11 +10,12 @@ use std::str;
 pub struct ProgramUniformValues<'a>{
     pub radius: f32,
     pub mode: u32,
+    pub stride:i32,
     pub texture:Option<(&'a sprite::Texture,f32,[f32;2])>
 }
 impl<'a> ProgramUniformValues<'a>{
     pub fn new(radius:f32,mode:u32)->Self{
-        ProgramUniformValues{mode,radius,texture:None}
+        ProgramUniformValues{mode,radius,texture:None,stride:0}
     }
 }
 
@@ -131,7 +132,7 @@ impl CircleProgram {
         let buffer_id = buffer_info.id;
         let offset = common.offset;
         let length = buffer_info.length;
-        
+        let stride=un.stride;
 
         unsafe {
             gl::UseProgram(self.program);
@@ -146,9 +147,6 @@ impl CircleProgram {
             gl::Uniform4fv(self.bcol_uniform, 1, col.as_ptr() as *const _);
             gl_ok!();
 
-            //gl::Uniform1i(self.square_uniform, square as i32);
-            //gl_ok!();
-
             gl::BindBuffer(gl::ARRAY_BUFFER, buffer_id);
             gl_ok!();
 
@@ -160,7 +158,7 @@ impl CircleProgram {
                 2,
                 gl::FLOAT,
                 gl::FALSE as GLboolean,
-                0 as i32,
+                stride as i32,
                 core::ptr::null(),
             );
             gl_ok!();
@@ -198,9 +196,6 @@ impl CircleProgram {
             gl::UseProgram(program);
             gl_ok!();
 
-            //let square_uniform: GLint =
-            //    gl::GetUniformLocation(program, CString::new("square").unwrap().as_ptr());
-            //gl_ok!();
 
             let point_size_uniform: GLint =
                 gl::GetUniformLocation(program, CString::new("point_size").unwrap().as_ptr());
@@ -222,11 +217,6 @@ impl CircleProgram {
                 gl::GetAttribLocation(program, CString::new("position").unwrap().as_ptr());
             gl_ok!();
 
-            /*
-            let sample_location =
-                gl::GetAttribLocation(program, CString::new("tex0").unwrap().as_ptr());
-            gl_ok!();
-            */
 
             CircleProgram {
                 program,
@@ -235,7 +225,6 @@ impl CircleProgram {
                 matrix_uniform,
                 bcol_uniform,
                 pos_attr,
-                //sample_location
             }
         }
     }

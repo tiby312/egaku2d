@@ -78,7 +78,7 @@ impl SpriteSession{
         };
         let un = SpriteProgramUniformValues { radius, texture};
         
-        let buffer=sys.sprite_buffer.get_info();
+        let buffer=sys.sprite_buffer.get_info(self.verts.len());
         Uniforms {
             common,
             sys,

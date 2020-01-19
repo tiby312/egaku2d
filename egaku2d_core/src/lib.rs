@@ -354,7 +354,7 @@ impl SimpleCanvas {
 
     //The reference returned by the closure must be a pointer into a member of T.
     pub unsafe fn circles_from_generic_slice<T,F:Fn(&T)->&[f32;2]>(&mut self,bots:&[T],func:F)->BatchCircle<T,F>{
-        unimplemented!();
+        BatchCircle::new(bots,func)
     }
 }
 
@@ -369,30 +369,44 @@ pub struct BatchCircle<T,F>{
 }
 
 impl<T,F:Fn(&T)->&[f32;2]> BatchCircle<T,F>{
-    pub fn new(func:F)->BatchCircle<T,F>{
-        BatchCircle{
+    pub fn new(bots:&[T],func:F)->BatchCircle<T,F>{
+        let mut b=BatchCircle{
             buffer:vbo::GrowableBuffer::new(),
             func,
             _p:PhantomData,
             _ns:ns()
-        }
-        
+        };
+        b.buffer.send_to_gpu(bots);
+        b
     }
 
     pub fn send_and_uniforms<'a>(&'a mut self,sys:&'a mut SimpleCanvas,bots:&[T],radius:f32)->Uniforms<'a>{
-        self.buffer.send_to_gpu(bots);
+        let stride=0;
+        /*
+        if bots.is_empty(){
 
+        }else{
+            self.buffer.send_to_gpu(bots);    
+        }
+        */
+
+        
         let common = UniformCommon {
             color: sys.color,
             offset: vec2same(0.0),
         };
-        let un = ProgramUniformValues::new(radius,gl::POINTS);
+        let un = ProgramUniformValues{
+            mode:gl::POINTS,
+            radius,
+            stride,
+            texture:None
+        };
 
         Uniforms {
             sys,
             common,
             un: UniformVals::Circle(un),
-            buffer:self.buffer.get_info()
+            buffer:self.buffer.get_info(bots.len())
         }
     }
 }

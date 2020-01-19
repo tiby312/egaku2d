@@ -59,7 +59,7 @@ impl SquareSession {
         };
         let un = ProgramUniformValues::new(radius,gl::POINTS);
 
-        let buffer=sys.circle_buffer.get_info();
+        let buffer=sys.circle_buffer.get_info(self.verts.len());
         Uniforms {
             sys,
             common,
@@ -118,7 +118,7 @@ impl CircleSession {
         };
         let un = ProgramUniformValues::new(radius,gl::POINTS);
 
-        let buffer=sys.circle_buffer.get_info();
+        let buffer=sys.circle_buffer.get_info(self.verts.len());
         Uniforms {
             sys,
             common,
@@ -186,7 +186,7 @@ impl RectSession {
             offset: vec2same(0.0),
         };
         let un = ProgramUniformValues::new(0.0,gl::TRIANGLES);
-        let buffer=sys.circle_buffer.get_info();
+        let buffer=sys.circle_buffer.get_info(self.verts.len());
         Uniforms {
             sys,
             common,
@@ -268,7 +268,7 @@ impl ArrowSession {
             offset: vec2same(0.0),
         };
         let un = ProgramUniformValues::new(0.0,gl::TRIANGLES);
-        let buffer=sys.circle_buffer.get_info();
+        let buffer=sys.circle_buffer.get_info(self.verts.len());
         Uniforms {
             sys,
             common,
@@ -376,7 +376,7 @@ impl LineSession {
 
 
         let un = ProgramUniformValues::new(0.0,gl::TRIANGLES);
-        let buffer=sys.circle_buffer.get_info();
+        let buffer=sys.circle_buffer.get_info(self.verts.len());
         Uniforms {
             sys,
             common,
