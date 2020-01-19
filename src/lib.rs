@@ -15,15 +15,13 @@
 //! * 1. Pick a drawing type (a particular shape or a sprite) and set mandatory values for the particular shape or sprite.
 //! * 2. Build up a large group of verticies by calling **`add()`**
 //!     * 2.1 Optionally save off verticies to a static vbo on the gpu for fast drawing at a later time by calling **`save()`**.
-//! * 3. Set mandatory shader uniform values bt calling **`uniforms()`**
+//! * 3. Send the vertex data to the gpu and set mandatory shader uniform values bt calling **`send_and_uniforms()`**
 //!     * 3.1 Set optional uniform values e.g. **`with_color()`**.
-//! * 4. Send the vertex data to the gpu and draw by calling **`send_and_draw()`**
+//! * 4. Draw the verticies by calling **`draw()`**
 //!
 //! Additionally, there is a way to draw the vertices we saved off to the gpu.
 //! To do that, instead of steps 1 and 2, we use the saved off verticies,
-//! and then set the uniform values and then draw by calling **`draw()`**. Drawing in this case is faster
-//! since the vertex data already exists on the gpu.
-//!
+//! and then set the uniform values by valling **`uniforms()`** and then draw by calling **`draw()`**.
 //!
 //! Using this pipeline, the user can efficiently draw thousands of circles, for example, with the caveat that
 //! they all will be the same radius and color/transparency values. This api does not allow the user
@@ -78,6 +76,20 @@
 //! that maps to a valid tile in the tile set to begin with.
 //! The rotation is normalized to a float on the gpu. The fact that the tile index has size u16,
 //! means you can have a texture with a mamimum of 256x256 tiles.
+//!
+//! # Batch drawing
+//!
+//! While you can pretty efficiently draw thousands of objects by calling add() a bunch of times,
+//! you might already have all of the vertex data embeded somewhere, in which case it can seem
+//! wasteful to iterate through your data structure to just build up another list that is then sent
+//! to the gpu. egaku2d has `Batches` that lets you map verticies to an existing data structure that you might have.
+//! This lets us skip building up a new verticies list by sending your entire data structure to the gpu.
+//!
+//! The downside to this approach is that you might have the vertex data in a list, but it might not be
+//! tightly packed, in which case we might end up sending a lot of useless data to the gpu.
+//!
+//! Currently this is only supported for circle drawing.
+//!
 //!
 //! # View
 //!
@@ -160,6 +172,7 @@ use glutin::PossiblyCurrent;
 use egaku2d_core;
 use egaku2d_core::gl;
 
+pub use egaku2d_core::batch;
 pub use egaku2d_core::shapes;
 pub use egaku2d_core::sprite;
 pub use egaku2d_core::uniforms;

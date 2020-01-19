@@ -119,9 +119,6 @@ impl<B> GrowableBuffer<B>{
         self.length=arr.len();
     }
     
-    pub(crate) fn len(&self)->usize{
-        self.length
-    }
     pub(crate) fn get_info(&self,length:usize) -> BufferInfo {
         assert!(length<=self.length);
         BufferInfo {

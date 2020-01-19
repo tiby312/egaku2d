@@ -47,6 +47,7 @@ mod circle_program;
 use sprite_program::SpriteProgram;
 mod sprite_program;
 
+pub mod batch;
 
 mod textured_shape_program;
 
@@ -146,92 +147,6 @@ pub mod uniforms {
         Regular(ProgramUniformValues<'a>),
         Circle(ProgramUniformValues<'a>),
     }
-
-    /*
-    pub struct Uniforms<'a> {
-        pub(crate) sys: &'a mut SimpleCanvas,
-        pub(crate) un: UniformVals<'a>,
-        pub(crate) common: UniformCommon,
-    }
-
-    impl<'a> Uniforms<'a> {
-        pub fn with_offset(&mut self, offset: [f32; 2]) -> &mut Self {
-            self.common.offset = vec2(offset[0], offset[1]);
-            self
-        }
-
-        pub fn with_texture(&mut self,texture:&'a sprite::Texture,scale:f32,offset:[f32;2])->&mut Self{
-            //add offset:[f32;2],scale:f32
-            //println!("offset ignored");
-            //println!("scale ignored");
-
-            match &mut self.un{
-                UniformVals::Sprite(s)=>{
-                    //println!("not implemented");
-                    s.texture=texture;
-                },
-                UniformVals::Regular(s)=>{
-                    s.texture=Some((texture,scale,offset));
-                },
-                UniformVals::Circle(s)=>{
-                    s.texture=Some((texture,scale,offset));
-                }
-            }   
-            self
-        }
-
-        pub fn with_color(&mut self, color: [f32; 4]) -> &mut Self {
-            self.common.color = color;
-            self
-        }
-
-        pub fn draw(&mut self) {
-            match &self.un {
-                UniformVals::Sprite(a) => {
-                    self.sys.sprite_program.set_buffer_and_draw(
-                        &self.common,
-                        a,
-                        self.sys.sprite_buffer.get_info(),
-                    );
-                }
-                UniformVals::Regular(a) => {
-                    if a.texture.is_some(){
-                        self.sys.textured_shape_program.set_buffer_and_draw(
-                            &self.common,
-                            a,
-                            self.sys.circle_buffer.get_info(),
-                        );        
-                    }else{
-                        self.sys.regular_program.set_buffer_and_draw(
-                            &self.common,
-                            a,
-                            self.sys.circle_buffer.get_info(),
-                        );        
-                    
-                    }
-                    
-                }
-                UniformVals::Circle(a) => {
-                    
-                    if a.texture.is_some(){
-                        self.sys.textured_circle_program.set_buffer_and_draw(
-                            &self.common,
-                            a,
-                            self.sys.circle_buffer.get_info(),
-                        );
-                    }else{
-                        self.sys.circle_program.set_buffer_and_draw(
-                            &self.common,
-                            a,
-                            self.sys.circle_buffer.get_info(),
-                        );    
-                    }
-                    
-                }
-            }
-        }
-    }
-    */
 }
 
 
@@ -353,60 +268,8 @@ impl SimpleCanvas {
     }
 
     //The reference returned by the closure must be a pointer into a member of T.
-    pub unsafe fn circles_from_generic_slice<T,F:Fn(&T)->&[f32;2]>(&mut self,bots:&[T],func:F)->BatchCircle<T,F>{
-        BatchCircle::new(bots,func)
+    pub unsafe fn batch_circles<T,F:Fn(&T)->&[f32;2]>(&mut self,bots:&[T],func:F)->batch::BatchCircle<T,F>{
+        batch::BatchCircle::new(bots,func)
     }
 }
 
-
-
-use core::marker::PhantomData;
-pub struct BatchCircle<T,F>{
-    buffer:vbo::GrowableBuffer<T>,
-    func:F,
-    _p:PhantomData<T>,
-    _ns:NotSend
-}
-
-impl<T,F:Fn(&T)->&[f32;2]> BatchCircle<T,F>{
-    pub fn new(bots:&[T],func:F)->BatchCircle<T,F>{
-        let mut b=BatchCircle{
-            buffer:vbo::GrowableBuffer::new(),
-            func,
-            _p:PhantomData,
-            _ns:ns()
-        };
-        b.buffer.send_to_gpu(bots);
-        b
-    }
-
-    pub fn send_and_uniforms<'a>(&'a mut self,sys:&'a mut SimpleCanvas,bots:&[T],radius:f32)->Uniforms<'a>{
-        let stride=0;
-        /*
-        if bots.is_empty(){
-
-        }else{
-            self.buffer.send_to_gpu(bots);    
-        }
-        */
-
-        
-        let common = UniformCommon {
-            color: sys.color,
-            offset: vec2same(0.0),
-        };
-        let un = ProgramUniformValues{
-            mode:gl::POINTS,
-            radius,
-            stride,
-            texture:None
-        };
-
-        Uniforms {
-            sys,
-            common,
-            un: UniformVals::Circle(un),
-            buffer:self.buffer.get_info(bots.len())
-        }
-    }
-}
