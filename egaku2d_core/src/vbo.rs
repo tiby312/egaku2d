@@ -7,6 +7,7 @@ pub(crate) struct BufferInfo {
     pub length: usize,
 }
 
+
 #[derive(Debug)]
 pub struct StaticBuffer<V> {
     info: BufferInfo,

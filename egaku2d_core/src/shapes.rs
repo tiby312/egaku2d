@@ -9,14 +9,14 @@ pub struct SquareSave {
     buffer: vbo::StaticBuffer<circle_program::Vertex>,
 }
 impl SquareSave {
-    pub fn uniforms<'a>(&'a self, sys: &'a mut SimpleCanvas, radius: f32) -> StaticUniforms<'a> {
+    pub fn uniforms<'a>(&'a self, sys: &'a mut SimpleCanvas, radius: f32) -> Uniforms<'a> {
         let common = UniformCommon {
             color: sys.color,
             offset: vec2same(0.0),
         };
-        let un = ProgramUniformValues::new(radius,gl::POINTS,None);
+        let un = ProgramUniformValues::new(radius,gl::POINTS);
 
-        StaticUniforms {
+        Uniforms {
             sys,
             un: UniformVals::Regular(un),
             common,
@@ -50,17 +50,21 @@ impl SquareSession {
         }
     }
 
-    pub fn uniforms<'a>(&'a mut self,sys:&'a mut SimpleCanvas, radius: f32) -> Uniforms<'a> {
+    pub fn send_and_uniforms<'a>(&'a mut self,sys:&'a mut SimpleCanvas, radius: f32) -> Uniforms<'a> {
+        sys.circle_buffer.send_to_gpu(&self.verts);
+                    
         let common = UniformCommon {
             color: sys.color,
             offset: vec2same(0.0),
         };
-        let un = ProgramUniformValues::new(radius,gl::POINTS,Some(&self.verts));
+        let un = ProgramUniformValues::new(radius,gl::POINTS);
 
+        let buffer=sys.circle_buffer.get_info();
         Uniforms {
             sys,
             common,
             un: UniformVals::Regular(un),
+            buffer
         }
     }
 }
@@ -70,17 +74,19 @@ pub struct CircleSave {
     buffer: vbo::StaticBuffer<circle_program::Vertex>,
 }
 impl CircleSave {
-    pub fn uniforms<'a>(&'a self, sys: &'a mut SimpleCanvas, radius: f32) -> StaticUniforms<'a> {
+    pub fn uniforms<'a>(&'a self, sys: &'a mut SimpleCanvas, radius: f32) -> Uniforms<'a> {
         let common = UniformCommon {
             color: sys.color,
             offset: vec2same(0.0),
         };
-        let un = ProgramUniformValues::new(radius,gl::POINTS,None);
-        StaticUniforms {
+        let un = ProgramUniformValues::new(radius,gl::POINTS);
+
+        let buffer=self.buffer.get_info();
+        Uniforms {
             common,
             sys,
             un: UniformVals::Circle(un),
-            buffer: self.buffer.get_info(),
+            buffer
         }
     }
 }
@@ -102,17 +108,22 @@ impl CircleSession {
     pub fn append(&mut self,other:&mut Self){
         self.verts.append(&mut other.verts);
     }
-    pub fn uniforms<'a>(&'a mut self,sys:&'a mut SimpleCanvas, radius: f32) -> Uniforms<'a> {
+    pub fn send_and_uniforms<'a>(&'a mut self,sys:&'a mut SimpleCanvas, radius: f32) -> Uniforms<'a> {
+        sys.circle_buffer.send_to_gpu(&self.verts);
+        
+
         let common = UniformCommon {
             color: sys.color,
             offset: vec2same(0.0),
         };
-        let un = ProgramUniformValues::new(radius,gl::POINTS,Some(&self.verts));
+        let un = ProgramUniformValues::new(radius,gl::POINTS);
 
+        let buffer=sys.circle_buffer.get_info();
         Uniforms {
             sys,
             common,
             un: UniformVals::Circle(un),
+            buffer
         }
     }
 
@@ -130,17 +141,18 @@ pub struct RectSave {
 
 impl RectSave {
     
-    pub fn uniforms<'a>(&'a self, sys: &'a mut SimpleCanvas) -> StaticUniforms<'a> {
+    pub fn uniforms<'a>(&'a self, sys: &'a mut SimpleCanvas) -> Uniforms<'a> {
         let common = UniformCommon {
             color: sys.color,
             offset: vec2same(0.0),
         };
-        let un = ProgramUniformValues::new(0.0,gl::TRIANGLES,None);
-        StaticUniforms {
+        let un = ProgramUniformValues::new(0.0,gl::TRIANGLES);
+        let buffer=self.buffer.get_info();
+        Uniforms {
             sys,
             common,
             un: UniformVals::Regular(un),
-            buffer: self.buffer.get_info(),
+            buffer
         }
     }
 }
@@ -165,16 +177,21 @@ impl RectSession {
     pub fn append(&mut self,other:&mut Self){
         self.verts.append(&mut other.verts);
     }
-    pub fn uniforms<'a>(&'a mut self,sys:&'a mut SimpleCanvas) -> Uniforms<'a> {
+    pub fn send_and_uniforms<'a>(&'a mut self,sys:&'a mut SimpleCanvas) -> Uniforms<'a> {
+        sys.circle_buffer.send_to_gpu(&self.verts);
+        
+
         let common = UniformCommon {
             color: sys.color,
             offset: vec2same(0.0),
         };
-        let un = ProgramUniformValues::new(0.0,gl::TRIANGLES,Some(&self.verts));
+        let un = ProgramUniformValues::new(0.0,gl::TRIANGLES);
+        let buffer=sys.circle_buffer.get_info();
         Uniforms {
             sys,
             common,
             un: UniformVals::Regular(un),
+            buffer
         }
     }
 
@@ -209,13 +226,13 @@ pub struct ArrowSave {
     buffer: vbo::StaticBuffer<circle_program::Vertex>,
 }
 impl ArrowSave {
-    pub fn uniforms<'a>(&'a self, sys: &'a mut SimpleCanvas) -> StaticUniforms<'a> {
+    pub fn uniforms<'a>(&'a self, sys: &'a mut SimpleCanvas) -> Uniforms<'a> {
         let common = UniformCommon {
             color: sys.color,
             offset: vec2same(0.0),
         };
-        let un = ProgramUniformValues::new(0.0,gl::TRIANGLES,None);
-        StaticUniforms {
+        let un = ProgramUniformValues::new(0.0,gl::TRIANGLES);
+        Uniforms {
             sys,
             common,
             un: UniformVals::Regular(un),
@@ -243,16 +260,20 @@ impl ArrowSession {
     pub fn append(&mut self,other:&mut Self){
         self.verts.append(&mut other.verts);
     }
-    pub fn uniforms<'a>(&'a mut self,sys:&'a mut SimpleCanvas) -> Uniforms<'a> {
+    pub fn send_and_uniforms<'a>(&'a mut self,sys:&'a mut SimpleCanvas) -> Uniforms<'a> {
+        sys.circle_buffer.send_to_gpu(&self.verts);
+        
         let common = UniformCommon {
             color: sys.color,
             offset: vec2same(0.0),
         };
-        let un = ProgramUniformValues::new(0.0,gl::TRIANGLES,Some(&self.verts));
+        let un = ProgramUniformValues::new(0.0,gl::TRIANGLES);
+        let buffer=sys.circle_buffer.get_info();
         Uniforms {
             sys,
             common,
             un: UniformVals::Regular(un),
+            buffer
         }
     }
 
@@ -308,13 +329,13 @@ pub struct LineSave {
 }
 
 impl LineSave {
-    pub fn uniforms<'a>(&'a self, sys: &'a mut SimpleCanvas) -> StaticUniforms<'a> {
+    pub fn uniforms<'a>(&'a self, sys: &'a mut SimpleCanvas) -> Uniforms<'a> {
         let common = UniformCommon {
             color: sys.color,
             offset: vec2same(0.0),
         };
-        let un = ProgramUniformValues::new(0.0,gl::TRIANGLES,None);
-        StaticUniforms {
+        let un = ProgramUniformValues::new(0.0,gl::TRIANGLES);
+        Uniforms {
             sys,
             common,
             un: UniformVals::Regular(un),
@@ -344,18 +365,23 @@ impl LineSession {
     pub fn append(&mut self,other:&mut Self){
         self.verts.append(&mut other.verts);
     }
-    pub fn uniforms<'a>(&'a mut self,sys:&'a mut SimpleCanvas) -> Uniforms<'a> {
+    pub fn send_and_uniforms<'a>(&'a mut self,sys:&'a mut SimpleCanvas) -> Uniforms<'a> {
+        sys.circle_buffer.send_to_gpu(&self.verts);
+        
+
         let common = UniformCommon {
             color: sys.color,
             offset: vec2same(0.0),
         };
 
 
-        let un = ProgramUniformValues::new(0.0,gl::TRIANGLES,Some(&self.verts));
+        let un = ProgramUniformValues::new(0.0,gl::TRIANGLES);
+        let buffer=sys.circle_buffer.get_info();
         Uniforms {
             sys,
             common,
             un: UniformVals::Regular(un),
+            buffer
         }
     }
 

@@ -10,12 +10,11 @@ use std::str;
 pub struct ProgramUniformValues<'a>{
     pub radius: f32,
     pub mode: u32,
-    pub texture:Option<(&'a sprite::Texture,f32,[f32;2])>,
-    pub(crate) verts:Option<&'a [circle_program::Vertex]>
+    pub texture:Option<(&'a sprite::Texture,f32,[f32;2])>
 }
 impl<'a> ProgramUniformValues<'a>{
-    pub fn new(radius:f32,mode:u32,verts:Option<&'a [circle_program::Vertex]>)->Self{
-        ProgramUniformValues{mode,radius,texture:None,verts}
+    pub fn new(radius:f32,mode:u32)->Self{
+        ProgramUniformValues{mode,radius,texture:None}
     }
 }
 

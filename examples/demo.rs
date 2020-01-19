@@ -138,7 +138,7 @@ fn main() {
                         builder.add([x, y]);
                     }
                 }
-                builder.uniforms(canvas,8.0).with_color(COL1).send_and_draw();
+                builder.send_and_uniforms(canvas,8.0).with_color(COL1).draw();
 
                 let mut builder = canvas.sprites();
                 for y in (100..500).step_by(80).map(|a| a as f32) {
@@ -150,24 +150,24 @@ fn main() {
                         builder.add([x, y], (cc % 64) as u16, c);
                     }
                 }
-                builder.uniforms(canvas,&adventurer, 100.0).with_color(WHITE).send_and_draw();
+                builder.send_and_uniforms(canvas,&adventurer, 100.0).with_color(WHITE).draw();
 
                 let mut builder = canvas.sprites();
                 add_ascii([100., 400.], 20.0, cc.cos()*0.5-0.2, "testing? TESTING!", &mut builder);
                 builder.add([100., 100.], ascii_tex.coord_to_index([2, 2]), 1.0);
-                builder.uniforms(canvas,&ascii_tex, 20.0).send_and_draw();
+                builder.send_and_uniforms(canvas,&ascii_tex, 20.0).draw();
 
                 let c = ((counter as f32 * 0.06).sin() * 100.0).abs();
-                canvas.circles().add(cursor).uniforms(canvas,c).with_texture(&leaves,1.0,[0.0;2]).send_and_draw();
+                canvas.circles().add(cursor).send_and_uniforms(canvas,c).with_texture(&leaves,1.0,[0.0;2]).draw();
                 
                 //draw a moving line
                 let c = counter as f32 * 0.07;
                 canvas
                     .lines(10.)
                     .add([50., 500.], [500., 50. + c.sin() * 50.])
-                    .uniforms(canvas)
+                    .send_and_uniforms(canvas)
                     .with_texture(&leaves,4.0,[0.0;2])
-                    .send_and_draw();
+                    .draw();
                 
                 //draw a rotating arrow
                 let c = counter as f32 * 0.04;
@@ -177,12 +177,12 @@ fn main() {
                 canvas
                     .arrows(10.0)
                     .add(center, other)
-                    .uniforms(canvas)
+                    .send_and_uniforms(canvas)
                     .with_color(COL4)
-                    .send_and_draw();
+                    .draw();
 
-                canvas.sprites().add([500.,200.],c as u16,c).uniforms(canvas,&fat_tiles_tex,100.).send_and_draw();
-                canvas.sprites().add([500.,50.],c as u16,c).uniforms(canvas,&tall_tiles_tex,100.).send_and_draw();
+                canvas.sprites().add([500.,200.],c as u16,c).send_and_uniforms(canvas,&fat_tiles_tex,100.).draw();
+                canvas.sprites().add([500.,50.],c as u16,c).send_and_uniforms(canvas,&tall_tiles_tex,100.).draw();
                 
                 //display what we drew
                 sys.swap_buffers();

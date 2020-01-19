@@ -137,7 +137,6 @@ pub struct PointMul(pub f32);
 pub struct SpriteProgramUniformValues<'a> {
     pub texture: &'a crate::sprite::Texture,
     pub radius: f32,
-    pub(crate) verts:Option<&'a [sprite_program::Vertex]>
 }
 
 impl SpriteProgram {

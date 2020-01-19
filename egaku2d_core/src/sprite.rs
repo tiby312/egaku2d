@@ -13,7 +13,7 @@ impl SpriteSave {
         sys: &'a mut SimpleCanvas,
         texture: &'a Texture,
         radius: f32,
-    ) -> StaticUniforms<'a> {
+    ) -> Uniforms<'a> {
         let sqrt2: f32 = 1.41421356237;
         let radius = radius * sqrt2;
 
@@ -21,8 +21,8 @@ impl SpriteSave {
             color: sys.color,
             offset: vec2same(0.0),
         };
-        let un = SpriteProgramUniformValues { radius, texture,verts:None };
-        StaticUniforms {
+        let un = SpriteProgramUniformValues { radius, texture };
+        Uniforms {
             sys,
             common,
             un: UniformVals::Sprite(un),
@@ -66,7 +66,9 @@ impl SpriteSession{
         }
     }
 
-    pub fn uniforms<'a>(&'a mut self, sys:&'a mut SimpleCanvas,texture: &'a Texture, radius: f32) -> Uniforms<'a> {
+    pub fn send_and_uniforms<'a>(&'a mut self, sys:&'a mut SimpleCanvas,texture: &'a Texture, radius: f32) -> Uniforms<'a> {
+        sys.sprite_buffer.send_to_gpu(&self.verts);
+
         let sqrt2: f32 = 1.41421356237;
         let radius = radius * sqrt2;
 
@@ -74,11 +76,14 @@ impl SpriteSession{
             color: sys.color,
             offset: vec2same(0.0),
         };
-        let un = SpriteProgramUniformValues { radius, texture,verts:Some(&self.verts) };
+        let un = SpriteProgramUniformValues { radius, texture};
+        
+        let buffer=sys.sprite_buffer.get_info();
         Uniforms {
             common,
             sys,
             un: UniformVals::Sprite(un),
+            buffer
         }
     }
 }
