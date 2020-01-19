@@ -36,6 +36,9 @@ pub struct SpriteSession{
 }
 
 impl SpriteSession{
+    pub fn new()->Self{
+        SpriteSession{verts:Vec::new()}
+    }
     ///Add a point sprite.
     #[inline(always)]
     pub fn add(&mut self, point: PointType, index: u16, rotation: f32) -> &mut Self {

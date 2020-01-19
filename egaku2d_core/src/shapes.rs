@@ -30,6 +30,9 @@ pub struct SquareSession {
 
 }
 impl SquareSession {
+    pub fn new()->Self{
+        SquareSession{verts:Vec::new()}
+    }
     #[inline(always)]
     pub fn add(&mut self, point: [f32; 2]) -> &mut Self {
         self.verts.push(circle_program::Vertex(point));
@@ -82,6 +85,9 @@ pub struct CircleSession {
 }
 
 impl CircleSession {
+    pub fn new()->Self{
+        CircleSession{verts:Vec::new()}
+    }
     pub fn save(&mut self,_sys:&mut SimpleCanvas) -> CircleSave {
         CircleSave {
             _ns: ns(),
@@ -110,16 +116,13 @@ impl CircleSession {
     }
 }
 
-pub struct RectSession{
-    pub verts:Vec<circle_program::Vertex>
-}
-
 pub struct RectSave {
     _ns: NotSend,
     buffer: vbo::StaticBuffer<circle_program::Vertex>,
 }
 
 impl RectSave {
+    
     pub fn uniforms<'a>(&'a self, sys: &'a mut SimpleCanvas) -> StaticUniforms<'a> {
         let common = UniformCommon {
             color: sys.color,
@@ -135,7 +138,15 @@ impl RectSave {
     }
 }
 
+pub struct RectSession{
+    pub verts:Vec<circle_program::Vertex>
+}
+
 impl RectSession {
+
+    pub fn new()->Self{
+        RectSession{verts:Vec::new()}
+    }
     pub fn save(&mut self,_sys:&mut SimpleCanvas) -> RectSave {
         RectSave {
             _ns: ns(),
@@ -207,6 +218,10 @@ pub struct ArrowSession {
 }
 
 impl ArrowSession {
+
+    pub fn new(radius:f32)->Self{
+        ArrowSession{radius,verts:Vec::new()}
+    }
     pub fn save(&mut self,_sys:&mut SimpleCanvas) -> ArrowSave {
         ArrowSave {
             _ns: ns(),
@@ -304,6 +319,11 @@ pub struct LineSession {
 }
 
 impl LineSession {
+
+    pub fn new(radius:f32)->Self{
+        LineSession{radius,verts:Vec::new()}
+    }
+
     pub fn save(&mut self,_sys:&mut SimpleCanvas) -> LineSave {
         LineSave {
             _ns: ns(),
