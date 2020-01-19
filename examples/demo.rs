@@ -26,42 +26,43 @@ fn main() {
     let leaves = sys.texture("leaves.png",[1,1]).unwrap();
     
     //Make a bunch of static vbos
+    let canvas=sys.canvas_mut();
     let background = {
-        sys.canvas_mut().rects().add([0.0,640.0,0.0,480.0]).save()
+        canvas.rects().add([0.0,640.0,0.0,480.0]).save(canvas)
     };
     let rect_save = {
-        let mut k = sys.canvas_mut().rects();
+        let mut k = canvas.rects();
         k.add([400., 420., 410., 420.]);
         k.add([50., 100., 60., 80.]);
         k.add([300., 500., 30., 50.]);
         k.add([300., 500., 300., 500.]);
-        k.save()
+        k.save(canvas)
     };
     let square_save = {
-        let mut k = sys.canvas_mut().squares();
+        let mut k = canvas.squares();
         for x in (0..1000).step_by(100).map(|a| a as f32) {
             for y in (0..1000).step_by(100).map(|a| a as f32) {
                 k.add([x, y]);
             }
         }
-        k.save()
+        k.save(canvas)
     };
     let arrow_save = {
-        sys.canvas_mut()
+        canvas
             .arrows(5.0)
             .add([40., 40.], [40., 200.])
             .add([40., 40.], [200., 40.])
-            .save()
+            .save(canvas)
     };
     let line_save = {
-        sys.canvas_mut()
+        canvas
             .lines(3.0)
             .add([400., 0.], [600., 400.])
             .add([10., 300.], [300., 400.])
-            .save()
+            .save(canvas)
     };
     let sprite_save = {
-        let mut k = sys.canvas_mut().sprites();
+        let mut k = canvas.sprites();
         for (i, x) in (032..200)
             .step_by(32)
             .enumerate()
@@ -75,7 +76,7 @@ fn main() {
                 k.add([x, y], food_tex.coord_to_index([i, j]), 0.0);
             }
         }
-        k.save()
+        k.save(canvas)
     };
 
 
@@ -137,7 +138,7 @@ fn main() {
                         builder.add([x, y]);
                     }
                 }
-                builder.uniforms(8.0).with_color(COL1).send_and_draw();
+                builder.uniforms(canvas,8.0).with_color(COL1).send_and_draw();
 
                 let mut builder = canvas.sprites();
                 for y in (100..500).step_by(80).map(|a| a as f32) {
@@ -149,22 +150,22 @@ fn main() {
                         builder.add([x, y], (cc % 64) as u16, c);
                     }
                 }
-                builder.uniforms(&adventurer, 100.0).with_color(WHITE).send_and_draw();
+                builder.uniforms(canvas,&adventurer, 100.0).with_color(WHITE).send_and_draw();
 
                 let mut builder = canvas.sprites();
                 add_ascii([100., 400.], 20.0, cc.cos()*0.5-0.2, "testing? TESTING!", &mut builder);
                 builder.add([100., 100.], ascii_tex.coord_to_index([2, 2]), 1.0);
-                builder.uniforms(&ascii_tex, 20.0).send_and_draw();
+                builder.uniforms(canvas,&ascii_tex, 20.0).send_and_draw();
 
                 let c = ((counter as f32 * 0.06).sin() * 100.0).abs();
-                canvas.circles().add(cursor).uniforms(c).with_texture(&leaves,1.0,[0.0;2]).send_and_draw();
+                canvas.circles().add(cursor).uniforms(canvas,c).with_texture(&leaves,1.0,[0.0;2]).send_and_draw();
                 
                 //draw a moving line
                 let c = counter as f32 * 0.07;
                 canvas
                     .lines(10.)
                     .add([50., 500.], [500., 50. + c.sin() * 50.])
-                    .uniforms()
+                    .uniforms(canvas)
                     .with_texture(&leaves,4.0,[0.0;2])
                     .send_and_draw();
                 
@@ -176,12 +177,12 @@ fn main() {
                 canvas
                     .arrows(10.0)
                     .add(center, other)
-                    .uniforms()
+                    .uniforms(canvas)
                     .with_color(COL4)
                     .send_and_draw();
 
-                canvas.sprites().add([500.,200.],c as u16,c).uniforms(&fat_tiles_tex,100.).send_and_draw();
-                canvas.sprites().add([500.,50.],c as u16,c).uniforms(&tall_tiles_tex,100.).send_and_draw();
+                canvas.sprites().add([500.,200.],c as u16,c).uniforms(canvas,&fat_tiles_tex,100.).send_and_draw();
+                canvas.sprites().add([500.,50.],c as u16,c).uniforms(canvas,&tall_tiles_tex,100.).send_and_draw();
                 
                 //display what we drew
                 sys.swap_buffers();

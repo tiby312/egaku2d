@@ -121,7 +121,7 @@
 //! let rect_save = canvas.squares()
 //!   .add([40., 40.])
 //!   .add([40., 40.])
-//!   .save();
+//!   .save(canvas);
 //!
 //! //Draw the squares we saved.
 //! rect_save.uniforms(canvas,5.0).with_color([0.0, 1.0, 0.1, 0.5]).draw();
@@ -130,24 +130,24 @@
 //! canvas.arrows(5.0)
 //!   .add([40., 40.], [40., 200.])
 //!   .add([40., 40.], [200., 40.])
-//!   .uniforms().send_and_draw();
+//!   .uniforms(canvas).send_and_draw();
 //!
 //! //Draw some circles.
 //! canvas.circles()
 //!   .add([5.,6.])
 //!   .add([7.,8.])
 //!   .add([9.,5.])
-//!   .uniforms(4.0).with_color([0., 1., 1., 0.1]).send_and_draw();
+//!   .uniforms(canvas,4.0).with_color([0., 1., 1., 0.1]).send_and_draw();
 //!
 //! //Draw some circles from f32 primitives.
 //! canvas.circles()
 //!   .add([5.,6.])
 //!   .add([7.,8.])
 //!   .add([9.,5.])
-//!   .uniforms(4.0).with_color([0., 1., 1., 0.1]).send_and_draw();
+//!   .uniforms(canvas,4.0).with_color([0., 1., 1., 0.1]).send_and_draw();
 //!
 //! //Draw the first tile in the top left corder of the texture.
-//! canvas.sprites().add([100.,100.],food_texture.coord_to_index([0,0]),3.14).uniforms(&food_texture,4.0).send_and_draw();
+//! canvas.sprites().add([100.,100.],food_texture.coord_to_index([0,0]),3.14).uniforms(canvas,&food_texture,4.0).send_and_draw();
 //!
 //! //Swap buffers on the opengl context.
 //! glsys.swap_buffers();

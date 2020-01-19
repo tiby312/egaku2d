@@ -1,8 +1,11 @@
 use super::*;
 
+pub use self::sprite_program::Vertex;
+
+
 pub struct SpriteSave {
     _ns: NotSend,
-    buffer: vbo::StaticBuffer<sprite_program::Vertex>,
+    pub buffer: vbo::StaticBuffer<sprite_program::Vertex>,
 }
 impl SpriteSave {
     pub fn uniforms<'a>(
@@ -28,12 +31,11 @@ impl SpriteSave {
     }
 }
 
-pub struct SpriteSession<'a> {
-    pub(crate) sys: &'a mut SimpleCanvas,
+pub struct SpriteSession{
     pub(crate) verts:Vec<sprite_program::Vertex>
 }
 
-impl SpriteSession<'_> {
+impl SpriteSession{
     ///Add a point sprite.
     #[inline(always)]
     pub fn add(&mut self, point: PointType, index: u16, rotation: f32) -> &mut Self {
@@ -50,25 +52,25 @@ impl SpriteSession<'_> {
     }
 
     ///Save this sprite session to into its own static buffer to be drawn later.
-    pub fn save(&mut self) -> SpriteSave {
+    pub fn save(&mut self,_sys:&mut SimpleCanvas) -> SpriteSave {
         SpriteSave {
             _ns: ns(),
             buffer: vbo::StaticBuffer::new(&self.verts),
         }
     }
 
-    pub fn uniforms<'a>(&'a mut self, texture: &'a Texture, radius: f32) -> Uniforms<'a> {
+    pub fn uniforms<'a>(&'a mut self, sys:&'a mut SimpleCanvas,texture: &'a Texture, radius: f32) -> Uniforms<'a> {
         let sqrt2: f32 = 1.41421356237;
         let radius = radius * sqrt2;
 
         let common = UniformCommon {
-            color: self.sys.color,
+            color: sys.color,
             offset: vec2same(0.0),
         };
         let un = SpriteProgramUniformValues { radius, texture,verts:Some(&self.verts) };
         Uniforms {
             common,
-            sys: self.sys,
+            sys,
             un: UniformVals::Sprite(un),
         }
     }

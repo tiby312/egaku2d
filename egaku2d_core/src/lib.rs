@@ -60,6 +60,7 @@ pub mod gl {
 ///They all follow the same api outlined in the crate documentation.
 pub mod shapes;
 
+
 use self::uniforms::UniformCommon;
 use self::uniforms::*;
 ///Contains the objects used for the uniform setting stage of the egaku2d drawing pipeline.
@@ -316,39 +317,23 @@ impl SimpleCanvas {
     }
 
     pub fn sprites(&mut self) -> sprite::SpriteSession {
-        sprite::SpriteSession { sys: self,verts:Vec::new() }
+        sprite::SpriteSession { verts:Vec::new() }
     }
 
     pub fn circles(&mut self) -> CircleSession {
-        CircleSession { sys: self ,verts:Vec::new()}
+        CircleSession { verts:Vec::new()}
     }
-
-    pub fn circles_from_slice<'a>(&'a mut self,verts:&'a [[f32;2]],radius:f32) ->Uniforms<'a>{
-        let common = UniformCommon {
-            color: self.color,
-            offset: vec2same(0.0),
-        };
-        let arr=unsafe{& * (verts as *const _ as *const [circle_program::Vertex])};
-        let un = ProgramUniformValues::new(radius,gl::POINTS,Some(arr));
-
-        Uniforms {
-            sys: self,
-            common,
-            un: UniformVals::Circle(un),
-        }
-    } 
 
     pub fn squares(&mut self) -> SquareSession {
-        SquareSession { sys: self ,verts:Vec::new()}
+        SquareSession { verts:Vec::new()}
     }
     pub fn rects(&mut self) -> RectSession {
-        RectSession { sys: self ,verts:Vec::new()}
+        RectSession { verts:Vec::new()}
     }
     pub fn arrows(&mut self, radius: f32) -> ArrowSession {
         let kk = self.point_mul.0;
 
         ArrowSession {
-            sys: self,
             radius: radius * kk,
             verts:Vec::new()
         }
@@ -357,7 +342,6 @@ impl SimpleCanvas {
     pub fn lines(&mut self, radius: f32) -> LineSession {
         let kk = self.point_mul.0;
         LineSession {
-            sys: self,
             radius: radius * kk,
             verts:Vec::new()
         }

@@ -50,7 +50,7 @@ fn main() {
                     }
                 }
 
-                circles.uniforms(10.0).with_color([1.0,1.0,1.0,1.0]).send_and_draw();
+                circles.uniforms(canvas,10.0).with_color([1.0,1.0,1.0,1.0]).send_and_draw();
 
                 //display what we drew
                 sys.swap_buffers();
