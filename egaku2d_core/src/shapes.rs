@@ -1,6 +1,6 @@
 use super::*;
 
-pub use self::circle_program::Vertex;
+//pub use self::circle_program::Vertex;
 
 
 
@@ -26,7 +26,7 @@ impl SquareSave {
 }
 
 pub struct SquareSession {
-    pub verts:Vec<circle_program::Vertex>
+    pub(crate) verts:Vec<circle_program::Vertex>
 
 }
 impl SquareSession {
@@ -37,6 +37,10 @@ impl SquareSession {
     pub fn add(&mut self, point: [f32; 2]) -> &mut Self {
         self.verts.push(circle_program::Vertex(point));
         self
+    }
+
+    pub fn append(&mut self,other:&mut Self){
+        self.verts.append(&mut other.verts);
     }
 
     pub fn save(&mut self,_sys:&mut SimpleCanvas) -> SquareSave {
@@ -81,7 +85,7 @@ impl CircleSave {
     }
 }
 pub struct CircleSession {
-    pub verts:Vec<circle_program::Vertex>
+    pub(crate) verts:Vec<circle_program::Vertex>
 }
 
 impl CircleSession {
@@ -95,6 +99,9 @@ impl CircleSession {
         }
     }
 
+    pub fn append(&mut self,other:&mut Self){
+        self.verts.append(&mut other.verts);
+    }
     pub fn uniforms<'a>(&'a mut self,sys:&'a mut SimpleCanvas, radius: f32) -> Uniforms<'a> {
         let common = UniformCommon {
             color: sys.color,
@@ -139,7 +146,7 @@ impl RectSave {
 }
 
 pub struct RectSession{
-    pub verts:Vec<circle_program::Vertex>
+    pub(crate) verts:Vec<circle_program::Vertex>
 }
 
 impl RectSession {
@@ -147,6 +154,7 @@ impl RectSession {
     pub fn new()->Self{
         RectSession{verts:Vec::new()}
     }
+
     pub fn save(&mut self,_sys:&mut SimpleCanvas) -> RectSave {
         RectSave {
             _ns: ns(),
@@ -154,6 +162,9 @@ impl RectSession {
         }
     }
 
+    pub fn append(&mut self,other:&mut Self){
+        self.verts.append(&mut other.verts);
+    }
     pub fn uniforms<'a>(&'a mut self,sys:&'a mut SimpleCanvas) -> Uniforms<'a> {
         let common = UniformCommon {
             color: sys.color,
@@ -168,7 +179,7 @@ impl RectSession {
     }
 
     #[inline(always)]
-    pub fn create_rect(rect:[f32;4])->[circle_program::Vertex;6]{
+    fn create_rect(rect:[f32;4])->[circle_program::Vertex;6]{
         let rect = axgeom::Rect::from_arr(rect);
         let [tl, tr, br, bl] = rect.get_corners();
         //let arr = [tr, tl, bl, bl, br, tr];
@@ -214,7 +225,7 @@ impl ArrowSave {
 }
 pub struct ArrowSession {
     pub(crate) radius: f32,
-    pub verts:Vec<circle_program::Vertex>
+    pub(crate) verts:Vec<circle_program::Vertex>
 }
 
 impl ArrowSession {
@@ -229,6 +240,9 @@ impl ArrowSession {
         }
     }
 
+    pub fn append(&mut self,other:&mut Self){
+        self.verts.append(&mut other.verts);
+    }
     pub fn uniforms<'a>(&'a mut self,sys:&'a mut SimpleCanvas) -> Uniforms<'a> {
         let common = UniformCommon {
             color: sys.color,
@@ -242,13 +256,9 @@ impl ArrowSession {
         }
     }
 
-    #[inline(always)]
-    pub fn get_radius(&self)->f32{
-        self.radius
-    }
 
     #[inline(always)]
-    pub fn create_arrow(radius:f32,start:PointType,end:PointType)->[circle_program::Vertex;9]{
+    fn create_arrow(radius:f32,start:PointType,end:PointType)->[circle_program::Vertex;9]{
         let start = vec2(start[0], start[1]);
         let end = vec2(end[0], end[1]);
         let offset = end - start;
@@ -315,7 +325,7 @@ impl LineSave {
 
 pub struct LineSession {
     pub(crate) radius: f32,
-    pub verts:Vec<circle_program::Vertex>
+    pub(crate) verts:Vec<circle_program::Vertex>
 }
 
 impl LineSession {
@@ -331,6 +341,9 @@ impl LineSession {
         }
     }
 
+    pub fn append(&mut self,other:&mut Self){
+        self.verts.append(&mut other.verts);
+    }
     pub fn uniforms<'a>(&'a mut self,sys:&'a mut SimpleCanvas) -> Uniforms<'a> {
         let common = UniformCommon {
             color: sys.color,
@@ -346,14 +359,9 @@ impl LineSession {
         }
     }
 
-    #[inline(always)]
-    pub fn radius(&self)->f32{
-        self.radius
-    }
-
 
     #[inline(always)]
-    pub fn create_line(radius:f32,start:PointType,end:PointType)->[circle_program::Vertex;6]{
+    fn create_line(radius:f32,start:PointType,end:PointType)->[circle_program::Vertex;6]{
         let start = vec2(start[0], start[1]); //TODO a program that detected bad uses like this would be cool
         let end = vec2(end[0], end[1]);
 

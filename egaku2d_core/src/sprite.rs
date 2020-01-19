@@ -1,11 +1,11 @@
 use super::*;
 
-pub use self::sprite_program::Vertex;
+//pub use self::sprite_program::Vertex;
 
 
 pub struct SpriteSave {
     _ns: NotSend,
-    pub buffer: vbo::StaticBuffer<sprite_program::Vertex>,
+    pub(crate) buffer: vbo::StaticBuffer<sprite_program::Vertex>,
 }
 impl SpriteSave {
     pub fn uniforms<'a>(
@@ -52,6 +52,10 @@ impl SpriteSession{
             rotation: k,
         });
         self
+    }
+    
+    pub fn append(&mut self,other:&mut Self){
+        self.verts.append(&mut other.verts);
     }
 
     ///Save this sprite session to into its own static buffer to be drawn later.

@@ -228,7 +228,7 @@ pub mod fullscreen {
     }
     impl FullScreenSystem {
         pub fn new(events_loop: &glutin::event_loop::EventLoop<()>) -> Self {
-            assert_only_one_instance();
+            onein::assert_only_one_instance();
 
             use glutin::window::Fullscreen;
             let fullscreen = Fullscreen::Borderless(prompt_for_monitor(events_loop));
@@ -250,9 +250,7 @@ pub mod fullscreen {
             //let dpi = windowed_context.window().scale_factor();
             let glutin::dpi::PhysicalSize { width, height } =
                 windowed_context.window().inner_size();
-
-            dbg!(width, height);
-
+            
             // Load the OpenGL function pointers
             gl::load_with(|symbol| windowed_context.get_proc_address(symbol) as *const _);
             assert_eq!(unsafe { gl::GetError() }, gl::NO_ERROR);
