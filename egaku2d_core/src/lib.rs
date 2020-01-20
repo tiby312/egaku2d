@@ -87,14 +87,10 @@ pub mod uniforms {
             scale: f32,
             offset: [f32; 2],
         ) -> &mut Self {
-            //add offset:[f32;2],scale:f32
-            //println!("offset ignored");
-            //println!("scale ignored");
-
+            
             match &mut self.un {
                 UniformVals::Sprite(s) => {
                     s.texture = texture;
-                    //println!("not implemented");
                 }
                 UniformVals::Regular(s) => {
                     s.texture = Some((texture, scale, offset));
@@ -279,7 +275,11 @@ impl SimpleCanvas {
         }
     }
 
-    //The reference returned by the closure must be a pointer into a member of T.
+    ///The closure is a function to extract a reference to the
+    ///vertex data for a given object T
+    ///
+    ///This function is unsafe because 
+    ///the reference returned by the closure must be a reference into a member of T.
     pub unsafe fn batch_circles<T, F: Fn(&T) -> &[f32; 2]>(
         &mut self,
         bots: &[T],
