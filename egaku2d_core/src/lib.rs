@@ -139,12 +139,12 @@ pub mod uniforms {
         }
     }
 
-    pub struct UniformCommon {
+    pub(crate) struct UniformCommon {
         pub(crate) offset: Vec2<f32>,
         pub(crate) color: [f32; 4],
     }
 
-    pub enum UniformVals<'a> {
+    pub(crate) enum UniformVals<'a> {
         Sprite(SpriteProgramUniformValues<'a>),
         Regular(ProgramUniformValues<'a>),
         Circle(ProgramUniformValues<'a>),
