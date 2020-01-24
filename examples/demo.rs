@@ -27,9 +27,9 @@ fn main() {
     let background = { canvas.rects().add([0.0, 640.0, 0.0, 480.0]).save(canvas) };
     let rect_save = {
         let mut k = canvas.rects();
-        k.add([400., 420., 410., 420.]);
-        k.add([50., 100., 60., 80.]);
-        k.add([300., 500., 30., 50.]);
+        //k.add([400., 420., 410., 420.]);
+        //k.add([50., 100., 60., 80.]);
+        //k.add([300., 500., 30., 50.]);
         k.add([300., 500., 300., 500.]);
         k.save(canvas)
     };
@@ -123,9 +123,11 @@ fn main() {
                 arrow_save.uniforms(canvas).draw();
                 line_save.uniforms(canvas).with_color(COL2).draw();
                 square_save.uniforms(canvas, 10.0).with_color(COL3).draw();
+
+                let w=[wobble[0]+300.0,wobble[1]+300.0];
                 rect_save
                     .uniforms(canvas)
-                    .with_texture(&fat_tiles_tex, 2.0, wobble)
+                    .with_texture(&fat_tiles_tex, 2.0, w)
                     .with_color(WHITE)
                     .with_offset(wobble)
                     .draw();
