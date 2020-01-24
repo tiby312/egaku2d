@@ -1,8 +1,9 @@
 ## Overview
 
-A library that lets you draw various simple 2d geometry primitives fast using a single
-shader program and a single vertex buffer object with a safe api (provided no other libray
-is calling opengl functions).
+A library that lets you draw various simple 2d geometry primitives and sprites fast using
+Vertex buffer objects with a safe api. Uses the builder pattern for a convinient api.
+The main design goal is to be able to draw thousands of shapes efficiently.
+Uses glutin and opengl es 3.0.
 
 ## Screenshot
 
@@ -12,7 +13,6 @@ is calling opengl functions).
 ## Example
 
 See the github example, or see the crate documentation.
-
 
 ## Demo
 

@@ -1,8 +1,7 @@
 //! # Overview
 //!
 //! A library that lets you draw various simple 2d geometry primitives and sprites fast using
-//! vertex buffer objects with a safe api (provided no other libray
-//! is calling opengl functions). Uses the builder pattern for a convinient api.
+//! vertex buffer objects with a safe api. Uses the builder pattern for a convinient api.
 //! The main design goal is to be able to draw thousands of shapes efficiently.
 //! Uses glutin and opengl es 3.0.
 //!
@@ -35,28 +34,33 @@
 //! There is special focus on reducing traffic between the cpu and the gpu by using compact vertices,
 //! point sprites, and by allowing the user to save vertex data to the gpu on their own.
 //!
-//! Writing fast shader programs is a seconady goal. This is a 2d drawing library even though most of the hardware outthere
-//! is made to handle 3d. This means that the gpu is most likely under-utilized with this library.
-//! Because of this, there is little point to make a non-rotatable sprite shader to save
-//! on gpu time, for example. Especially since the vertex layout is the same size. So there are no gains
-//! from having to send less data to the gpu.
+//! Providing a safe api is also a goal. All draw functions require a mutable version to the canvas, ensuring
+//! they happen sequentially. The user is prevented from making multiple instances of the system using an atomic counter.
+//! The system also does not implement Send so that the drop calls from vertex buffers going out of scope happen sequentially
+//! as well. If the user were to call opengl functions on their own, then some safety guarentees might be lost.
+//! However, if the user does not, this api should be completely safe.
 //!
+//! Writing fast shader programs is a seconady goal. This is a 2d drawing library even though most of the hardware out there
+//! is made to handle 3d. This means that the gpu is most likely under-utilized with this library.
+//! Because of this, it was decided there is little point to make a non-rotatable sprite shader to save
+//! on gpu time, for example. Especially since the vertex layout is the same size (with 32bit alignment) (`[f32;2],i16,i16` vs `[f32;2],i16`),
+//! so there are no gains from having to send less data to the gpu.
 //!
 //! # Using Shapes
 //!
 //! The user can draw the following:
 //!
-//! Shape                     | Representation       
-//! --------------------------|-----------------------------
-//! Circles                   | `(point,radius)`              
-//! Axis Aligned Rectangles   | `(startx,endx,starty,endy)`   
-//! Axis Aligned Squares      | `(point,radius)`              
-//! Lines                     | `(point,point,thickness)`               
-//! Arrows                    | `(point_start,point_end,thickness)`               
+//! Shape                     | Representation                        | Opengl Primitive Type
+//! --------------------------|---------------------------------------|-----------------
+//! Circles                   | `(point,radius)`                      | POINTS
+//! Axis Aligned Rectangles   | `(startx,endx,starty,endy)`           | TRIANGLES
+//! Axis Aligned Squares      | `(point,radius)`                      | POINTS
+//! Lines                     | `(point,point,thickness)`             | TRIANGLES
+//! Arrows                    | `(point_start,point_end,thickness)`   | TRIANGLES 
 //!   
 //! # Using Sprites
 //!
-//! You can also draw sprites! You can upload a tileset texture to the gpu and then draw thousands of sprites
+//! This crate also allows the user to draw sprites. You can upload a tileset texture to the gpu and then draw thousands of sprites
 //! using a similar api to the shape drawing api.
 //! The sprites are point sprites drawn using the opengl POINTS primitive in order to cut down on the data
 //! that needs to be sent to the gpu.
@@ -72,10 +76,14 @@
 //! Each texture object has functions to create this index from a x and y coordinate.
 //! On the gpu, the index will be split into a x and y coordinate.
 //! If the index is larger than texture.dim.x*texture.dim.y then it will be modded so that
-//! it can be mapped to a tile set. But obviously, the user should be picking an index
-//! that maps to a valid tile in the tile set to begin with.
+//! it can be mapped to a tile set. Therefore it is impossible for the index
+//! to have a 'invalid' value. But obviously, the user should be picking an index
+//! that maps to a valid tile in the tile set to begin with. 
+//!
 //! The rotation is normalized to a float on the gpu. The fact that the tile index has size u16,
-//! means you can have a texture with a mamimum of 256x256 tiles.
+//! means you can have a texture with a mamimum of 256x256 tiles. The user simply passes a f32 through
+//! the api. The rotation is in radians with 0 being no rotation and grows with a clockwise rotation.
+//! 
 //!
 //! # Batch drawing
 //!
@@ -86,10 +94,10 @@
 //! This lets us skip building up a new verticies list by sending your entire data structure to the gpu.
 //!
 //! The downside to this approach is that you might have the vertex data in a list, but it might not be
-//! tightly packed, in which case we might end up sending a lot of useless data to the gpu.
+//! tightly packed since you have a bunch of other  data associated with each element,
+//! in which case we might end up sending a lot of useless data to the gpu.
 //!
 //! Currently this is only supported for circle drawing.
-//!
 //!
 //! # View
 //!
@@ -252,8 +260,6 @@ pub mod fullscreen {
 
             let gl_window = glutin::window::WindowBuilder::new().with_fullscreen(Some(fullscreen));
 
-            //std::thread::sleep(std::time::Duration::from_millis(5000));
-
             //we are targeting only opengl 3.0 es. and glsl 300 es.
 
             let windowed_context = glutin::ContextBuilder::new()
@@ -264,7 +270,6 @@ pub mod fullscreen {
 
             let windowed_context = unsafe { windowed_context.make_current().unwrap() };
 
-            //let dpi = windowed_context.window().scale_factor();
             let glutin::dpi::PhysicalSize { width, height } =
                 windowed_context.window().inner_size();
 
@@ -279,7 +284,6 @@ pub mod fullscreen {
 
             let windowed_context = Some(windowed_context);
 
-            //let game_world = Rect::new(0.0, width as f32, 0.0, height as f32);
             let mut f = FullScreenSystem {
                 windowed_context,
                 window_dim,
@@ -327,10 +331,6 @@ pub mod fullscreen {
         }
 
         pub fn set_viewport_from_width(&mut self, width: f32) {
-            //let dim = self.get_dim().inner_as::<f32>();
-            //let aspect_ratio = dim.y / dim.x;
-
-            //let height = aspect_ratio * width;
             self.inner.set_viewport(self.window_dim, width);
         }
 
@@ -343,10 +343,6 @@ pub mod fullscreen {
         }
 
         pub fn set_viewport_from_height(&mut self, height: f32) {
-            //let dim = self.get_dim().inner_as::<f32>();
-            //let aspect_ratio = dim.x / dim.y;
-
-            //let width = aspect_ratio * height;
             let width = self.window_dim.ratio.width_over_height() as f32 * height;
             self.inner.set_viewport(self.window_dim, width);
         }
