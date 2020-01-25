@@ -198,7 +198,7 @@ impl RectSession {
 
     #[inline(always)]
     fn create_rect(rect: [f32; 4]) -> [circle_program::Vertex; 6] {
-        let rect = axgeom::Rect::from_arr(rect);
+        let rect:Rect<f32> = core::convert::From::from(rect);
         let [tl, tr, br, bl] = rect.get_corners();
         //let arr = [tr, tl, bl, bl, br, tr];
 

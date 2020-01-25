@@ -7,6 +7,8 @@
 use crate::shapes::*;
 use axgeom::*;
 
+pub use axgeom;
+
 use core::mem;
 use gl::types::*;
 

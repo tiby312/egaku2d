@@ -173,7 +173,7 @@
 //! glsys.swap_buffers();
 //! ```
 
-use axgeom::*;
+use egaku2d_core::axgeom;
 pub use glutin;
 use glutin::PossiblyCurrent;
 
@@ -384,7 +384,7 @@ pub mod fullscreen {
 ///A version where the user can control the size of the window.
 pub struct WindowedSystem {
     inner: SimpleCanvas,
-    window_dim: FixedAspectVec2,
+    window_dim: axgeom::FixedAspectVec2,
     windowed_context: glutin::WindowedContext<PossiblyCurrent>,
 }
 
@@ -402,10 +402,10 @@ impl WindowedSystem {
     ) -> WindowedSystem {
         onein::assert_only_one_instance();
 
-        let dim = vec2(dim[0], dim[1]);
+        let dim = axgeom::vec2(dim[0], dim[1]);
         let dim = dim.inner_as::<f32>();
 
-        let game_world = Rect::new(0.0, dim.x, 0.0, dim.y);
+        let game_world = axgeom::Rect::new(0.0, dim.x, 0.0, dim.y);
 
         let width = game_world.x.distance() as f64;
         let height = game_world.y.distance() as f64;
@@ -440,7 +440,7 @@ impl WindowedSystem {
         assert_eq!(height as usize, dim.y as usize);
 
         let window_dim = axgeom::FixedAspectVec2 {
-            ratio: AspectRatio(vec2(width as f64, height as f64)),
+            ratio: axgeom::AspectRatio(axgeom::vec2(width as f64, height as f64)),
             width: width as f64,
         };
 
