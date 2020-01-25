@@ -15,7 +15,7 @@ keywords = ["2d-graphics", "2d","graphics","opengl"]
 members = [ "egaku2d_core"]
 
 [dependencies]
-egaku2d_core = {version="0.5.0", path="./egaku2d_core"}
+egaku2d_core = {version="0.5.1", path="./egaku2d_core"}
 glutin = "0.22"
 image = "0.22.3"
 
