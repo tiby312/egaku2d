@@ -18,7 +18,7 @@ impl SpriteSave {
 
         let common = UniformCommon {
             color: sys.color,
-            offset: vec2same(0.0),
+            offset: sys.offset,
         };
         let un = SpriteProgramUniformValues { radius, texture };
         Uniforms {
@@ -78,7 +78,7 @@ impl SpriteSession {
 
         let common = UniformCommon {
             color: sys.color,
-            offset: vec2same(0.0),
+            offset: sys.offset,
         };
         let un = SpriteProgramUniformValues { radius, texture };
 

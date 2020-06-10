@@ -74,7 +74,7 @@ pub mod uniforms {
 
     impl<'a> Uniforms<'a> {
         pub fn with_offset(&mut self, offset: [f32; 2]) -> &mut Self {
-            self.common.offset = vec2(offset[0], offset[1]);
+            self.common.offset += vec2(offset[0], offset[1]);
             self
         }
 
@@ -173,9 +173,14 @@ pub struct SimpleCanvas {
     circle_buffer: vbo::GrowableBuffer<circle_program::Vertex>,
     sprite_buffer: vbo::GrowableBuffer<sprite_program::Vertex>,
     color: [f32; 4], //Default color used
+    offset: Vec2<f32>, //Default offset
 }
 
 impl SimpleCanvas {
+
+    pub fn set_global_offset(&mut self,offset:[f32;2]){
+        self.offset=Vec2::from(offset);
+    }
     pub fn set_default_color(&mut self, color: [f32; 4]) {
         self.color = color;
     }
@@ -233,6 +238,7 @@ impl SimpleCanvas {
             textured_shape_program,
             textured_circle_program,
             color: [1.0; 4],
+            offset: vec2same(0.0)
         }
     }
 

@@ -29,7 +29,6 @@ pub static VS_SRC: &'static str = "
 #version 300 es
 in vec2 position;
 out vec2 pos;
-//out float ps;
 uniform vec2 offset;
 uniform mat3 mmatrix;
 uniform float point_size;
@@ -37,7 +36,6 @@ void main() {
     gl_PointSize = point_size;
     vec3 pp=vec3(position+offset,1.0);
     pos=position*0.005;
-    //ps=gl_PointSize;
     gl_Position = vec4(mmatrix*pp.xyz, 1.0);
 }";
 
@@ -49,7 +47,7 @@ uniform vec4 bcol;
 out vec4 out_color;
 in vec2 pos;
 in float ps;
-//uniform sampler2D tex0;
+
 void main() {
 
     vec2 coord = gl_PointCoord - vec2(0.5,0.5);
@@ -58,8 +56,6 @@ void main() {
         discard;
     }
 
-
-    //out_color = texture(tex0,(coord*0.01*ps))*bcol;
     out_color = bcol;
 }";
 
@@ -70,9 +66,7 @@ uniform vec4 bcol;
 in vec2 pos;
 out vec4 out_color;
 
-//uniform sampler2D tex0;
 void main() {
-    //out_color = texture(tex0,pos)*bcol;
     out_color=bcol;
 }";
 

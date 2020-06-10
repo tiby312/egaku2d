@@ -10,7 +10,7 @@ impl SquareSave {
     pub fn uniforms<'a>(&'a self, sys: &'a mut SimpleCanvas, radius: f32) -> Uniforms<'a> {
         let common = UniformCommon {
             color: sys.color,
-            offset: vec2same(0.0),
+            offset: sys.offset,
         };
         let un = ProgramUniformValues::new(radius, gl::POINTS);
 
@@ -56,7 +56,7 @@ impl SquareSession {
 
         let common = UniformCommon {
             color: sys.color,
-            offset: vec2same(0.0),
+            offset: sys.offset,
         };
         let un = ProgramUniformValues::new(radius, gl::POINTS);
 
@@ -78,7 +78,7 @@ impl CircleSave {
     pub fn uniforms<'a>(&'a self, sys: &'a mut SimpleCanvas, radius: f32) -> Uniforms<'a> {
         let common = UniformCommon {
             color: sys.color,
-            offset: vec2same(0.0),
+            offset: sys.offset,
         };
         let un = ProgramUniformValues::new(radius, gl::POINTS);
 
@@ -118,7 +118,7 @@ impl CircleSession {
 
         let common = UniformCommon {
             color: sys.color,
-            offset: vec2same(0.0),
+            offset: sys.offset,
         };
         let un = ProgramUniformValues::new(radius, gl::POINTS);
 
@@ -147,7 +147,7 @@ impl RectSave {
     pub fn uniforms<'a>(&'a self, sys: &'a mut SimpleCanvas) -> Uniforms<'a> {
         let common = UniformCommon {
             color: sys.color,
-            offset: vec2same(0.0),
+            offset: sys.offset,
         };
         let un = ProgramUniformValues::new(0.0, gl::TRIANGLES);
         let buffer = self.buffer.get_info();
@@ -223,7 +223,7 @@ impl ArrowSave {
     pub fn uniforms<'a>(&'a self, sys: &'a mut SimpleCanvas) -> Uniforms<'a> {
         let common = UniformCommon {
             color: sys.color,
-            offset: vec2same(0.0),
+            offset: sys.offset,
         };
         let un = ProgramUniformValues::new(0.0, gl::TRIANGLES);
         Uniforms {
@@ -326,7 +326,7 @@ impl LineSave {
     pub fn uniforms<'a>(&'a self, sys: &'a mut SimpleCanvas) -> Uniforms<'a> {
         let common = UniformCommon {
             color: sys.color,
-            offset: vec2same(0.0),
+            offset: sys.offset,
         };
         let un = ProgramUniformValues::new(0.0, gl::TRIANGLES);
         Uniforms {
@@ -366,7 +366,7 @@ impl LineSession {
 
         let common = UniformCommon {
             color: sys.color,
-            offset: vec2same(0.0),
+            offset: sys.offset,
         };
 
         let un = ProgramUniformValues::new(0.0, gl::TRIANGLES);

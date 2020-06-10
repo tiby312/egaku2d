@@ -27,9 +27,6 @@ fn main() {
     let background = { canvas.rects().add([0.0, 640.0, 0.0, 480.0]).save(canvas) };
     let rect_save = {
         let mut k = canvas.rects();
-        //k.add([400., 420., 410., 420.]);
-        //k.add([50., 100., 60., 80.]);
-        //k.add([300., 500., 30., 50.]);
         k.add([300., 500., 300., 500.]);
         k.save(canvas)
     };
@@ -103,7 +100,11 @@ fn main() {
 
         Event::MainEventsCleared => {
             if timer.is_ready() {
+
                 let canvas = sys.canvas_mut();
+
+                //canvas.set_default_offset([-cursor[0],-cursor[1]]);
+
 
                 let cc = counter as f32 * 0.1;
                 let wobble = [cc.cos() * 10.0, cc.sin() * 10.0];
@@ -115,11 +116,13 @@ fn main() {
                     .uniforms(canvas)
                     .with_texture(&sky, 2.0, [0.0; 2])
                     .draw();
+
                 sprite_save
                     .uniforms(canvas, &food_tex, 32.0)
                     .with_color(COL4)
                     .with_offset([-wobble[0], -wobble[1]])
                     .draw();
+
                 arrow_save.uniforms(canvas).draw();
                 line_save.uniforms(canvas).with_color(COL2).draw();
                 square_save.uniforms(canvas, 10.0).with_color(COL3).draw();
