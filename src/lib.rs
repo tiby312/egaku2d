@@ -423,7 +423,7 @@ impl WindowedSystem {
         //we are targeting only opengl 3.0 es. and glsl 300 es.
 
         let windowed_context = glutin::ContextBuilder::new()
-            .with_gl(glutin::GlRequest::Specific(glutin::Api::OpenGlEs, (3, 0)))
+            .with_gl(glutin::GlRequest::Specific(glutin::Api::OpenGlEs, (2, 0)))
             .with_vsync(true)
             .build_windowed(gl_window, &events_loop)
             .unwrap();
