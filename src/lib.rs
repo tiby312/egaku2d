@@ -436,8 +436,8 @@ impl WindowedSystem {
 
         //let dpi = windowed_context.window().scale_factor();
         let glutin::dpi::PhysicalSize { width, height } = windowed_context.window().inner_size();
-        assert_eq!(width as usize, dim.x as usize);
-        assert_eq!(height as usize, dim.y as usize);
+        // assert_eq!(width as usize, dim.x as usize);
+        // assert_eq!(height as usize, dim.y as usize);
 
         let window_dim = axgeom::FixedAspectVec2 {
             ratio: axgeom::AspectRatio(axgeom::vec2(width as f64, height as f64)),
