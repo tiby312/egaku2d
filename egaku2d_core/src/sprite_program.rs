@@ -112,8 +112,8 @@ void main()
 #[derive(Copy, Clone, Debug, Default)]
 pub struct Vertex {
     pub pos: [f32; 2], //TODO use half floats??
-    pub index: f32,
-    pub rotation: f32,
+    pub index: u16,
+    pub rotation: u16,
 }
 
 #[derive(Debug)]
@@ -212,7 +212,7 @@ impl SpriteProgram {
             gl::Uniform1i(self.sample_location, 0);
             gl_ok!();
 
-            assert_eq!(core::mem::size_of::<Vertex>(), 16);
+            assert_eq!(core::mem::size_of::<Vertex>(), 12);
 
             let sx = texture.dim[0] / (texture.grid_dim[0] as f32);
             let sy = texture.dim[1] / (texture.grid_dim[1] as f32);
@@ -243,7 +243,7 @@ impl SpriteProgram {
                 2,
                 gl::FLOAT,
                 gl::FALSE as GLboolean,
-                16 as i32,
+                12 as i32,
                 0 as *const _,
             );
             gl_ok!();
@@ -254,9 +254,9 @@ impl SpriteProgram {
             gl::VertexAttribPointer(
                 self.index_attr as GLuint,
                 1,
-                gl::FLOAT,
+                gl::UNSIGNED_SHORT,
                 gl::FALSE as GLboolean,
-                16 as i32,
+                12 as i32,
                 (4 * 2) as *const _,
             );
             gl_ok!();
@@ -269,8 +269,8 @@ impl SpriteProgram {
                 1,
                 gl::UNSIGNED_SHORT,
                 gl::TRUE as GLboolean,
-                16 as i32,
-                ((4 * 2) + 4) as *const _,
+                12 as i32,
+                ((4 * 2) + 2) as *const _,
             );
             gl_ok!();
 

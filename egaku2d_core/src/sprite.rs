@@ -47,8 +47,8 @@ impl SpriteSession {
 
         self.verts.push(sprite_program::Vertex {
             pos: point,
-            index: index as f32,
-            rotation: k as f32 * 0.001,
+            index: index as u16,
+            rotation: k as u16,
         });
         self
     }
