@@ -260,8 +260,7 @@ pub mod fullscreen {
 
             let gl_window = glutin::window::WindowBuilder::new().with_fullscreen(Some(fullscreen));
 
-            //we are targeting only opengl 3.0 es. and glsl 300 es.
-
+            //we are targeting only opengl 2.0 es. and glsl 100.
             let windowed_context = glutin::ContextBuilder::new()
                 .with_gl(glutin::GlRequest::Specific(glutin::Api::OpenGlEs, (2, 0)))
                 .with_vsync(true)
@@ -420,7 +419,7 @@ impl WindowedSystem {
             .with_resizable(false)
             .with_title(title);
 
-        //we are targeting only opengl 3.0 es. and glsl 300 es.
+        //we are targeting only opengl 2.0 es. and glsl 100.
 
         let windowed_context = glutin::ContextBuilder::new()
             .with_gl(glutin::GlRequest::Specific(glutin::Api::OpenGlEs, (2, 0)))
