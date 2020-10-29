@@ -8,9 +8,9 @@ use std::str;
 
 // Shader sources
 pub static VS_SRC: &'static str = "
-#version 300 es
-in vec2 position;
-out float ps;
+#version 100
+attribute vec2 position;
+varying float ps;
 
 uniform vec2 offset;
 uniform mat3 mmatrix;
@@ -24,11 +24,10 @@ void main() {
 
 //https://blog.lapingames.com/draw-circle-glsl-shader/
 pub static CIRCLE_FS_SRC: &'static str = "
-#version 300 es
+#version 100
 precision mediump float;
 uniform vec4 bcol;
-out vec4 out_color;
-in float ps;
+varying float ps;
 uniform sampler2D tex0;
 uniform vec2 texture_dim;
 uniform float texture_scale;
@@ -45,14 +44,13 @@ void main() {
     pos.x=gl_FragCoord.x;
     pos.y=-gl_FragCoord.y;
     
-    out_color = texture(tex0,( ((pos-texture_offset)/texture_dim)/texture_scale))*bcol;
+    gl_FragColor = texture2D(tex0,( ((pos-texture_offset)/texture_dim)/texture_scale))*bcol;
 }";
 
 pub static REGULAR_FS_SRC: &'static str = "
-#version 300 es
+#version 100
 precision mediump float;
 uniform vec4 bcol;
-out vec4 out_color;
 
 uniform vec2 texture_dim;
 uniform float texture_scale;
@@ -63,7 +61,7 @@ void main() {
     vec2 pos;
     pos.x=gl_FragCoord.x;
     pos.y=-gl_FragCoord.y;
-    out_color = texture(tex0, ((pos-texture_offset)/texture_dim)/texture_scale)*bcol;
+    gl_FragColor = texture2D(tex0, ((pos-texture_offset)/texture_dim)/texture_scale)*bcol;
 
 }";
 

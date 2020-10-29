@@ -26,9 +26,9 @@ impl<'a> ProgramUniformValues<'a> {
 
 // Shader sources
 pub static VS_SRC: &'static str = "
-#version 300 es
-in vec2 position;
-out vec2 pos;
+#version 100
+attribute vec2 position;
+varying vec2 pos;
 uniform vec2 offset;
 uniform mat3 mmatrix;
 uniform float point_size;
@@ -41,12 +41,11 @@ void main() {
 
 //https://blog.lapingames.com/draw-circle-glsl-shader/
 pub static CIRCLE_FS_SRC: &'static str = "
-#version 300 es
+#version 100
 precision mediump float;
 uniform vec4 bcol;
-out vec4 out_color;
-in vec2 pos;
-in float ps;
+varying vec2 pos;
+varying float ps;
 
 void main() {
 
@@ -56,18 +55,17 @@ void main() {
         discard;
     }
 
-    out_color = bcol;
+    gl_FragColor = bcol;
 }";
 
 pub static REGULAR_FS_SRC: &'static str = "
-#version 300 es
+#version 100
 precision mediump float;
 uniform vec4 bcol;
-in vec2 pos;
-out vec4 out_color;
+varying vec2 pos;
 
 void main() {
-    out_color=bcol;
+    gl_FragColor=bcol;
 }";
 
 #[repr(transparent)]

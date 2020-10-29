@@ -119,7 +119,7 @@ fn main() {
 
                 sprite_save
                     .uniforms(canvas, &food_tex, 32.0)
-                    .with_color(COL4)
+                    .with_color(WHITE)
                     .with_offset([-wobble[0], -wobble[1]])
                     .draw();
 
