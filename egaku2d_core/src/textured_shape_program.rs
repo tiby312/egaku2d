@@ -222,40 +222,49 @@ impl TexturedShapeProgram {
             gl::UseProgram(program);
             gl_ok!();
 
+            let temp=CString::new("texture_scale").unwrap();
             let texture_scale_uniform: GLint =
-                gl::GetUniformLocation(program, CString::new("texture_scale").unwrap().as_ptr());
+                gl::GetUniformLocation(program, temp.as_ptr());
             gl_ok!();
 
+            let temp=CString::new("texture_dim").unwrap();
             let texture_dim_uniform: GLint =
-                gl::GetUniformLocation(program, CString::new("texture_dim").unwrap().as_ptr());
+                gl::GetUniformLocation(program, temp.as_ptr());
             gl_ok!();
 
+            let temp=CString::new("texture_offset").unwrap();
             let texture_offset_uniform: GLint =
-                gl::GetUniformLocation(program, CString::new("texture_offset").unwrap().as_ptr());
+                gl::GetUniformLocation(program, temp.as_ptr());
             gl_ok!();
 
+            let temp=CString::new("point_size").unwrap();
             let point_size_uniform: GLint =
-                gl::GetUniformLocation(program, CString::new("point_size").unwrap().as_ptr());
+                gl::GetUniformLocation(program, temp.as_ptr());
             gl_ok!();
 
+            let temp=CString::new("mmatrix").unwrap();
             let matrix_uniform: GLint =
-                gl::GetUniformLocation(program, CString::new("mmatrix").unwrap().as_ptr());
+                gl::GetUniformLocation(program, temp.as_ptr());
             gl_ok!();
 
+            let temp=CString::new("bcol").unwrap();
             let bcol_uniform: GLint =
-                gl::GetUniformLocation(program, CString::new("bcol").unwrap().as_ptr());
+                gl::GetUniformLocation(program, temp.as_ptr());
             gl_ok!();
 
+            let temp=CString::new("offset").unwrap();
             let offset_uniform: GLint =
-                gl::GetUniformLocation(program, CString::new("offset").unwrap().as_ptr());
+                gl::GetUniformLocation(program, temp.as_ptr());
             gl_ok!();
 
+            let temp=CString::new("position").unwrap();
             let pos_attr =
-                gl::GetAttribLocation(program, CString::new("position").unwrap().as_ptr());
+                gl::GetAttribLocation(program, temp.as_ptr());
             gl_ok!();
 
+            let temp=CString::new("tex0").unwrap();
             let sample_location =
-                gl::GetAttribLocation(program, CString::new("tex0").unwrap().as_ptr());
+                gl::GetAttribLocation(program, temp.as_ptr());
             gl_ok!();
 
             TexturedShapeProgram {

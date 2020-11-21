@@ -310,48 +310,59 @@ impl SpriteProgram {
             gl::UseProgram(program);
             gl_ok!();
 
+            let temp=CString::new("grid_dim").unwrap();
             let grid_dim_uniform: GLint =
-                gl::GetUniformLocation(program, CString::new("grid_dim").unwrap().as_ptr());
+                gl::GetUniformLocation(program, temp.as_ptr());
             gl_ok!();
 
+            let temp=CString::new("sprite_dim").unwrap();
             let sprite_dim_uniform: GLint =
-                gl::GetUniformLocation(program, CString::new("sprite_dim").unwrap().as_ptr());
+                gl::GetUniformLocation(program, temp.as_ptr());
             gl_ok!();
 
+            let temp=CString::new("square").unwrap();
             let square_uniform: GLint =
-                gl::GetUniformLocation(program, CString::new("square").unwrap().as_ptr());
+                gl::GetUniformLocation(program, temp.as_ptr());
             gl_ok!();
 
+            let temp=CString::new("point_size").unwrap();
             let point_size_uniform: GLint =
-                gl::GetUniformLocation(program, CString::new("point_size").unwrap().as_ptr());
+                gl::GetUniformLocation(program, temp.as_ptr());
             gl_ok!();
 
+            let temp=CString::new("mmatrix").unwrap();
             let matrix_uniform: GLint =
-                gl::GetUniformLocation(program, CString::new("mmatrix").unwrap().as_ptr());
+                gl::GetUniformLocation(program, temp.as_ptr());
             gl_ok!();
 
+            let temp=CString::new("bcol").unwrap();
             let bcol_uniform: GLint =
-                gl::GetUniformLocation(program, CString::new("bcol").unwrap().as_ptr());
+                gl::GetUniformLocation(program, temp.as_ptr());
             gl_ok!();
 
+            let temp=CString::new("offset").unwrap();
             let offset_uniform: GLint =
-                gl::GetUniformLocation(program, CString::new("offset").unwrap().as_ptr());
+                gl::GetUniformLocation(program, temp.as_ptr());
             gl_ok!();
 
+            let temp=CString::new("position").unwrap();
             let pos_attr =
-                gl::GetAttribLocation(program, CString::new("position").unwrap().as_ptr());
+                gl::GetAttribLocation(program, temp.as_ptr());
             gl_ok!();
 
+            let temp=CString::new("cellindex").unwrap();
             let index_attr =
-                gl::GetAttribLocation(program, CString::new("cellindex").unwrap().as_ptr());
+                gl::GetAttribLocation(program, temp.as_ptr());
             gl_ok!();
 
+            let temp=CString::new("rotation").unwrap();
             let rotation_attr =
-                gl::GetAttribLocation(program, CString::new("rotation").unwrap().as_ptr());
+                gl::GetAttribLocation(program, temp.as_ptr());
             gl_ok!();
 
+            let temp=CString::new("tex0").unwrap();
             let sample_location =
-                gl::GetAttribLocation(program, CString::new("tex0").unwrap().as_ptr());
+                gl::GetAttribLocation(program, temp.as_ptr());
             gl_ok!();
 
             SpriteProgram {

@@ -16,7 +16,7 @@ members = [ "egaku2d_core"]
 
 [dependencies]
 egaku2d_core = {version="0.5.1", path="./egaku2d_core"}
-glutin = "0.22"
+glutin = "0.25"
 image = "0.22.3"
 
 [features]
