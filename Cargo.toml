@@ -1,6 +1,6 @@
 [package]
 name = "egaku2d"
-version = "0.5.2"
+version = "0.5.3"
 authors = ["Ken Reed <kenakioreed@gmail.com>"]
 repository = "https://github.com/tiby312/egaku2d"
 readme = "README.md"
