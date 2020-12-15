@@ -185,6 +185,8 @@ pub use egaku2d_core::shapes;
 pub use egaku2d_core::sprite;
 pub use egaku2d_core::uniforms;
 pub use egaku2d_core::SimpleCanvas;
+use egaku2d_core::FixedAspectVec2;
+use egaku2d_core::AspectRatio;
 
 mod onein {
     use std::sync::atomic::{AtomicUsize, Ordering::SeqCst};
@@ -384,7 +386,7 @@ pub mod fullscreen {
 ///A version where the user can control the size of the window.
 pub struct WindowedSystem {
     inner: SimpleCanvas,
-    window_dim: axgeom::FixedAspectVec2,
+    window_dim: FixedAspectVec2,
     windowed_context: glutin::WindowedContext<PossiblyCurrent>,
 }
 
@@ -439,8 +441,8 @@ impl WindowedSystem {
         assert_eq!(width as usize, dim.x as usize);
         assert_eq!(height as usize, dim.y as usize);
 
-        let window_dim = axgeom::FixedAspectVec2 {
-            ratio: axgeom::AspectRatio(axgeom::vec2(width as f64, height as f64)),
+        let window_dim = FixedAspectVec2 {
+            ratio: AspectRatio(axgeom::vec2(width as f64, height as f64)),
             width: width as f64,
         };
 

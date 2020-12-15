@@ -14,7 +14,7 @@ repository = "https://github.com/tiby312/egaku2d"
 
 
 [dependencies]
-axgeom = "1.6"
+axgeom = "1.9"
 
 
 [build-dependencies]

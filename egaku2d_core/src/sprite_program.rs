@@ -1,7 +1,5 @@
 use crate::gl;
-
 use crate::shader::*;
-use axgeom;
 use std::ffi::CString;
 use std::str;
 
@@ -142,7 +140,7 @@ pub struct SpriteProgramUniformValues<'a> {
 impl SpriteProgram {
     pub fn set_viewport(
         &mut self,
-        window_dim: axgeom::FixedAspectVec2,
+        window_dim: FixedAspectVec2,
         game_width: f32,
     ) -> PointMul {
         let game_height = window_dim.ratio.height_over_width() as f32 * game_width;
